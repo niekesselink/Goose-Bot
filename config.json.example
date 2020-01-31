@@ -1,0 +1,10 @@
+{
+  "token": "insert token here",
+  "description": "Sustainable Bird gaming server bot.",
+  "username": "Sustainable Geese",
+  "playing": "Lars Simulator '20",
+  "prefix": [
+    "!",
+    "."
+  ]
+}
