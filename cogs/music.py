@@ -43,22 +43,32 @@ class Music(commands.Cog):
             await ctx.send('Honk honk. No. Playing already bitch.')
             return
 
-        # We need to download it, inform the user
-        await ctx.send('Honk honk. Wait a little bit, getting the audio ready...')
-
         # Define download options
         ydl_opts = {
             'format': 'bestaudio/best',
+            'noplaylist': True,
             'outtmpl': 'audio.mp3',
             'postprocessors': [{
                 'key': 'FFmpegExtractAudio',
                 'preferredcodec': 'mp3',
                 'preferredquality': '192',
-            }],
+            }]
         }
 
-        # Download from YouTube now using youtube-dl package
+        # Declare the youtube-dl downloader
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+            # Download the metadata of the video
+            meta = ydl.extract_info([url], download=False)
+
+            # Only allow if it's not longer than 6 minutes
+            if meta['duration'] > 360:
+                await ctx.send('Honk honk. Nobody got time to listen to that.')
+                return
+
+            # We need to download it, inform the chat
+            await ctx.send('Honk honk. Wait a little bit, getting the audio ready...')
+
+            # Download from YouTube now, finish using the downloader
             ydl.download([url])
 
         # Now let's actually start playing
