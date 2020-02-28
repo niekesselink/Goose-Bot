@@ -5,10 +5,12 @@ import os
 from discord.ext import commands
 from discord import FFmpegPCMAudio
 from os import system
+from utils import data
 
 class Music(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.config = data.getjson('config.json')
 
     @commands.command(brief='Makes the bot join your channel')
     async def join(self, ctx):
@@ -40,7 +42,7 @@ class Music(commands.Cog):
             if song_there:
                 os.remove('audio.mp3')
         except PermissionError:
-            await ctx.send('Honk honk. No. Playing already bitch.')
+            await ctx.send('Honk honk. Already honking can\'t you hear?')
             return
 
         # Define download options
@@ -60,13 +62,13 @@ class Music(commands.Cog):
             # Download the metadata of the video
             meta = ydl.extract_info(url, download=False)
 
-            # Only allow if it's not longer than 6 minutes
-            if meta['duration'] > 360:
-                await ctx.send('Honk honk. Nobody got time to listen to that.')
+            # Only allow if it's not longer than set amount of minutes
+            if meta['duration'] > self.config.music.maxduration:
+                await ctx.send(f'Honk honk. No, I\'m not going to honk longer than {self.config.music.maxduration} seconds.')
                 return
 
             # We need to download it, inform the chat
-            await ctx.send('Honk honk. Wait a little bit, getting the audio ready...')
+            await ctx.send('Honk honk. Wait a little bit, stealing the music...')
 
             # Download from YouTube now, finish using the downloader
             ydl.download([url])
