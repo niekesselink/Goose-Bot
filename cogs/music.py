@@ -58,7 +58,7 @@ class Music(commands.Cog):
         # Declare the youtube-dl downloader
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
             # Download the metadata of the video
-            meta = ydl.extract_info([url], download=False)
+            meta = ydl.extract_info(url, download=False)
 
             # Only allow if it's not longer than 6 minutes
             if meta['duration'] > 360:
