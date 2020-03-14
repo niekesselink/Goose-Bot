@@ -36,6 +36,11 @@ class Music(commands.Cog):
 
     @commands.command(brief='This will play a song \'play [url]\'')
     async def play(self, ctx, url: str):
+        # Now just a check to see if we're not playing...
+        if ctx.voice_client.is_playing():
+            await ctx.send('Honk honk. Already honking can\'t you hear?')
+            return
+
         # Remove previous downloaded file.
         song_there = os.path.isfile('audio.mp3')
         try:
@@ -43,11 +48,6 @@ class Music(commands.Cog):
                 os.remove('audio.mp3')
         except:
             pass
-
-        # Now just a check to see if we're not playing...
-        if ctx.voice_client.is_playing():
-            await ctx.send('Honk honk. Already honking can\'t you hear?')
-            return
 
         # Define download options
         ydl_opts = {
