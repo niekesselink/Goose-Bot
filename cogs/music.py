@@ -36,12 +36,16 @@ class Music(commands.Cog):
 
     @commands.command(brief='This will play a song \'play [url]\'')
     async def play(self, ctx, url: str):
-        # Get the previous downloaded audio file, remove it if we aren't playing already (file in use)
+        # Remove previous downloaded file.
         song_there = os.path.isfile('audio.mp3')
         try:
             if song_there:
                 os.remove('audio.mp3')
-        except PermissionError:
+        except:
+            pass
+
+        # Now just a check to see if we're not playing...
+        if ctx.voice_client.is_playing():
             await ctx.send('Honk honk. Already honking can\'t you hear?')
             return
 
@@ -57,21 +61,22 @@ class Music(commands.Cog):
             }]
         }
 
-        # Declare the youtube-dl downloader
-        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-            # Download the metadata of the video
-            meta = ydl.extract_info(url, download=False)
+        # Inform the chat; checking and preparing the song...
+        await ctx.send('Honk honk. Wait a little bit, stealing the music...')
 
-            # Only allow if it's not longer than set amount of minutes
-            if meta['duration'] > self.config.music.maxduration:
-                await ctx.send(f'Honk honk. No, I\'m not going to honk longer than {self.config.music.maxduration} seconds.')
-                return
+        # Start typing incidicator and declare the youtube-dl downloader
+        async with ctx.typing():
+            with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+                # Download the metadata of the video
+                meta = ydl.extract_info(url, download=False)
 
-            # We need to download it, inform the chat
-            await ctx.send('Honk honk. Wait a little bit, stealing the music...')
+                # Only allow if it's not longer than set amount of minutes
+                if meta['duration'] > self.config.music.maxduration:
+                    await ctx.send(f'Honk honk. No, I\'m not going to honk longer than {self.config.music.maxduration} seconds.')
+                    return
 
-            # Download from YouTube now, finish using the downloader
-            ydl.download([url])
+                # Download from YouTube now, finish using the downloader
+                ydl.download([url])
 
         # Now let's actually start playing
         ctx.voice_client.play(discord.FFmpegPCMAudio('audio.mp3'))
