@@ -47,7 +47,8 @@ class Music(commands.Cog):
             if song_there:
                 os.remove('audio.mp3')
         except:
-            pass
+            await ctx.send('Honk honk. You broke it! Wait a bit or ask the creator of me... honk.')
+            return
 
         # Define download options
         ydl_opts = {
