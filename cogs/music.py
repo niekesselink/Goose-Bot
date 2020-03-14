@@ -1,9 +1,9 @@
 import discord
-import youtube_dl
 import os
+import youtube_dl
 
-from discord.ext import commands
 from discord import FFmpegPCMAudio
+from discord.ext import commands
 from os import system
 from utils import data
 
