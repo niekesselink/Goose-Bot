@@ -1,8 +1,8 @@
 import discord
 import re
+import requests
 
 from discord.ext import commands
-from utils import aid2
 from utils import data
 
 STORIES = {}
@@ -20,11 +20,35 @@ STATUS_CHARACTER = 'character'
 STATUS_NAME = 'name'
 STATUS_STORY = 'story'
 
+URL = 'https://api.aidungeon.io'
+
+TOKEN = None
+CONFIG = None
+MAX_RERUN = 5
+
 class AIDungeon(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.config = data.getjson('config.json')
-        aid2.init_session(self.config)
+        self.setup_aid()
+
+    def setup_aid(self):
+        global TOKEN
+
+        data = {}
+        data['email'] = self.config.aid2.email
+        data['password'] = self.config.aid2.password
+
+        r = requests.post(f'{URL}/users', data)
+
+        if not r.ok:
+            print('/users', r.status_code, r.reason)
+            return None
+
+        try:
+            TOKEN = r.json()['accessToken']
+        except (ValueError, KeyError):
+            print(f'{URL}/users: invalid response: {r.content}')
 
     @commands.command(brief='Information on how to play AIDungeon with this bot')
     async def how(self, ctx):
@@ -66,12 +90,29 @@ class AIDungeon(commands.Cog):
 
                 # And now we continue it if not running into an error...
                 async with message.channel.typing():
-                    result = aid2.continue_story(story['id'], message.content)
-                    if result is not None:
-                        await message.channel.send(f'Honk honk. {message.author.mention}. ```{result}```')
-                    else:
-                        await message.channel.send(f'Honk! Error in your story {message.author.mention}, I give up. Bye, honk.')
+                    data = {
+                        'text': message.content
+                    }
+
+                    r = None
+                    times = 0
+                    story_id = story['id']
+
+                    while (r is None or r.status_code >= 500) and times < MAX_RERUN:
+                        r = requests.post(f'{URL}/sessions/{story_id}/inputs', data, headers={'X-Access-Token': TOKEN})
+                        times += 1
+
+                    if not r.ok:
+                        await message.channel.send(f'Honk! Error in your continuing story {message.author.mention}, request error, I give up. Bye, honk.')
                         del STORIES[userSlang]
+                    else:
+                        try:
+                            r = r.json()
+                            result = r[-1]['value']
+                            await message.channel.send(f'Honk honk. {message.author.mention}. ```{result}```')
+                        except (ValueError, KeyError, IndexError):
+                            await message.channel.send(f'Honk! Error in continuing your story {message.author.mention}, value error, I give up. Bye, honk.')
+                            del STORIES[userSlang]
 
     # Function that creates a story, it's a little bit complicated this one.
     async def new_story(self, userSlang, message):
@@ -165,15 +206,35 @@ class AIDungeon(commands.Cog):
             # We are typing...
             async with message.channel.typing():
                 # Create the story!
-                story_id, result = aid2.init_story(story['mode'], story['character'], story['name'])
+                data = {
+                    'storyMode': story['mode'],
+                    'characterType': story['character'],
+                    'name': story['name'],
+                    'customPrompt': None,
+                    'promptId': None
+                }
 
-                if result is not None:
-                    story['id'] = story_id
-                    story['status'] = STATUS_STORY
-                    await message.channel.send(f'Honk honk. {message.author.mention}. ```{result}```')
-                else:
-                    await message.channel.send(f'Honk! Error in your story {message.author.mention}, I give up. Bye, honk.')
+                r = None
+                times = 0
+
+                while (r is None or r.status_code >= 500) and times < MAX_RERUN:
+                    r = requests.post(f'{URL}/sessions', data, headers={'X-Access-Token': TOKEN})
+                    times += 1
+
+                if not r.ok:
+                    await message.channel.send(f'Honk! Error in starting your story {message.author.mention}, request error, I give up. Bye, honk.')
                     del STORIES[userSlang]
+                else:
+                    try:
+                        r = r.json()
+                        story['id'] = r['id']
+                        story['status'] = STATUS_STORY
+
+                        result = r['story'][0]['value']
+                        await message.channel.send(f'Honk honk. {message.author.mention}. ```{result}```')
+                    except (ValueError, KeyError, IndexError):
+                        await message.channel.send(f'Honk! Error in starting your story {message.author.mention}, value error, I give up. Bye, honk.')
+                        del STORIES[userSlang]
 
 def setup(bot):
     bot.add_cog(AIDungeon(bot))
