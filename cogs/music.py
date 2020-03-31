@@ -42,10 +42,10 @@ class Music(commands.Cog):
             return
 
         # Remove previous downloaded file.
-        song_there = os.path.isfile('audio.mp3')
+        song_there = os.path.isfile(f'{ctx.guild.id}.mp3')
         try:
             if song_there:
-                os.remove('audio.mp3')
+                os.remove(f'{ctx.guild.id}.mp3')
         except:
             await ctx.send('Honk honk. You broke it! Wait a bit or ask the creator of me... honk.')
             return
@@ -54,7 +54,7 @@ class Music(commands.Cog):
         ydl_opts = {
             'format': 'bestaudio/best',
             'noplaylist': True,
-            'outtmpl': 'audio.mp3',
+            'outtmpl': f'{ctx.guild.id}.mp3',
             'postprocessors': [{
                 'key': 'FFmpegExtractAudio',
                 'preferredcodec': 'mp3',
@@ -80,7 +80,7 @@ class Music(commands.Cog):
                 ydl.download([url])
 
         # Now let's actually start playing
-        ctx.voice_client.play(discord.FFmpegPCMAudio('audio.mp3'))
+        ctx.voice_client.play(discord.FFmpegPCMAudio(f'{ctx.guild.id}.mp3'))
 
         # Inform that we are playing now
         await ctx.send('HONK HONK! PLAYING!')

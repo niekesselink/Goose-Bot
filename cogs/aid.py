@@ -36,8 +36,8 @@ class AIDungeon(commands.Cog):
         global TOKEN
 
         data = {}
-        data['email'] = self.config.aid2.email
-        data['password'] = self.config.aid2.password
+        data['email'] = self.config.aid.email
+        data['password'] = self.config.aid.password
 
         r = requests.post(f'{URL}/users', data)
 

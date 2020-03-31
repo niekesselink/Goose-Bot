@@ -350,5 +350,5 @@ MigrationBackup/
 .ionide/
 
 # Specific for this app
-/audio.mp3
+/*.mp3
 /config.json
