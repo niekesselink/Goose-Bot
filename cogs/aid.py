@@ -1,5 +1,4 @@
 import discord
-import re
 import requests
 
 from discord.ext import commands
@@ -20,47 +19,53 @@ STATUS_CHARACTER = 'character'
 STATUS_NAME = 'name'
 STATUS_STORY = 'story'
 
-URL = 'https://api.aidungeon.io'
-
-TOKEN = None
-CONFIG = None
 MAX_RERUN = 5
+TOKEN = None
+URL = 'https://api.aidungeon.io'
 
 class AIDungeon(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.config = data.getjson('config.json')
-        self.setup_aid()
+        self.get_token()
 
-    def setup_aid(self):
+    def get_token(self):
         global TOKEN
 
+        # Declare data.
         data = {}
         data['email'] = self.config.aid.email
         data['password'] = self.config.aid.password
 
+        # Make the request for a token.
         r = requests.post(f'{URL}/users', data)
-
+        
+        # Did it fail?
         if not r.ok:
             print('/users', r.status_code, r.reason)
             return None
 
+        # Save, or die.
         try:
             TOKEN = r.json()['accessToken']
         except (ValueError, KeyError):
             print(f'{URL}/users: invalid response: {r.content}')
 
-    @commands.command(brief='Information on how to play AIDungeon with this bot')
+    @commands.command()
     async def how(self, ctx):
+        """ Information on how to play AIDungeon with this bot """
+
         # Just send a message
         await ctx.send(f'Honk honk. To play AIDungeon, just @ me and say "new story", stop a story by saying "end story".\n'
                        f'No need to @ mention me during creation but you have to do that afterwards, oke? Honk honk.')
 
+    # Listener for messages.
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
-        # Ignore messages sent by the bot
-        if message.author == self.bot.user:
-            return
+
+        # Ignore private.
+        if not message.guild:
+            return;
 
         # Create an user slang used to keep track of stories...
         userSlang = f'{message.guild.id}/{message.channel.id}/{message.author.id}'
@@ -71,7 +76,6 @@ class AIDungeon(commands.Cog):
 
         # We listen here to mentions, not to commands, so check if we are mentioned...
         if self.bot.user in message.mentions:
-            message.content = re.sub(r'<@[^>]+>', '', message.content).strip()
 
             # Regardless of being in a story or not, do we want a new one?
             if message.content.lower().startswith('new story'):
@@ -116,6 +120,7 @@ class AIDungeon(commands.Cog):
 
     # Function that creates a story, it's a little bit complicated this one.
     async def new_story(self, userSlang, message):
+
         # Creating a new one? Declare it.
         if userSlang not in STORIES:
             STORIES[userSlang] = {
@@ -154,6 +159,7 @@ class AIDungeon(commands.Cog):
             if mode not in MODES:
                 await message.channel.send(f'Honk! That was not one of the options... honk!')
             else:
+
                 # Save the mode.
                 story['mode'] = mode
                 
@@ -184,6 +190,7 @@ class AIDungeon(commands.Cog):
             if character not in MODES[story['mode']]:
                 await message.channel.send(f'Honk! That was not one of the options... honk!')
             else:
+
                 # Save it.
                 story['character'] = character
 
@@ -196,6 +203,7 @@ class AIDungeon(commands.Cog):
 
         # And we got a response... you know the story.
         elif story['status'] == STATUS_NAME:
+
             # Save the name.
             story['name'] = message.content.strip()
 
