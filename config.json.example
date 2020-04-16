@@ -12,6 +12,7 @@
     "password": "insert aidungeon password here"
   },
   "music": {
-    "maxduration": 360
+    "maxduration": 360,
+    "volume": 1
   }
 }
