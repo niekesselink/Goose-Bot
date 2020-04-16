@@ -2,7 +2,6 @@ import discord
 import requests
 
 from discord.ext import commands
-from utils import data
 
 STORIES = {}
 
