@@ -2,7 +2,6 @@
   "token": "insert token here",
   "description": "insert description for the bot here",
   "username": "insert username for the bot here",
-  "playing": "insert game playing for the bot here",
   "prefix": [
     "!",
     "."

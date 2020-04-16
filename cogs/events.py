@@ -21,7 +21,7 @@ class Events(commands.Cog):
         # Change the name and status of the bot
         await self.bot.user.edit(username=self.config.username)
         await self.bot.change_presence(
-            activity=discord.Game(type=3, name=self.config.playing),
+            activity=discord.Activity(type=discord.ActivityType.listening, name='humans.'),
             status=discord.Status.online
         )
 
