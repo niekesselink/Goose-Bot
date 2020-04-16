@@ -53,6 +53,14 @@ class General(commands.Cog):
 
     @commands.is_owner()
     @commands.command(hidden=True)
+    async def reloadconfig(self, ctx):
+        """ Reloads the config.json """
+
+        self.bot.reloadconfig()
+        await ctx.send(f'Honk honk, configuration file has been reloaded!')
+
+    @commands.is_owner()
+    @commands.command(hidden=True)
     async def pull(self, ctx):
         """ Pulls the most recent version from the repository """
 

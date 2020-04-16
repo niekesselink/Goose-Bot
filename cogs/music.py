@@ -4,14 +4,12 @@ import youtube_dl
 
 from discord import FFmpegPCMAudio
 from discord.ext import commands
-from utils import data
 
 QUEUES = {}
 
 class Music(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.config = data.getjson('config.json')
 
     @commands.command(no_pm=True)
     async def join(self, ctx):
@@ -83,8 +81,8 @@ class Music(commands.Cog):
                 meta = ydl.extract_info(url, download=False)
 
                 # Only allow if it's not longer than set amount of minutes
-                if meta['duration'] > self.config.music.maxduration:
-                    await ctx.send(f'Honk honk. No, I\'m not going to honk longer than {self.config.music.maxduration} seconds.')
+                if meta['duration'] > self.bot.config.music.maxduration:
+                    await ctx.send(f'Honk honk. No, I\'m not going to honk longer than {self.bot.config.music.maxduration} seconds.')
                     return
 
                 # Are we playing already? If so, add the song to the queue.
@@ -149,7 +147,7 @@ class Music(commands.Cog):
             ydl.download([url])
 
         # Set a proper volume...
-        volume = self.config.music.volume
+        volume = self.bot.config.music.volume
         if ctx.voice_client.source is not None:
             volume = ctx.voice_client.source.volume
 

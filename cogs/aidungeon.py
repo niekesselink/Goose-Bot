@@ -26,7 +26,6 @@ URL = 'https://api.aidungeon.io'
 class AIDungeon(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.config = data.getjson('config.json')
         self.get_token()
 
     def get_token(self):
@@ -34,8 +33,8 @@ class AIDungeon(commands.Cog):
 
         # Declare data.
         data = {}
-        data['email'] = self.config.aid.email
-        data['password'] = self.config.aid.password
+        data['email'] = self.bot.config.aid.email
+        data['password'] = self.bot.config.aid.password
 
         # Make the request for a token.
         r = requests.post(f'{URL}/users', data)

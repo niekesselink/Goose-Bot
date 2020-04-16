@@ -4,7 +4,7 @@ from discord.ext import commands
 from utils import data
 
 INSTALLED_COGS = [
-    'cogs.aidungeon',
+    # 'cogs.aidungeon',
     'cogs.general',
     'cogs.image',
     'cogs.music',
@@ -32,6 +32,8 @@ class Bot(commands.Bot):
             self.unload_extension(cog)
             self.log(f'Unloaded {cog}', 'Goose-Bot')
 
+    def reloadconfig (self):
+        self.config = data.getjson('config.json')
 
     async def on_command(self, ctx):
         self.log(ctx.message.clean_content, ctx.author.name)
