@@ -18,7 +18,7 @@ class General(commands.Cog):
 
     @commands.command()
     async def honk(self, ctx):
-        """ Honk! """
+        """ Honk! This is a response test """
 
         honk = await ctx.send('HONK!')
         difference = honk.created_at - ctx.message.created_at
