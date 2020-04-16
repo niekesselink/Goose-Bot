@@ -3,7 +3,7 @@ import discord
 from discord.ext import commands
 from utils import data
 
-COGS = [
+INSTALLED_COGS = [
     'cogs.aidungeon',
     'cogs.general',
     'cogs.image',
