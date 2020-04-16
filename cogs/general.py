@@ -32,7 +32,7 @@ class General(commands.Cog):
         """ Load a specific cog """
 
         self.bot.load(cog)
-        await ctx.send(f"Honk honk, {cog} has been loaded!")
+        await ctx.send(f'Honk honk, {cog} has been loaded!')
 
     @commands.is_owner()
     @commands.command(hidden=True)
@@ -40,25 +40,26 @@ class General(commands.Cog):
         """ Unload a specific cog """
 
         self.bot.unload(cog)
-        await ctx.send(f"Honk honk, {cog} has been unloaded!")
+        await ctx.send(f'Honk honk, {cog} has been unloaded!')
 
     @commands.is_owner()
     @commands.command(hidden=True)
     async def reload(self, ctx, cog):
         """ Reloads a specific cog """
 
-        self.bot.reload(cog)
-        await ctx.send(f"Honk honk, {cog} has been reloaded!")
+        self.bot.unload(cog)
+        self.bot.load(cog)
+        await ctx.send(f'Honk honk, {cog} has been reloaded!')
 
     @commands.is_owner()
     @commands.command(hidden=True)
     async def pull(self, ctx):
         """ Pulls the most recent version from the repository """
 
-        response = os.popen("git pull").read()
+        response = os.popen('git pull').read()
         await ctx.send(embed=discord.Embed(
-            title="Git pull...",
-            description=f"```diff\n{response}\n```",
+            title='Honk. Updating myself...',
+            description=f'```diff\n{response}\n```',
             colour=0x009688,
         ))
 

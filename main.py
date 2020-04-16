@@ -1,10 +1,9 @@
 import discord
-import os
 
 from discord.ext import commands
 from utils import data
 
-INSTALLED_COGS = [
+COGS = [
     'cogs.aidungeon',
     'cogs.general',
     'cogs.image',
@@ -15,8 +14,10 @@ class Bot(commands.Bot):
     def __init__(self, *args, **kwargs):
         self.log('Initialising bot', 'Goose-Bot')
         self.config = data.getjson('config.json')
-
         super().__init__(command_prefix=self.config.prefix, description=self.config.description, *args, **kwargs)
+
+    def token(self):
+        return self.config.token
 
     def log(self, value, name=None):
         print(f'[{name}]', value)
@@ -31,12 +32,6 @@ class Bot(commands.Bot):
             self.unload_extension(cog)
             self.log(f'Unloaded {cog}', 'Goose-Bot')
 
-    def reload(self, cog):
-        self.unload(cog)
-        self.load(cog)
-
-    def token(self):
-        return self.config.token
 
     async def on_command(self, ctx):
         self.log(ctx.message.clean_content, ctx.author.name)
@@ -48,19 +43,15 @@ class Bot(commands.Bot):
             status=discord.Status.online
         )
 
-    async def on_error(event, *args, **kwargs):
-        await ctx.send(print_error(args[0]))
-
     async def on_command_error(self, ctx, exception):
         if type(exception) == discord.ext.commands.errors.CommandNotFound:
             return
 
-        await ctx.send(print_error(exception))
-
-    def print_error(self, exception):
-        error_embed = discord.Embed(colour=0xFF0000)
-        error_embed.title = "Oeps. A honking error..."
-        error_embed.description = "`" + str(exception) + "`"
+        await ctx.send(embed=discord.Embed(
+            title='Oeps. A honking error...',
+            description=f'`{str(exception)}`',
+            colour=0xFF0000,
+        ))
 
 def main():
     bot = Bot()
