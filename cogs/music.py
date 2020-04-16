@@ -71,7 +71,9 @@ class Music(commands.Cog):
 
         # Declare youtube-dl options, simplified.
         ydl_opts = {
-            'noplaylist': True
+            'noplaylist': True,
+            'skip_download': True,
+            'quiet': True
         }
 
         # Declare the youtube-dl downloader and start typing incidicator.
@@ -118,6 +120,10 @@ class Music(commands.Cog):
         # If we don't have an url, then get one from the queue.
         if url is None:
 
+            # Do we have a queue? If not, end.
+            if ctx.guild.id not in QUEUES:
+                return
+
             # First check if we actually have an entry, if not stop and clear queue.
             if len(QUEUES[ctx.guild.id]) == 0:
                 del(QUEUES[ctx.guild.id])
@@ -129,8 +135,8 @@ class Music(commands.Cog):
 
         # Declare the options for youtube-dl.
         ydl_opts = {
-            'format': 'bestaudio/best',
             'noplaylist': True,
+            'format': 'bestaudio/best',
             'outtmpl': f'{ctx.guild.id}.mp3',
             'postprocessors': [{
                 'key': 'FFmpegExtractAudio',
