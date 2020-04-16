@@ -1,4 +1,5 @@
 import discord
+import os
 import subprocess
 
 from discord.ext import commands
@@ -48,6 +49,18 @@ class General(commands.Cog):
 
         self.bot.reload(cog)
         await ctx.send(f"Honk honk, {cog} has been reloaded!")
+
+    @commands.is_owner()
+    @commands.command(hidden=True)
+    async def pull(self, ctx):
+        """ Pulls the most recent version from the repository """
+
+        response = os.popen("git pull").read()
+        await ctx.send(embed=discord.Embed(
+            title="Git pull...",
+            description=f"```diff\n{response}\n```",
+            colour=0x009688,
+        ))
 
 def setup(bot):
     bot.add_cog(General(bot))
