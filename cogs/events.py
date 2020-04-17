@@ -31,7 +31,8 @@ class Events(commands.Cog):
 
         await ctx.send(embed=discord.Embed(
             title='Oeps. A honking error...',
-            description=f'`{str(exception)}`',
+            #description=f'`{str(exception)}`',
+            description=f'`We hate big error logs that do not make sense. Just try another song... that worked.`',
             colour=0xFF0000,
         ))
         
