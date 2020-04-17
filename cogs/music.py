@@ -11,7 +11,8 @@ class Music(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(no_pm=True)
+    @commands.command()
+    @commands.guild_only()
     async def join(self, ctx):
         """ Summons the goose to your voice channel """
 
@@ -27,7 +28,8 @@ class Music(commands.Cog):
         else:
             await channel.connect()
 
-    @commands.command(no_pm=True)
+    @commands.command()
+    @commands.guild_only()
     async def leave(self, ctx):
         """ Makes the goose leave any voice channel it is in """
 
@@ -39,7 +41,8 @@ class Music(commands.Cog):
         # Now leave.
         await ctx.voice_client.disconnect()
 
-    @commands.command(no_pm=True)
+    @commands.command()
+    @commands.guild_only()
     async def volume(self, ctx, volume: int):
         """Changes the volume output of the bot"""
 
@@ -52,7 +55,8 @@ class Music(commands.Cog):
         ctx.voice_client.source.volume = volume / 100
         await ctx.send("Honk honk! I'll honk now at {}% volume.".format(volume))
 
-    @commands.command(no_pm=True)
+    @commands.command()
+    @commands.guild_only()
     async def play(self, ctx, url: str):
         """ Plays or queues a song from YouTube. Usage: .playsong [url] """
 

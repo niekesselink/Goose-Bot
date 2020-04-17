@@ -19,7 +19,6 @@ class Events(commands.Cog):
 
         self.bot.log(f'Ready: {self.bot.user} | Guilds: {len(self.bot.guilds)}', 'Goose-Bot')
 
-        await self.bot.user.edit(username=self.bot.config.username)
         await self.bot.change_presence(
             activity=discord.Activity(type=discord.ActivityType.listening, name='humans.'),
             status=discord.Status.online

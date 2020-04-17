@@ -57,7 +57,6 @@ class AIDungeon(commands.Cog):
         await ctx.send(f'Honk honk. To play AIDungeon, just @ me and say "new story", stop a story by saying "end story".\n'
                        f'No need to @ mention me during creation but you have to do that afterwards, oke? Honk honk.')
 
-    # Listener for messages.
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
 
