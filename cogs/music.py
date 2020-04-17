@@ -51,6 +51,11 @@ class Music(commands.Cog):
             await ctx.send('Honk honk. I\'m not in a channel!')
             return
 
+        # Ensure we have a source.
+        if ctx.voice_client.source is None:
+            await ctx.send('Honk honk. I\'m not playing or have played something before!')
+            return
+
         # Now let's change the volume...
         ctx.voice_client.source.volume = volume / 100
         await ctx.send("Honk honk! I'll honk now at {}% volume.".format(volume))
