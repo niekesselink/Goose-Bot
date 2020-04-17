@@ -1,5 +1,4 @@
 import discord
-import os
 import subprocess
 
 from discord.ext import commands
@@ -24,52 +23,7 @@ class General(commands.Cog):
         honk = await ctx.send('HONK!')
         difference = honk.created_at - ctx.message.created_at
         miliseconds = int(difference.total_seconds() * 1000)
-        await honk.edit(content=f'HONK HONK! `{miliseconds}ms`')
-
-    @commands.is_owner()
-    @commands.command(hidden=True)
-    async def load(self, ctx, cog=None):
-        """ Load a specific cog """
-
-        self.bot.load(cog)
-        await ctx.send(f'Honk honk, {cog} has been loaded!')
-
-    @commands.is_owner()
-    @commands.command(hidden=True)
-    async def unload(self, ctx, cog=None):
-        """ Unload a specific cog """
-
-        self.bot.unload(cog)
-        await ctx.send(f'Honk honk, {cog} has been unloaded!')
-
-    @commands.is_owner()
-    @commands.command(hidden=True)
-    async def reload(self, ctx, cog):
-        """ Reloads a specific cog """
-
-        self.bot.unload(cog)
-        self.bot.load(cog)
-        await ctx.send(f'Honk honk, {cog} has been reloaded!')
-
-    @commands.is_owner()
-    @commands.command(hidden=True)
-    async def reloadconfig(self, ctx):
-        """ Reloads the config.json """
-
-        self.bot.reloadconfig()
-        await ctx.send(f'Honk honk, configuration file has been reloaded!')
-
-    @commands.is_owner()
-    @commands.command(hidden=True)
-    async def pull(self, ctx):
-        """ Pulls the most recent version from the repository """
-
-        response = os.popen('git pull').read()
-        await ctx.send(embed=discord.Embed(
-            title='Honk. Updating myself...',
-            description=f'```diff\n{response}\n```',
-            colour=0x009688,
-        ))
+        await honk.edit(content=f'*HONK HONK!* `{miliseconds}ms`')
 
 def setup(bot):
     bot.add_cog(General(bot))
