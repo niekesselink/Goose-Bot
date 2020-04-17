@@ -10,7 +10,7 @@ class Events(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command(self, ctx):
-        self.log(ctx.message.clean_content, ctx.author.name)
+        self.bot.log(ctx.message.clean_content, ctx.author.name)
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -31,8 +31,7 @@ class Events(commands.Cog):
 
         await ctx.send(embed=discord.Embed(
             title='Oeps. A honking error...',
-            #description=f'`{str(exception)}`',
-            description=f'`We hate big error logs that do not make sense. Just try another song... that worked.`',
+            description=f'`{str(exception)}`',
             colour=0xFF0000,
         ))
         

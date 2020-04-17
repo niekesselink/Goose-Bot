@@ -115,6 +115,10 @@ class Music(commands.Cog):
     # Function to actually play a song.
     def play_song(self, ctx, url=None):
 
+        # Maybe we just got .leave and aren't in a channel anymore? Queue problems...
+        if ctx.voice_client is None:
+            return
+
         # Remove previous downloaded file.
         song_there = os.path.isfile(f'{ctx.guild.id}.mp3')
         try:
