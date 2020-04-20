@@ -22,7 +22,7 @@ class Info(commands.Cog):
         embed = discord.Embed(
             title='Goose',
             description=self.bot.config.description,
-            colour=self.bot.config.colour,
+            colour=self.bot.get_colour(),
         )
 
         # Fill more info...

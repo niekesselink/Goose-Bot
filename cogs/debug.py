@@ -63,7 +63,7 @@ class Debug(commands.Cog):
         await ctx.send(embed=discord.Embed(
             title='Honk. Updating...',
             description=f'```diff\n{response}\n```',
-            colour=self.bot.config.colour,
+            colour=self.bot.get_colour(),
         ))
         
 def setup(bot):

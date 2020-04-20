@@ -1,7 +1,7 @@
 {
   "token": "insert token here",
   "description": "insert description for the bot here",
-  "colour": "insert embed colour here",
+  "colour": "519f65",
   "prefix": [
     "."
   ],
