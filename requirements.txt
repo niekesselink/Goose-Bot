@@ -1,4 +1,5 @@
 discord.py
+psutil
 PyNaCl
 requests
 youtube-dl
