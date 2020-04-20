@@ -9,15 +9,11 @@ class Events(commands.Cog):
         self.bot = bot
 
     @commands.Cog.listener()
-    async def on_command(self, ctx):
-        self.bot.log(ctx.message.clean_content, ctx.author.name)
-
-    @commands.Cog.listener()
     async def on_ready(self):
         if not hasattr(self.bot, 'uptime'):
             self.bot.uptime = datetime.utcnow()
 
-        self.bot.log(f'Ready: {self.bot.user} | Guilds: {len(self.bot.guilds)}', 'Goose-Bot')
+        self.bot.log(f'Bot has started.', 'Goose-Bot')
 
         await self.bot.change_presence(
             activity=discord.Activity(type=discord.ActivityType.listening, name='humans.'),
@@ -32,7 +28,7 @@ class Events(commands.Cog):
         await ctx.send(embed=discord.Embed(
             title='Oeps. A honking error...',
             description=f'`{str(exception)}`',
-            colour=0xFF0000,
+            colour=0xED5A40,
         ))
         
 def setup(bot):

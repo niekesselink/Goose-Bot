@@ -1,14 +1,11 @@
 {
   "token": "insert token here",
   "description": "insert description for the bot here",
+  "colour": "insert embed colour here",
   "prefix": [
     "."
   ],
 
-  "aid": {
-    "email": "insert aidungeon username here",
-    "password": "insert aidungeon password here"
-  },
   "music": {
     "maxduration": 360,
     "volume": 1
