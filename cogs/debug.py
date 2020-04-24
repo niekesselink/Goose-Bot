@@ -8,10 +8,16 @@ class Debug(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.is_owner()
     @commands.group(hidden=True)
     async def debug(self, ctx):
         return
+
+    @debug.command(hidden=True)
+    async def honk(self, ctx):
+        honk = await ctx.send('HONK!')
+        difference = honk.created_at - ctx.message.created_at
+        miliseconds = int(difference.total_seconds() * 1000)
+        await honk.edit(content=f'**HONK HONK!** `{miliseconds}ms`')
 
     @commands.is_owner()
     @debug.command(hidden=True)

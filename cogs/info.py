@@ -49,14 +49,5 @@ class Info(commands.Cog):
         # Just send a message with the invite link...
         await ctx.send(f'**HONK!** Use this URL to invite me!\n<{discord.utils.oauth_url(self.bot.user.id)}>')
 
-    @commands.command()
-    async def honk(self, ctx):
-        """ I will honk back! This is a response test """
-
-        honk = await ctx.send('HONK!')
-        difference = honk.created_at - ctx.message.created_at
-        miliseconds = int(difference.total_seconds() * 1000)
-        await honk.edit(content=f'**HONK HONK!** `{miliseconds}ms`')
-
 def setup(bot):
     bot.add_cog(Info(bot))
