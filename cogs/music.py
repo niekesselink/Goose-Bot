@@ -24,14 +24,18 @@ class Music(commands.Cog):
             await ctx.send(f'**Honk honk.** Get first in a channel yourself {ctx.message.author.mention}!')
             return
 
-        # And ignore if we are in the same channel already...
-        if ctx.message.author.voice.channel is ctx.voice_client.channel:
-            await ctx.send(f'**Honk honk.** I\'m already there {ctx.message.author.mention}!')
-            return
-
-        # Now go to the channel nicely
+        # Are we in a voice client?
         if ctx.voice_client is not None:
+
+            # Ignore if we are in the same channel already...
+            if ctx.message.author.voice.channel is ctx.voice_client.channel:
+                await ctx.send(f'**Honk honk.** I\'m already there {ctx.message.author.mention}!')
+                return
+
+            # Move to the same channel
             await ctx.voice_client.move_to(ctx.message.author.voice.channel)
+
+        # We're not in a channel but are going to now...
         else:
             await channel.connect()
 
