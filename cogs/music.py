@@ -105,7 +105,7 @@ class Music(commands.Cog):
         embed.add_field(name='Honking...', value=self.bot.memory['playlists'][ctx.guild.id][0]['title'], inline=False)
 
         # And now what we are playing next, if something...
-        if len(self.bot.memory['playlists'][ctx.guild.id]) <= 1:
+        if len(self.bot.memory['playlists'][ctx.guild.id]) < 2:
             embed.add_field(name='Honks upcoming...', value='Nothing :-(', inline=False)
         else:
             embed.add_field(name='Honks upcoming...',
@@ -237,12 +237,12 @@ class Music(commands.Cog):
 
         # Only add this if there's a queue, and don't let this be the next song either.
         # Silent exit if conditions not met; it's an easter egg after all...
-        if ctx.guild.id not in self.bot.memory['playlists'] and len(self.bot.memory['playlists'][ctx.guild.id]) <= 1:
+        if ctx.guild.id not in self.bot.memory['playlists'] and len(self.bot.memory['playlists'][ctx.guild.id]) < 1:
             return
 
         # Define the entry...
         entry = {
-            'url': 'https://www.youtube.com/watch?v=rvrZJ5C_Nwg',
+            'url': 'rvrZJ5C_Nwg',
             'title': '**AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH**'
         }
 
@@ -255,32 +255,44 @@ class Music(commands.Cog):
     # Function that goes with the easter egg...
     async def do_aah_script(self, ctx):
 
-        # Wait for the AAAAH's to kick off..
-        await asyncio.sleep(126)
-
-        # Volume goes up...
+        # Declare old volume for later...
         old_volume = ctx.voice_client.source.volume
+
+        # Wait for the right moment, increase volume when there... (2:08 in video)
+        await asyncio.sleep(127.5)
         ctx.voice_client.source.volume = 2
 
         # And now let's go AAAAAAH!
-        await asyncio.sleep(16)
+        await asyncio.sleep(14.5)
         await ctx.send(file=discord.File(f'assets/aaaaaah/1.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH')
         await asyncio.sleep(3)
         await ctx.send(file=discord.File(f'assets/aaaaaah/2.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH')
         await asyncio.sleep(3)
         await ctx.send(file=discord.File(f'assets/aaaaaah/3.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH')
-        await asyncio.sleep(3)
+        await asyncio.sleep(3.5)
         await ctx.send(file=discord.File(f'assets/aaaaaah/4.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH')
         await asyncio.sleep(3)
-        await ctx.send(file=discord.File(f'assets/aaaaaah/5.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
+        await ctx.send(file=discord.File(f'assets/aaaaaah/5.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
         await asyncio.sleep(9)
         await ctx.send(file=discord.File(f'assets/aaaaaah/6.jpg'), content='AAAAAAEH!')
-        await asyncio.sleep(2)
+        await asyncio.sleep(1)
         await ctx.send(file=discord.File(f'assets/aaaaaah/7.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAA')
-        await asyncio.sleep(4)
+        await asyncio.sleep(5)
 
-        # Restore volume...
+        # Restore volume, it's bridge time, and wait...
         ctx.voice_client.source.volume = old_volume
-        
+
+        # Second but shorter wave incoming; getting ready! (3:30 in video)
+        await asyncio.sleep(35)
+        ctx.voice_client.source.volume = 2
+
+        # Here we go, finale!
+        await asyncio.sleep(1)
+        await ctx.send(file=discord.File(f'assets/aaaaaah/8.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAAAAAAAH')
+        await asyncio.sleep(13)
+
+        # Restore volume, we're done now...
+        ctx.voice_client.source.volume = old_volume
+
 def setup(bot):
     bot.add_cog(Music(bot))
