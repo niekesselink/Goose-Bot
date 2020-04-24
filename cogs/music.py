@@ -37,7 +37,7 @@ class Music(commands.Cog):
 
         # We're not in a channel but are going to now...
         else:
-            await channel.connect()
+            await ctx.message.author.voice.channel.connect()
 
         # Do we have a playlist but not playing? Also known as techincal difficulty...
         if ctx.guild.id in self.bot.memory['playlists'] and ctx.voice_client.source is None:
