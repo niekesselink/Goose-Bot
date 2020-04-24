@@ -1,3 +1,4 @@
+import asyncio
 import discord
 import os
 import youtube_dl
@@ -58,6 +59,11 @@ class Music(commands.Cog):
         # Ensure we have a source.
         if ctx.voice_client.source is None:
             await ctx.send(f'**Honk honk.** {ctx.message.author.mention}, why? I\'m not playing something!')
+            return
+
+        # Ignore during easter egg...
+        if QUEUES[ctx.guild.id][0]['title'] == '**AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH**':
+            await ctx.send('**AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH**!')
             return
 
         # Now let's change the volume...
@@ -150,7 +156,7 @@ class Music(commands.Cog):
 
                 # Inform and return.
                 await ctx.send(f'**Honk honk.** {ctx.message.author.mention}, I\'ve added your song to the queue!\n'
-                               f'Your song is at position #{len(QUEUES[ctx.guild.id]) - 1}, so be patient...')
+                               f'Your song is at position #{len(QUEUES[ctx.guild.id]) - 1} in the queue, so be patient...')
 
     # Function to actually play a song.
     def play_song(self, ctx, pop=False):
@@ -203,6 +209,64 @@ class Music(commands.Cog):
         # Now let's actually start playing..
         source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(f'{ctx.guild.id}.mp3'), volume)
         ctx.voice_client.play(source, after=lambda e: self.play_song(ctx, pop=True))
+
+        # Is this easter egg song? Do the stuff...
+        if QUEUES[ctx.guild.id][0]['title'] == '**AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH**':
+            self.bot.loop.create_task(self.do_aah_script(ctx))
+
+    # Easter egg command...
+    @commands.cooldown(1, 10800, commands.BucketType.guild)
+    @commands.command(hidden=True)
+    @commands.guild_only()
+    async def AAAAAAAAAAAAAAAAH(self, ctx):
+        """ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH """
+
+        # Only add this if there's a queue, and don't let this be the next song either.
+        # Silent exit if conditions not met; it's an easter egg after all...
+        if ctx.guild.id not in QUEUES and len(QUEUES[ctx.guild.id]) <= 1:
+            return
+
+        # Define the entry...
+        entry = {
+            'url': 'https://www.youtube.com/watch?v=rvrZJ5C_Nwg',
+            'title': '**AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH**'
+        }
+
+        # And queue it!
+        QUEUES[ctx.guild.id].append(entry)
+
+        # We got it coming for ya...
+        await ctx.send('Honk... ehm... **AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH**!')
+
+    # Function that goes with the easter egg...
+    async def do_aah_script(self, ctx):
+
+        # Wait for the AAAAH's to kick off..
+        await asyncio.sleep(126)
+
+        # Volume goes up...
+        old_volume = ctx.voice_client.source.volume
+        ctx.voice_client.source.volume = 2
+
+        # And now let's go AAAAAAH!
+        await asyncio.sleep(16)
+        await ctx.send(file=discord.File(f'assets/aaaaaah/1.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH')
+        await asyncio.sleep(3)
+        await ctx.send(file=discord.File(f'assets/aaaaaah/2.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH')
+        await asyncio.sleep(3)
+        await ctx.send(file=discord.File(f'assets/aaaaaah/3.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH')
+        await asyncio.sleep(3)
+        await ctx.send(file=discord.File(f'assets/aaaaaah/4.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH')
+        await asyncio.sleep(3)
+        await ctx.send(file=discord.File(f'assets/aaaaaah/5.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
+        await asyncio.sleep(9)
+        await ctx.send(file=discord.File(f'assets/aaaaaah/6.jpg'), content='AAAAAAEH!')
+        await asyncio.sleep(2)
+        await ctx.send(file=discord.File(f'assets/aaaaaah/7.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAA')
+        await asyncio.sleep(4)
+
+        # Restore volume...
+        ctx.voice_client.source.volume = old_volume
         
 def setup(bot):
     bot.add_cog(Music(bot))
