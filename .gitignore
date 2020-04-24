@@ -351,4 +351,6 @@ MigrationBackup/
 
 # Specific for this app
 /*.mp3
+/*.mp3.part
 /config.json
+Goose Env/

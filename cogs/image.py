@@ -1,7 +1,7 @@
 import discord
 import requests
 
-from discord.ext import commands
+from discord.ext import commands, tasks
 
 class Image(commands.Cog):
     def __init__(self, bot):
