@@ -263,7 +263,7 @@ class Music(commands.Cog):
         ctx.voice_client.source.volume = 2
 
         # And now let's go AAAAAAH!
-        await asyncio.sleep(14.5)
+        await asyncio.sleep(15.5)
         await ctx.send(file=discord.File(f'assets/aaaaaah/1.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH')
         await asyncio.sleep(3)
         await ctx.send(file=discord.File(f'assets/aaaaaah/2.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH')
@@ -273,7 +273,7 @@ class Music(commands.Cog):
         await ctx.send(file=discord.File(f'assets/aaaaaah/4.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH')
         await asyncio.sleep(3)
         await ctx.send(file=discord.File(f'assets/aaaaaah/5.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
-        await asyncio.sleep(9)
+        await asyncio.sleep(9.5)
         await ctx.send(file=discord.File(f'assets/aaaaaah/6.jpg'), content='AAAAAAEH!')
         await asyncio.sleep(1)
         await ctx.send(file=discord.File(f'assets/aaaaaah/7.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAA')
