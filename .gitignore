@@ -353,4 +353,4 @@ MigrationBackup/
 /*.mp3
 /*.mp3.part
 /config.json
-Goose Env/
+env/
