@@ -7,7 +7,7 @@ from discord import FFmpegPCMAudio
 from discord.ext import commands, tasks
 
 class Music(commands.Cog):
-    """ Commands for playing music in a voice channel """
+    """Commands for playing music in a voice channel."""
 
     def __init__(self, bot):
         self.bot = bot
@@ -19,9 +19,9 @@ class Music(commands.Cog):
     @commands.command()
     @commands.guild_only()
     async def join(self, ctx):
-        """ Summons the goose to your voice channel """
+        """Summons the goose to your voice channel."""
 
-        # Make sure the person using the command is in a voice channel
+        # Make sure the person using the command is in a voice channel.
         if ctx.message.author.voice is None:
             await ctx.send(f'**Honk honk.** Get first in a channel yourself {ctx.message.author.mention}!')
             return
@@ -34,7 +34,7 @@ class Music(commands.Cog):
                 await ctx.send(f'**Honk honk.** I\'m already there {ctx.message.author.mention}!')
                 return
 
-            # Move to the same channel
+            # Move to the same channel.
             await ctx.voice_client.move_to(ctx.message.author.voice.channel)
 
         # We're not in a channel but are going to now...
@@ -48,7 +48,7 @@ class Music(commands.Cog):
     @commands.command()
     @commands.guild_only()
     async def leave(self, ctx):
-        """ Makes the goose leave any voice channel it is in """
+        """Makes the goose leave any voice channel it is in."""
 
         # This command only works when the bot is in a voice channel...
         if ctx.voice_client is None:
@@ -65,7 +65,7 @@ class Music(commands.Cog):
     @commands.command()
     @commands.guild_only()
     async def volume(self, ctx, volume: int):
-        """ Changes the volume output of the bot """
+        """Changes the volume output of the bot."""
 
         # This command only works when the bot is in a voice channel...
         if ctx.voice_client is None:
@@ -84,14 +84,14 @@ class Music(commands.Cog):
     @commands.command()
     @commands.guild_only()
     async def playlist(self, ctx):
-        """ Shows the playlist of the bot if present """
+        """Shows the playlist of the bot if present."""
 
         # Do we have a queue or are we still in a channel? If not, no playlist.
         if ctx.guild.id not in self.bot.memory['music'] or ctx.voice_client is None:
             await ctx.send('**Honk honk.** I\'m not playing anything!')
             return
 
-        # Make an embed
+        # Make an embed...
         embed = discord.Embed(
             title='Goose\'s playlist',
             description='These are the songs I am honking or going to honk very soon! Remember, you can add songs by using .play followed by a YouTube URL or video id.',
@@ -115,7 +115,7 @@ class Music(commands.Cog):
     @commands.command()
     @commands.guild_only()
     async def play(self, ctx, url: str):
-        """ Plays or queues a song from YouTube, pass video id or url """
+        """Plays or queues a song from YouTube, pass video id or url."""
 
         # This command only works when the bot is in a voice channel...
         if ctx.voice_client is None:
@@ -138,10 +138,10 @@ class Music(commands.Cog):
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
             async with ctx.typing():
 
-                # Download the metadata of the video
+                # Download the metadata of the video.
                 meta = ydl.extract_info(url, download=False)
 
-                # Only allow if it's not longer than set amount of minutes
+                # Only allow if it's not longer than set amount of minutes.
                 if meta['duration'] > self.bot.config.music.maxduration:
                     await ctx.send(f'**Honk honk.** {ctx.message.author.mention}, no, I\'m not going to honk longer than {self.bot.config.music.maxduration} seconds.')
                     return
@@ -169,8 +169,8 @@ class Music(commands.Cog):
                 await ctx.send(f'**Honk honk.** {ctx.message.author.mention}, I\'ve added your song to the queue!\n'
                                f"Your song is at position #{len(self.bot.memory['music'][ctx.guild.id]) - 1} in the queue, so be patient...")
 
-    # Function to actually play a song.
     def play_song(self, ctx, pop=False):
+        """Function to actually play a song."""
 
         # Remove previous downloaded file.
         song_there = os.path.isfile(f'{ctx.guild.id}.mp3')

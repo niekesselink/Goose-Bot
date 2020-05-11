@@ -4,15 +4,16 @@ import discord
 from discord.ext import commands, tasks
 
 class Secrets(commands.Cog):
+    """Secret commands for some fun easter eggs."""
+
     def __init__(self, bot):
         self.bot = bot
 
-    # Easter egg command...
     @commands.cooldown(1, 10800, commands.BucketType.guild)
     @commands.command(hidden=True)
     @commands.guild_only()
     async def AAAAAAAAAAAAAAAAH(self, ctx):
-        """ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH """
+        """.AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH."""
 
         # Only add this if there's one song in the queue so this one will be next.
         # Silent exit if conditions not met; it's an easter egg after all... sucks for cooldown.
@@ -34,8 +35,8 @@ class Secrets(commands.Cog):
         # Now let's start the AAAH script...
         self.bot.loop.create_task(self.do_aah_script(ctx))
 
-    # Function that goes with the easter egg...
     async def do_aah_script(self, ctx):
+        """Function that goes with the easter egg..."""
 
         # Are we there at the song, if not stay in a loop...
         # Yes, it's bad design but hey, it works.
