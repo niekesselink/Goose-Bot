@@ -7,12 +7,14 @@ from discord import FFmpegPCMAudio
 from discord.ext import commands, tasks
 
 class Music(commands.Cog):
+    """ Commands for playing music in a voice channel """
+
     def __init__(self, bot):
         self.bot = bot
 
-        # Create bot memory if not present
-        if 'playlists' not in self.bot.memory:
-            self.bot.memory['playlists'] = {}
+        # Define memory variables...
+        if 'music' not in self.bot.memory:
+            self.bot.memory['music'] = {}
 
     @commands.command()
     @commands.guild_only()
@@ -40,7 +42,7 @@ class Music(commands.Cog):
             await ctx.message.author.voice.channel.connect()
 
         # Do we have a playlist but not playing? Also known as techincal difficulty...
-        if ctx.guild.id in self.bot.memory['playlists'] and ctx.voice_client.source is None:
+        if ctx.guild.id in self.bot.memory['music'] and ctx.voice_client.source is None:
             self.play_song(ctx)
 
     @commands.command()
@@ -57,8 +59,8 @@ class Music(commands.Cog):
         await ctx.voice_client.disconnect()
 
         # Destroy the queue if we had one...
-        if ctx.guild.id in self.bot.memory['playlists']:
-            del(self.bot.memory['playlists'][ctx.guild.id])
+        if ctx.guild.id in self.bot.memory['music']:
+            del(self.bot.memory['music'][ctx.guild.id])
 
     @commands.command()
     @commands.guild_only()
@@ -75,11 +77,6 @@ class Music(commands.Cog):
             await ctx.send(f'**Honk honk.** {ctx.message.author.mention}, why? I\'m not playing something!')
             return
 
-        # Ignore during easter egg...
-        if self.bot.memory['playlists'][ctx.guild.id][0]['title'] == '**AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH**':
-            await ctx.send('**AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH**!')
-            return
-
         # Now let's change the volume...
         ctx.voice_client.source.volume = volume / 100
         await ctx.send("**Honk honk!** Oke, I'll honk now at {}% volume.".format(volume))
@@ -90,7 +87,7 @@ class Music(commands.Cog):
         """ Shows the playlist of the bot if present """
 
         # Do we have a queue or are we still in a channel? If not, no playlist.
-        if ctx.guild.id not in self.bot.memory['playlists'] or ctx.voice_client is None:
+        if ctx.guild.id not in self.bot.memory['music'] or ctx.voice_client is None:
             await ctx.send('**Honk honk.** I\'m not playing anything!')
             return
 
@@ -102,14 +99,14 @@ class Music(commands.Cog):
         )
 
         # Add what we are now playing.
-        embed.add_field(name='Honking...', value=self.bot.memory['playlists'][ctx.guild.id][0]['title'], inline=False)
+        embed.add_field(name='Honking...', value=self.bot.memory['music'][ctx.guild.id][0]['title'], inline=False)
 
         # And now what we are playing next, if something...
-        if len(self.bot.memory['playlists'][ctx.guild.id]) < 2:
+        if len(self.bot.memory['music'][ctx.guild.id]) < 2:
             embed.add_field(name='Honks upcoming...', value='Nothing :-(', inline=False)
         else:
             embed.add_field(name='Honks upcoming...',
-                            value='\n'.join([f"{i}) {self.bot.memory['playlists'][ctx.guild.id][i]['title']}" for i in range(1, len(self.bot.memory['playlists'][ctx.guild.id]))]),
+                            value='\n'.join([f"{i}) {self.bot.memory['music'][ctx.guild.id][i]['title']}" for i in range(1, len(self.bot.memory['music'][ctx.guild.id]))]),
                             inline=False)
 
         # Send the embed...
@@ -156,11 +153,11 @@ class Music(commands.Cog):
                 }
 
                 # Is there a queue already? If not, make one.
-                if ctx.guild.id not in self.bot.memory['playlists']:
-                    self.bot.memory['playlists'][ctx.guild.id] = []
+                if ctx.guild.id not in self.bot.memory['music']:
+                    self.bot.memory['music'][ctx.guild.id] = []
 
                 # Now add the song the queue.
-                self.bot.memory['playlists'][ctx.guild.id].append(entry)
+                self.bot.memory['music'][ctx.guild.id].append(entry)
 
                 # Now let's see if we need to start playing directly, as in, nothing is playing...
                 if not ctx.voice_client.is_playing():
@@ -170,7 +167,7 @@ class Music(commands.Cog):
 
                 # Inform and return.
                 await ctx.send(f'**Honk honk.** {ctx.message.author.mention}, I\'ve added your song to the queue!\n'
-                               f"Your song is at position #{len(self.bot.memory['playlists'][ctx.guild.id]) - 1} in the queue, so be patient...")
+                               f"Your song is at position #{len(self.bot.memory['music'][ctx.guild.id]) - 1} in the queue, so be patient...")
 
     # Function to actually play a song.
     def play_song(self, ctx, pop=False):
@@ -184,20 +181,20 @@ class Music(commands.Cog):
             pass
 
         # Do we have a queue or are we still in a channel? If not, end.
-        if ctx.guild.id not in self.bot.memory['playlists'] or ctx.voice_client is None:
+        if ctx.guild.id not in self.bot.memory['music'] or ctx.voice_client is None:
             return
 
         # Pop the previous song from the queue if we have to.
         if pop:
-            self.bot.memory['playlists'][ctx.guild.id].pop(0)
+            self.bot.memory['music'][ctx.guild.id].pop(0)
 
         # Now let's make sure we still can play something, if not delete queue from memory.
-        if len(self.bot.memory['playlists'][ctx.guild.id]) == 0:
-            del(self.bot.memory['playlists'][ctx.guild.id])
+        if len(self.bot.memory['music'][ctx.guild.id]) == 0:
+            del(self.bot.memory['music'][ctx.guild.id])
             return
 
         # Now get an url, since we do have one in the queue.
-        url = self.bot.memory['playlists'][ctx.guild.id][0]['url']
+        url = self.bot.memory['music'][ctx.guild.id][0]['url']
 
         # Declare the options for youtube-dl.
         ydl_opts = {
@@ -223,76 +220,6 @@ class Music(commands.Cog):
         # Now let's actually start playing..
         source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(f'{ctx.guild.id}.mp3'), volume)
         ctx.voice_client.play(source, after=lambda e: self.play_song(ctx, pop=True))
-
-        # Is this easter egg song? Do the stuff...
-        if self.bot.memory['playlists'][ctx.guild.id][0]['title'] == '**AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH**':
-            self.bot.loop.create_task(self.do_aah_script(ctx))
-
-    # Easter egg command...
-    @commands.cooldown(1, 10800, commands.BucketType.guild)
-    @commands.command(hidden=True)
-    @commands.guild_only()
-    async def AAAAAAAAAAAAAAAAH(self, ctx):
-        """ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH """
-
-        # Only add this if there's a queue, and don't let this be the next song either.
-        # Silent exit if conditions not met; it's an easter egg after all...
-        if ctx.guild.id not in self.bot.memory['playlists'] and len(self.bot.memory['playlists'][ctx.guild.id]) < 1:
-            return
-
-        # Define the entry...
-        entry = {
-            'url': 'rvrZJ5C_Nwg',
-            'title': '**AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH**'
-        }
-
-        # And queue it!
-        self.bot.memory['playlists'][ctx.guild.id].append(entry)
-
-        # We got it coming for ya...
-        await ctx.send('Honk... ehm... **AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH**!')
-
-    # Function that goes with the easter egg...
-    async def do_aah_script(self, ctx):
-
-        # Declare old volume for later...
-        old_volume = ctx.voice_client.source.volume
-
-        # Wait for the right moment, increase volume when there... (2:08 in video)
-        await asyncio.sleep(127.5)
-        ctx.voice_client.source.volume = 2
-
-        # And now let's go AAAAAAH!
-        await asyncio.sleep(15.5)
-        await ctx.send(file=discord.File(f'assets/aaaaaah/1.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH')
-        await asyncio.sleep(3)
-        await ctx.send(file=discord.File(f'assets/aaaaaah/2.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH')
-        await asyncio.sleep(3)
-        await ctx.send(file=discord.File(f'assets/aaaaaah/3.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH')
-        await asyncio.sleep(3.5)
-        await ctx.send(file=discord.File(f'assets/aaaaaah/4.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH')
-        await asyncio.sleep(3)
-        await ctx.send(file=discord.File(f'assets/aaaaaah/5.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
-        await asyncio.sleep(9.5)
-        await ctx.send(file=discord.File(f'assets/aaaaaah/6.jpg'), content='AAAAAAEH!')
-        await asyncio.sleep(1)
-        await ctx.send(file=discord.File(f'assets/aaaaaah/7.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAA')
-        await asyncio.sleep(5)
-
-        # Restore volume, it's bridge time, and wait...
-        ctx.voice_client.source.volume = old_volume
-
-        # Second but shorter wave incoming; getting ready! (3:30 in video)
-        await asyncio.sleep(35)
-        ctx.voice_client.source.volume = 2
-
-        # Here we go, finale!
-        await asyncio.sleep(1)
-        await ctx.send(file=discord.File(f'assets/aaaaaah/8.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAAAAAAAH')
-        await asyncio.sleep(13)
-
-        # Restore volume, we're done now...
-        ctx.voice_client.source.volume = old_volume
 
 def setup(bot):
     bot.add_cog(Music(bot))
