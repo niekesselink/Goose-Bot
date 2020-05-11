@@ -1,12 +1,19 @@
+import asyncio
 import discord
 import os
+import subprocess
 
 from discord.ext import commands, tasks
 from utils import data
 
 class Debug(commands.Cog):
+    """Debug commands mainly for development/update purposes."""
+
     def __init__(self, bot):
         self.bot = bot
+
+    async def cog_check(self, ctx):
+        return await self.bot.is_owner(ctx.author)
 
     @commands.group(hidden=True)
     async def debug(self, ctx):
@@ -14,6 +21,7 @@ class Debug(commands.Cog):
 
     @debug.command(hidden=True)
     async def honk(self, ctx):
+        """Latency test command."""
 
         # Send the first message.
         honk = await ctx.send('HONK!')
@@ -25,74 +33,65 @@ class Debug(commands.Cog):
         # Update previous message with the difference.
         await honk.edit(content=f'**HONK HONK!** `{miliseconds}ms`')
 
-    @commands.is_owner()
     @debug.command(hidden=True)
-    async def loadcog(self, ctx, name):
-        """ Load a specific cog """
+    async def load(self, ctx, name):
+        """Load a module."""
 
         self.bot.load_extension(f"cogs.{name}")
-        await ctx.send(f'Honk, cog {name} has been loaded!')
+        await ctx.send(f'**Honk!** Module {name} has been loaded!')
 
-    @commands.is_owner()
     @debug.command(hidden=True)
-    async def unloadcog(self, ctx, name):
+    async def unload(self, ctx, name):
         """ Unload a specific cog """
 
         self.bot.unload_extension(f"cogs.{name}")
-        await ctx.send(f'Honk, cog {name} has been unloaded!')
+        await ctx.send(f'**Honk!** Module {name} has been unloaded!')
 
-    @commands.is_owner()
     @debug.command(hidden=True)
-    async def reloadcog(self, ctx, name):
-        """ Reloads a specific cog """
+    async def reload(self, ctx, name):
+        """Reloads a specific cog."""
 
-        # Make it possible to reload all of the cogs that are loaded..
-        if name == 'all':
-            for file in os.listdir('cogs'):
-                if file.endswith('.py'):
-                    cog = file[:-3]
-                    try:
-                        self.bot.reload_extension(f'cogs.{cog}')
-                        await ctx.send(f'Honk, cog {cog} has been reloaded!')
-                    except:
-                        # Probably unloaded for a reason... ignore.
-                        pass
-        else:
-            # Just reload one...
+        # Just reload one if not 'all'...
+        if name != 'all':
             self.bot.reload_extension(f"cogs.{name}")
-            await ctx.send(f'Honk, cog {name} has been reloaded!')
+            return await ctx.send(f'**Honk!** Module {name} has been reloaded!')
 
-    @commands.is_owner()
+        # Reload all possible cogs which have been loaded...
+        for file in os.listdir('cogs'):
+            if file.endswith('.py'):
+                cog = file[:-3]
+                try:
+                    self.bot.reload_extension(f'cogs.{cog}')
+                    await ctx.send(f'**Honk!** Module {cog} has been reloaded!')
+                except:
+                    pass
+
     @debug.command(hidden=True)
-    async def reloadconfig(self, ctx):
-        """ Reloads the config.json """
-
-        self.bot.config = data.getjson('config.json')
-        await ctx.send(f'Honk, config.json has been reloaded!')
-
-    @commands.is_owner()
-    @debug.command(hidden=True)
-    async def reloadutil(self, ctx, name: str):
-        """ Reloads an util module. """
-
-        util = importlib.import_module(f"utils.{name}")
-        importlib.reload(util)
-        await ctx.send(f'Honk, util {name} has been reloaded!')
-
-    @commands.is_owner()
-    @debug.command(hidden=True)
-    async def gitpull(self, ctx):
-        """ Pulls the most recent version from the repository """
+    async def pull(self, ctx):
+        """Pulls the most recent version from the repository."""
 
         # Execture "git pull" command in shell...
-        response = os.popen('git pull').read()
+        async with ctx.typing():
+            stdout, stderr = await self.run_process('git pull')
 
         # Inform the report.
         await ctx.send(embed=discord.Embed(
-            title='Honk. Updating...',
-            description=f'```diff\n{response}\n```',
+            title='**Honk.** Git pulling...',
+            description=f'```diff\n{stdout}\n{stderr}\n```',
             colour=self.bot.get_colour(),
         ))
+
+    # Function for running progams on the VPS.
+    async def run_process(self, command):
+        try:
+            process = await asyncio.create_subprocess_shell(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            result = await process.communicate()
+        except NotImplementedError:
+            process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            result = await self.bot.loop.run_in_executor(None, process.communicate)
+
+        # Return the output.
+        return [output.decode() for output in result]
         
 def setup(bot):
     bot.add_cog(Debug(bot))
