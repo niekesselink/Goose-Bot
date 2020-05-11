@@ -1,9 +1,6 @@
 import asyncio
 import discord
-import os
-import youtube_dl
 
-from discord import FFmpegPCMAudio
 from discord.ext import commands, tasks
 
 class Secrets(commands.Cog):
