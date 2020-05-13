@@ -32,9 +32,15 @@ class Debug(commands.Cog):
 
         # Update previous message with the difference.
         await honk.edit(content=f'**HONK HONK!** `{miliseconds}ms`')
+    @debug.command(hidden=True)
+    async def reloadconfig(self, ctx):
+        """Reloads the config.json file."""
+
+        self.bot.config = data.getjson('config.json')
+        await ctx.send('**Honk!** Config file has been reloaded!')
 
     @debug.command(hidden=True)
-    async def image(self, ctx):
+    async def reloadprofileimage(self, ctx):
         """Update profile image of the bot."""
 
         with open('assets/goose.jpg', 'rb') as f:

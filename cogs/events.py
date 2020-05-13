@@ -56,9 +56,9 @@ class Events(commands.Cog):
 
         # We really hit an error, send the error...
         await ctx.send(embed=discord.Embed(
-            title='Oeps. A honking error...',
+            title='***Honk error...***',
             description=f'`{str(error)}`',
-            colour=0xED5A40,
+            colour=0xFF7E62,
         ))
         
 def setup(bot):
