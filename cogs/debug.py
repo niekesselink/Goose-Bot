@@ -34,6 +34,14 @@ class Debug(commands.Cog):
         await honk.edit(content=f'**HONK HONK!** `{miliseconds}ms`')
 
     @debug.command(hidden=True)
+    async def image(self, ctx):
+        """Update profile image of the bot."""
+
+        with open('assets/goose.jpg', 'rb') as f:
+            await self.bot.user.edit(avatar=f.read())
+            await ctx.send('**Honk!** Updated my profile picture.')
+
+    @debug.command(hidden=True)
     async def load(self, ctx, name):
         """Load a module."""
 
