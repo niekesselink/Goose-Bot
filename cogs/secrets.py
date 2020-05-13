@@ -13,7 +13,7 @@ class Secrets(commands.Cog):
     @commands.command(hidden=True)
     @commands.guild_only()
     async def AAAAAAAAAAAAAAAAH(self, ctx):
-        """.AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH."""
+        """AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH."""
 
         # Only add this if there's one song in the queue so this one will be next.
         # Silent exit if conditions not met; it's an easter egg after all... sucks for cooldown.
