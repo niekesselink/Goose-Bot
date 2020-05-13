@@ -23,8 +23,14 @@ class Secrets(commands.Cog):
         # Define the entry...
         entry = {
             'url': 'rvrZJ5C_Nwg',
-            'title': '**AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH**'
+            'title': '**AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH**',
+            'duration': 360
         }
+
+        # Get total seconds in playlist.
+        total_seconds = 0
+        for i in range(0, len(self.bot.memory['music'][ctx.guild.id])):
+            total_seconds += self.bot.memory['music'][ctx.guild.id][i]['duration']
 
         # And queue it!
         self.bot.memory['music'][ctx.guild.id].append(entry)
@@ -33,16 +39,13 @@ class Secrets(commands.Cog):
         await ctx.send('Honk... ehm... **AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH**!')
 
         # Now let's start the AAAH script...
-        self.bot.loop.create_task(self.do_aah_script(ctx))
+        self.bot.loop.create_task(self.do_aah_script(ctx, total_seconds))
 
-    async def do_aah_script(self, ctx):
+    async def do_aah_script(self, ctx, wait_seconds):
         """Function that goes with the easter egg..."""
 
-        # Are we there at the song, if not stay in a loop...
-        # Yes, it's bad design but hey, it works.
-        while True:
-            if self.bot.memory['music'][ctx.guild.id][0]['title'] == '**AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH**':
-                break
+        # Wait for start, plus one for download...
+        await asyncio.sleep(wait_seconds + 1)
 
         # Declare old volume for later and set a block...
         old_volume = ctx.voice_client.source.volume

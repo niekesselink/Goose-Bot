@@ -1,6 +1,7 @@
 import asyncio
 import discord
 import os
+import time
 import youtube_dl
 
 from discord import FFmpegPCMAudio
@@ -142,7 +143,8 @@ class Music(commands.Cog):
             # We can add it, let's define the object for in the queue.
             entry = {
                 'url': url,
-                'title': meta['title']
+                'title': meta['title'],
+                'duration': meta['duration']
             }
 
             # Is there a queue already? If not, make one.
@@ -157,9 +159,34 @@ class Music(commands.Cog):
                 self.play_song(ctx)
                 return await ctx.send('**Honk honk.** Beginning to honk!')
                 
-            # Inform and return.
+            # Get total seconds in playlist.
+            total_seconds = 0
+            for i in range(0, len(self.bot.memory['music'][ctx.guild.id])):
+                total_seconds += self.bot.memory['music'][ctx.guild.id][i]['duration']
+
+            # Declare variables for converting it into a nice figure...
+            result = []
+            intervals = (
+                ('weeks', 604800),  # 60 * 60 * 24 * 7
+                ('days', 86400),    # 60 * 60 * 24
+                ('hours', 3600),    # 60 * 60
+                ('minutes', 60),
+                ('seconds', 1),
+            )
+
+            # Now make it readable for how long we need to wait for this song...
+            for name, count in intervals:
+                value = total_seconds // count
+                if value:
+                    total_seconds -= value * count
+                    if value == 1:
+                        name = name.rstrip('s')
+                    result.append("{} {}".format(value, name))
+
+            # Inform.
             await ctx.send(f"**Honk honk.** {ctx.message.author.mention}, I've added your song to the queue!\n"
-                           f"Your song is at position #{len(self.bot.memory['music'][ctx.guild.id]) - 1} in the queue...")
+                           f"Your song is #{len(self.bot.memory['music'][ctx.guild.id]) - 1} in the queue. I will honk it over " +
+                           ', '.join(result[:2])+ '...')
 
     def play_song(self, ctx, pop=False):
         """Function to actually play a song."""
