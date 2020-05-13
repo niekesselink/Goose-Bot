@@ -89,7 +89,7 @@ class Music(commands.Cog):
 
         # Make an embed...
         embed = discord.Embed(
-            title="Goose's playlist",
+            title="**Honking list.**",
             description='These are the songs I am honking or going to honk very soon! Remember, you can add songs by using .play followed by a YouTube URL or video id.',
             colour=self.bot.get_colour()
         )
@@ -160,15 +160,13 @@ class Music(commands.Cog):
                 return await ctx.send('**Honk honk.** Beginning to honk!')
                 
             # Get total seconds in playlist.
-            total_seconds = 0
+            total_seconds = 0 - meta['duration']
             for i in range(0, len(self.bot.memory['music'][ctx.guild.id])):
                 total_seconds += self.bot.memory['music'][ctx.guild.id][i]['duration']
 
             # Declare variables for converting it into a nice figure...
             result = []
             intervals = (
-                ('weeks', 604800),  # 60 * 60 * 24 * 7
-                ('days', 86400),    # 60 * 60 * 24
                 ('hours', 3600),    # 60 * 60
                 ('minutes', 60),
                 ('seconds', 1),

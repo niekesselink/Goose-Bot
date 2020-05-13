@@ -56,7 +56,7 @@ class Events(commands.Cog):
 
         # We really hit an error, send the error...
         await ctx.send(embed=discord.Embed(
-            title='***Honk error...***',
+            title='**Honk error...**',
             description=f'`{str(error)}`',
             colour=0xFF7E62,
         ))
