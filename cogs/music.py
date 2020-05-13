@@ -1,9 +1,9 @@
 import asyncio
 import discord
 import os
-import time
 import youtube_dl
 
+from datetime import datetime
 from discord import FFmpegPCMAudio
 from discord.ext import commands, tasks
 
@@ -144,7 +144,8 @@ class Music(commands.Cog):
             entry = {
                 'url': url,
                 'title': meta['title'],
-                'duration': meta['duration']
+                'duration': meta['duration'],
+                'start': None
             }
 
             # Is there a queue already? If not, make one.
@@ -164,6 +165,9 @@ class Music(commands.Cog):
             for i in range(0, len(self.bot.memory['music'][ctx.guild.id])):
                 total_seconds += self.bot.memory['music'][ctx.guild.id][i]['duration']
 
+            # Retract how far we are now in current song.
+            total_seconds = total_seconds - (datetime.now() - self.bot.memory['music'][ctx.guild.id][0]['start']).total_seconds()
+
             # Declare variables for converting it into a nice figure...
             result = []
             intervals = (
@@ -174,7 +178,7 @@ class Music(commands.Cog):
 
             # Now make it readable for how long we need to wait for this song...
             for name, count in intervals:
-                value = total_seconds // count
+                value = round(total_seconds // count)
                 if value:
                     total_seconds -= value * count
                     if value == 1:
@@ -235,6 +239,7 @@ class Music(commands.Cog):
             volume = ctx.voice_client.source.volume
 
         # Now let's actually start playing..
+        self.bot.memory['music'][ctx.guild.id][0]['start'] = datetime.now()
         source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(f'{ctx.guild.id}.mp3'), volume)
         ctx.voice_client.play(source, after=lambda e: self.play_song(ctx, pop=True))
 

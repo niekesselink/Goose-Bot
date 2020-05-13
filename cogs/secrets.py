@@ -24,7 +24,8 @@ class Secrets(commands.Cog):
         entry = {
             'url': 'rvrZJ5C_Nwg',
             'title': '**AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH**',
-            'duration': 360
+            'duration': 360,
+            'start': None
         }
 
         # Get total seconds in playlist.
@@ -44,14 +45,15 @@ class Secrets(commands.Cog):
     async def do_aah_script(self, ctx, wait_seconds):
         """Function that goes with the easter egg..."""
 
-        # Wait for start, plus one for download...
-        await asyncio.sleep(wait_seconds + 1)
+        # Wait for start, plus five for download, you never know...
+        await asyncio.sleep(wait_seconds + 5)
 
         # Declare old volume for later and set a block...
         old_volume = ctx.voice_client.source.volume
 
         # Wait for the right moment, increase volume when there... (2:08 in video)
-        await asyncio.sleep(127.5)
+        second_difference = (datetime.now() - self.bot.memory['music'][ctx.guild.id][0]['start']).total_seconds()
+        await asyncio.sleep(127.5 - second_difference)
         ctx.voice_client.source.volume = 2
 
         # And now let's go AAAAAAH!
