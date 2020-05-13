@@ -95,13 +95,13 @@ class Music(commands.Cog):
         )
 
         # Add what we are now playing.
-        embed.add_field(name='Honking...', value=self.bot.memory['music'][ctx.guild.id][0]['title'], inline=False)
+        embed.add_field(name='Now...', value=self.bot.memory['music'][ctx.guild.id][0]['title'], inline=False)
 
         # And now what we are playing next, if something...
         if len(self.bot.memory['music'][ctx.guild.id]) < 2:
-            embed.add_field(name='Honks upcoming...', value='Nothing :-(', inline=False)
+            embed.add_field(name='Upcoming...', value='Nothing :-(', inline=False)
         else:
-            embed.add_field(name='Honks upcoming...',
+            embed.add_field(name='Upcoming...',
                             value='\n'.join([f"{i}) {self.bot.memory['music'][ctx.guild.id][i]['title']}" for i in range(1, len(self.bot.memory['music'][ctx.guild.id]))]),
                             inline=False)
 
