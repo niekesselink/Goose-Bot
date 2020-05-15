@@ -1,6 +1,7 @@
 import asyncio
 import discord
 
+from datetime import datetime
 from discord.ext import commands, tasks
 
 class Secrets(commands.Cog):
@@ -9,7 +10,7 @@ class Secrets(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.cooldown(1, 10800, commands.BucketType.guild)
+    @commands.cooldown(1, 3600, commands.BucketType.guild)
     @commands.command(hidden=True)
     @commands.guild_only()
     async def AAAAAAAAAAAAAAAAH(self, ctx):
@@ -22,7 +23,7 @@ class Secrets(commands.Cog):
 
         # Define the entry...
         entry = {
-            'url': 'rvrZJ5C_Nwg',
+            'url': 'mbIUn8TYKAU',
             'title': '**AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH**',
             'duration': 360,
             'start': None
@@ -43,7 +44,7 @@ class Secrets(commands.Cog):
         self.bot.loop.create_task(self.do_aah_script(ctx, total_seconds))
 
     async def do_aah_script(self, ctx, wait_seconds):
-        """Function that goes with the easter egg..."""
+        """Function that goes with the AAAAAAAAAAAAAAAAH easter egg..."""
 
         # Wait for start, plus five for download, you never know...
         await asyncio.sleep(wait_seconds + 5)
@@ -51,13 +52,13 @@ class Secrets(commands.Cog):
         # Declare old volume for later and set a block...
         old_volume = ctx.voice_client.source.volume
 
-        # Wait for the right moment, increase volume when there... (2:08 in video)
+        # Wait for the right moment, increase volume when there... (2:00 in video)
         second_difference = (datetime.now() - self.bot.memory['music'][ctx.guild.id][0]['start']).total_seconds()
-        await asyncio.sleep(127.5 - second_difference)
+        await asyncio.sleep(120.5 - second_difference)
         ctx.voice_client.source.volume = 2
 
         # And now let's go AAAAAAH!
-        await asyncio.sleep(15.5)
+        await asyncio.sleep(16)
         await ctx.send(file=discord.File(f'assets/aaaaaah/1.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH')
         await asyncio.sleep(3)
         await ctx.send(file=discord.File(f'assets/aaaaaah/2.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH')
@@ -67,7 +68,7 @@ class Secrets(commands.Cog):
         await ctx.send(file=discord.File(f'assets/aaaaaah/4.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH')
         await asyncio.sleep(3)
         await ctx.send(file=discord.File(f'assets/aaaaaah/5.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
-        await asyncio.sleep(9.5)
+        await asyncio.sleep(9)
         await ctx.send(file=discord.File(f'assets/aaaaaah/6.jpg'), content='AAAAAAEH!')
         await asyncio.sleep(1)
         await ctx.send(file=discord.File(f'assets/aaaaaah/7.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAA')
@@ -76,14 +77,14 @@ class Secrets(commands.Cog):
         # Restore volume, it's bridge time, and wait...
         ctx.voice_client.source.volume = old_volume
 
-        # Second but shorter wave incoming; getting ready! (3:30 in video)
-        await asyncio.sleep(35)
+        # Second but shorter wave incoming; getting ready!
+        await asyncio.sleep(34)
         ctx.voice_client.source.volume = 2
 
         # Here we go, finale!
         await asyncio.sleep(1)
         await ctx.send(file=discord.File(f'assets/aaaaaah/8.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAAAAAAAH')
-        await asyncio.sleep(13)
+        await asyncio.sleep(14)
 
         # Restore volume, we're done now...
         ctx.voice_client.source.volume = old_volume
