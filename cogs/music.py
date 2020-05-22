@@ -6,6 +6,7 @@ import youtube_dl
 from datetime import datetime
 from discord import FFmpegPCMAudio
 from discord.ext import commands, tasks
+from utils import embed
 
 class Music(commands.Cog):
     """Commands for playing music in a voice channel."""
@@ -90,26 +91,23 @@ class Music(commands.Cog):
         if ctx.guild.id not in self.bot.memory['music'] or ctx.voice_client is None:
             return await ctx.send("**Honk honk.** I'm not playing anything!")
 
-        # Make an embed...
-        embed = discord.Embed(
-            title="**Honking list.**",
-            description='These are the songs I am honking or going to honk very soon! Remember, you can add songs by using .play followed by a YouTube URL or video id.',
-            colour=self.bot.get_colour()
-        )
+        # Define fields data with now playing.
+        fields = {
+            'Now...': self.bot.memory['music'][ctx.guild.id][0]['title']
+        }
 
-        # Add what we are now playing.
-        embed.add_field(name='Now...', value=self.bot.memory['music'][ctx.guild.id][0]['title'], inline=False)
-
-        # And now what we are playing next, if something...
+        # Add the future entries to the fields data.
         if len(self.bot.memory['music'][ctx.guild.id]) < 2:
-            embed.add_field(name='Upcoming...', value='Nothing :-(', inline=False)
+            fields.update({ 'Upcoming...': 'Nothing :-(' })
         else:
-            embed.add_field(name='Upcoming...',
-                            value='\n'.join([f"{i}) {self.bot.memory['music'][ctx.guild.id][i]['title']}" for i in range(1, len(self.bot.memory['music'][ctx.guild.id]))]),
-                            inline=False)
+            fields.update({ 'Upcoming...': '\n'.join([f"{i}) {self.bot.memory['music'][ctx.guild.id][i]['title']}" for i in range(1, len(self.bot.memory['music'][ctx.guild.id]))]) })
 
         # Send the embed...
-        await ctx.send(embed=embed)
+        await ctx.send(embed=embed.create(
+            title="**Honking list.**",
+            description='These are the songs I am honking or going to honk very soon! Remember, you can add songs by using .play followed by a YouTube URL or video id.',
+            fields=fields
+        ))
 
     @commands.command()
     @commands.guild_only()

@@ -1,10 +1,11 @@
 import asyncio
 import discord
+import importlib
 import os
 import subprocess
 
 from discord.ext import commands, tasks
-from utils import json
+from utils import embed, json
 
 class Debug(commands.Cog):
     """Debug commands mainly for development/update purposes."""
@@ -12,13 +13,14 @@ class Debug(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.is_owner()
+    async def cog_check(self, ctx):
+        return await self.bot.is_owner(ctx.author)
+
     @commands.group(hidden=True)
     async def debug(self, ctx):
         return
 
-    @commands.is_owner()
-    @debug.command(hidden=True)
+    @debug.command()
     async def honk(self, ctx):
         """Latency test command."""
 
@@ -32,48 +34,28 @@ class Debug(commands.Cog):
         # Update previous message with the difference.
         await honk.edit(content=f'**HONK HONK!** `{miliseconds}ms`')
 
-    @commands.is_owner()
-    @debug.command(hidden=True)
-    async def reloadconfig(self, ctx):
-        """Reloads the config.json file."""
-
-        self.bot.config = data.getjson('config.json')
-        await ctx.send('**Honk!** Config file has been reloaded!')
-
-    @commands.is_owner()
-    @debug.command(hidden=True)
-    async def reloadprofileimage(self, ctx):
-        """Update profile image of the bot."""
-
-        with open('assets/goose.jpg', 'rb') as f:
-            await self.bot.user.edit(avatar=f.read())
-            await ctx.send('**Honk!** Updated my profile picture.')
-
-    @commands.is_owner()
-    @debug.command(hidden=True)
+    @debug.command()
     async def load(self, ctx, name):
-        """Load a module."""
+        """Load a cog."""
 
-        self.bot.load_extension(f"cogs.{name}")
-        await ctx.send(f'**Honk!** Module {name} has been loaded!')
+        self.bot.load_extension(f'cogs.{name}')
+        await ctx.send(f'**Honk!** Cog {name} has been loaded!')
 
-    @commands.is_owner()
-    @debug.command(hidden=True)
+    @debug.command()
     async def unload(self, ctx, name):
-        """ Unload a specific cog """
+        """Unload a specific cog."""
 
-        self.bot.unload_extension(f"cogs.{name}")
-        await ctx.send(f'**Honk!** Module {name} has been unloaded!')
+        self.bot.unload_extension(f'cogs.{name}')
+        await ctx.send(f'**Honk!** Cog {name} has been unloaded!')
 
-    @commands.is_owner()
-    @debug.command(hidden=True)
+    @debug.command()
     async def reload(self, ctx, name):
         """Reloads a specific cog."""
 
         # Just reload one if not 'all'...
         if name != 'all':
-            self.bot.reload_extension(f"cogs.{name}")
-            return await ctx.send(f'**Honk!** Module {name} has been reloaded!')
+            self.bot.reload_extension(f'cogs.{name}')
+            return await ctx.send(f'**Honk!** Cog {name} has been reloaded!')
 
         # Reload all possible cogs which have been loaded...
         for file in os.listdir('cogs'):
@@ -81,12 +63,19 @@ class Debug(commands.Cog):
                 cog = file[:-3]
                 try:
                     self.bot.reload_extension(f'cogs.{cog}')
-                    await ctx.send(f'**Honk!** Module {cog} has been reloaded!')
+                    await ctx.send(f'**Honk!** Cog {cog} has been reloaded!')
                 except:
                     pass
 
-    @commands.is_owner()
-    @debug.command(hidden=True)
+    @debug.command()
+    async def importutil(self, ctx, name):
+        """Imports an util."""
+
+        util = importlib.import_module(f'utils.{name}')
+        importlib.reload(util)
+        await ctx.send(f'**Honk!** Util {name} has been (re)imported!')
+
+    @debug.command()
     async def pull(self, ctx):
         """Pulls the most recent version from the repository."""
 
@@ -95,10 +84,9 @@ class Debug(commands.Cog):
             stdout, stderr = await self.run_process('git pull')
 
         # Inform the report.
-        await ctx.send(embed=discord.Embed(
+        await ctx.send(embed=embed.create(
             title='**Honk.** Git pulling...',
-            description=f'```diff\n{stdout}\n{stderr}\n```',
-            colour=self.bot.get_colour(),
+            description=f'```diff\n{stdout}\n{stderr}\n```'
         ))
 
     # Function for running progams on the VPS.

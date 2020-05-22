@@ -4,6 +4,7 @@ import psutil
 import subprocess
 
 from discord.ext import commands, tasks
+from utils import embed
 
 class Info(commands.Cog):
     """Information commands about the bot."""
@@ -20,22 +21,21 @@ class Info(commands.Cog):
         ramUsage = self.process.memory_full_info().rss / 1024**2
         avgMembers = round(len(self.bot.users) / len(self.bot.guilds))
 
-        # Make an embed...
-        embed = discord.Embed(
+        # Define embed fields data.
+        fields = {
+            'Creator': '<@462311999980961793>',
+            'Servers active': f'{len(ctx.bot.guilds)} (avg: {avgMembers} users/server)',
+            'Last update': f'{subprocess.check_output(["git", "log", "-1", "--format=%cd "]).strip().decode("utf-8")}',
+            'RAM usage': f'{ramUsage:.2f} MB'
+        }
+
+        # Create and send the embed.
+        await ctx.send(embed=embed.create(
             title='**Information.**',
-            description=self.bot.config.description,
-            colour=self.bot.get_colour(),
-        )
-
-        # Fill more info...
-        embed.set_thumbnail(url=ctx.bot.user.avatar_url)
-        embed.add_field(name='Creator', value='<@462311999980961793>', inline=False)
-        embed.add_field(name='Servers active', value=f'{len(ctx.bot.guilds)} (avg: {avgMembers} users/server)', inline=False)
-        embed.add_field(name='Last update', value=f'{subprocess.check_output(["git", "log", "-1", "--format=%cd "]).strip().decode("utf-8")}', inline=False)
-        embed.add_field(name='RAM usage', value=f'{ramUsage:.2f} MB', inline=False)
-
-        # Send the embed.
-        await ctx.send(embed=embed)
+            description='Open-source Discord bot for providing moderation features, music features and other fun commands to a Discord server.',
+            thumbnail=ctx.bot.user.avatar_url,
+            fields=fields
+        ))
 
     @commands.command()
     async def source(self, ctx):

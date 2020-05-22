@@ -15,15 +15,15 @@ class Bot(commands.Bot):
         self.memory = {}
 
         # Call the initialize of the bot itself...
-        super().__init__(command_prefix=self.config.prefix, description=self.config.description, *args, **kwargs)
+        super().__init__(
+            command_prefix='.',
+            *args,
+            **kwargs
+        )
 
     # Function that returns the token from the config to run the bot.
     def get_token(self):
         return self.config.token
-
-    # Function that return the default colour used for the bot.
-    def get_colour(self):
-        return discord.Color(value=int(self.config.colour, 16))
 
     # Function to log information into the console.
     def log(self, value, name):

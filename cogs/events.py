@@ -57,7 +57,7 @@ class Events(commands.Cog):
         # We've hit an error. Inform that the owner is on it...
         await ctx.send(f'**Honk!** An error has occured. My caretaker been notified and will feed me some fixing code soon, thanks for being a crash-dummy {ctx.message.author.mention}!')
 
-        # Create an embed for this error and send it to the bot owner.
+        # Create a special error embed for this error and send it to the bot owner.
         owner = self.bot.get_user(462311999980961793)
         await owner.send(embed=discord.Embed(
             title=f'Error using {ctx.message.content}',
