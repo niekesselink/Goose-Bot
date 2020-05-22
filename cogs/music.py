@@ -20,18 +20,18 @@ class Music(commands.Cog):
     @commands.command()
     @commands.guild_only()
     async def join(self, ctx):
-        """Summons the goose to your voice channel."""
+        """Brings the bot to your voice channel."""
 
         # Make sure the person using the command is in a voice channel.
         if ctx.message.author.voice is None:
-            return await ctx.send(f'**Honk honk.** Get first in a channel yourself {ctx.message.author.mention}!')
+            return await ctx.send(f'**Honk honk.** Get first in a channel yourself, {ctx.message.author.mention}!')
 
         # Are we in a voice client?
         if ctx.voice_client is not None:
 
             # Ignore if we are in the same channel already...
             if ctx.message.author.voice.channel is ctx.voice_client.channel:
-                return await ctx.send(f"**Honk honk.** I'm already there {ctx.message.author.mention}!")
+                return await ctx.send(f"**Honk honk.** I'm already there, {ctx.message.author.mention}!")
 
             # Move to the same channel.
             await ctx.voice_client.move_to(ctx.message.author.voice.channel)
@@ -47,7 +47,7 @@ class Music(commands.Cog):
     @commands.command()
     @commands.guild_only()
     async def leave(self, ctx):
-        """Makes the goose leave any voice channel it is in."""
+        """Makes the bot leave any voice channel it is in."""
 
         # This command only works when the bot is in a voice channel...
         if ctx.voice_client is None:
@@ -71,7 +71,7 @@ class Music(commands.Cog):
             
         # And also, only in the same channel...
         if ctx.message.author.voice.channel is not ctx.voice_client.channel:
-            return await ctx.send(f"**Honk honk.** We're not in the same channel {ctx.message.author.mention}!")
+            return await ctx.send(f"**Honk honk.** We're not in the same channel, {ctx.message.author.mention}!")
 
         # Ensure we have a source.
         if ctx.voice_client.source is None:
@@ -122,7 +122,7 @@ class Music(commands.Cog):
             
         # And also, only in the same channel...
         if ctx.message.author.voice.channel is not ctx.voice_client.channel:
-            return await ctx.send(f"**Honk honk.** We're not in the same channel {ctx.message.author.mention}!")
+            return await ctx.send(f"**Honk honk.** We're not in the same channel, {ctx.message.author.mention}!")
             
         # Declare youtube-dl options, simplified.
         ydl_opts = {
