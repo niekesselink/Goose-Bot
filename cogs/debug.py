@@ -32,6 +32,7 @@ class Debug(commands.Cog):
 
         # Update previous message with the difference.
         await honk.edit(content=f'**HONK HONK!** `{miliseconds}ms`')
+
     @debug.command(hidden=True)
     async def reloadconfig(self, ctx):
         """Reloads the config.json file."""

@@ -69,6 +69,9 @@ class Music(commands.Cog):
         if ctx.voice_client is None:
             return await ctx.send("**Honk honk.** I'm not in a channel!")
             
+        # And also, only in the same channel...
+        if ctx.message.author.voice.channel is not ctx.voice_client.channel:
+            return await ctx.send(f"**Honk honk.** We're not in the same channel {ctx.message.author.mention}!")
 
         # Ensure we have a source.
         if ctx.voice_client.source is None:
