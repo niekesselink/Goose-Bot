@@ -54,9 +54,13 @@ class Events(commands.Cog):
         if isinstance(error, commands.NoPrivateMessage):
             return await ctx.author.send('**Honk!** This command cannot be used in private message.')
 
-        # We really hit an error, send the error...
-        await ctx.send(embed=discord.Embed(
-            title='**Honk error...**',
+        # We've hit an error. Inform that the owner is on it...
+        await ctx.author.send(f'**Honk!** An error has occured. The owner has been notified and this will be fixed soon, thanks for being a crash-dummy {ctx.message.author.mention}!')
+
+        # Create an embed for this error and send it to the bot owner.
+        owner = self.bot.get_user(462311999980961793)
+        await owner.send(embed=discord.Embed(
+            title='Error by {ctx.message.author.mention} using {ctx.message.content}...',
             description=f'`{str(error)}`',
             colour=0xFF7E62,
         ))

@@ -12,13 +12,12 @@ class Debug(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    async def cog_check(self, ctx):
-        return await self.bot.is_owner(ctx.author)
-
+    @commands.is_owner()
     @commands.group(hidden=True)
     async def debug(self, ctx):
         return
 
+    @commands.is_owner()
     @debug.command(hidden=True)
     async def honk(self, ctx):
         """Latency test command."""
@@ -33,6 +32,7 @@ class Debug(commands.Cog):
         # Update previous message with the difference.
         await honk.edit(content=f'**HONK HONK!** `{miliseconds}ms`')
 
+    @commands.is_owner()
     @debug.command(hidden=True)
     async def reloadconfig(self, ctx):
         """Reloads the config.json file."""
@@ -40,6 +40,7 @@ class Debug(commands.Cog):
         self.bot.config = data.getjson('config.json')
         await ctx.send('**Honk!** Config file has been reloaded!')
 
+    @commands.is_owner()
     @debug.command(hidden=True)
     async def reloadprofileimage(self, ctx):
         """Update profile image of the bot."""
@@ -48,6 +49,7 @@ class Debug(commands.Cog):
             await self.bot.user.edit(avatar=f.read())
             await ctx.send('**Honk!** Updated my profile picture.')
 
+    @commands.is_owner()
     @debug.command(hidden=True)
     async def load(self, ctx, name):
         """Load a module."""
@@ -55,6 +57,7 @@ class Debug(commands.Cog):
         self.bot.load_extension(f"cogs.{name}")
         await ctx.send(f'**Honk!** Module {name} has been loaded!')
 
+    @commands.is_owner()
     @debug.command(hidden=True)
     async def unload(self, ctx, name):
         """ Unload a specific cog """
@@ -62,6 +65,7 @@ class Debug(commands.Cog):
         self.bot.unload_extension(f"cogs.{name}")
         await ctx.send(f'**Honk!** Module {name} has been unloaded!')
 
+    @commands.is_owner()
     @debug.command(hidden=True)
     async def reload(self, ctx, name):
         """Reloads a specific cog."""
@@ -81,6 +85,7 @@ class Debug(commands.Cog):
                 except:
                     pass
 
+    @commands.is_owner()
     @debug.command(hidden=True)
     async def pull(self, ctx):
         """Pulls the most recent version from the repository."""
