@@ -2,14 +2,14 @@ import discord
 import os
 
 from discord.ext import commands, tasks
-from utils import data
+from utils import json
 
 class Bot(commands.Bot):
     def __init__(self, *args, **kwargs):
 
         # Starting...
         self.log('Initialising bot', 'Goose-Bot')
-        self.config = data.getjson('config.json')
+        self.config = json.get('config.json')
 
         # Declare a memory array for all cogs data for now.
         self.memory = {}

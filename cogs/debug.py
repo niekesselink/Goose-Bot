@@ -4,7 +4,7 @@ import os
 import subprocess
 
 from discord.ext import commands, tasks
-from utils import data
+from utils import json
 
 class Debug(commands.Cog):
     """Debug commands mainly for development/update purposes."""
