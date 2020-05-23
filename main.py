@@ -1,7 +1,7 @@
 import discord
 import os
 
-from discord.ext import commands, tasks
+from discord.ext import commands
 from utils import json
 
 class Bot(commands.Bot):
@@ -16,7 +16,7 @@ class Bot(commands.Bot):
 
         # Call the initialize of the bot itself...
         super().__init__(
-            command_prefix='.',
+            command_prefix=self.config.prefix,
             *args,
             **kwargs
         )

@@ -4,7 +4,7 @@ import importlib
 import os
 import subprocess
 
-from discord.ext import commands, tasks
+from discord.ext import commands
 from utils import embed, json
 
 class Debug(commands.Cog):

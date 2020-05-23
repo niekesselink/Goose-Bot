@@ -5,7 +5,7 @@ import youtube_dl
 
 from datetime import datetime
 from discord import FFmpegPCMAudio
-from discord.ext import commands, tasks
+from discord.ext import commands
 from utils import embed
 
 class Music(commands.Cog):

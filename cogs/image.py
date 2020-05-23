@@ -1,7 +1,7 @@
 import discord
 import requests
 
-from discord.ext import commands, tasks
+from discord.ext import commands
 
 class Image(commands.Cog):
     """Random images commands for fun."""

@@ -2,7 +2,7 @@ import asyncio
 import discord
 
 from datetime import datetime
-from discord.ext import commands, tasks
+from discord.ext import commands
 
 class Secrets(commands.Cog):
     """Secret commands for some fun easter eggs."""

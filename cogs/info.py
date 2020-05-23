@@ -3,7 +3,7 @@ import os
 import psutil
 import subprocess
 
-from discord.ext import commands, tasks
+from discord.ext import commands
 from utils import embed
 
 class Info(commands.Cog):
@@ -50,6 +50,13 @@ class Info(commands.Cog):
 
         # Just send a message with the invite link...
         await ctx.send(f'**HONK!** Use this URL to invite me!\n<{discord.utils.oauth_url(self.bot.user.id)}>')
+
+    @commands.command()
+    async def official(self, ctx):
+        """Get an invite to the official server of Goose bot."""
+
+        # Just send a message with the link, just like the other command above.
+        await ctx.send('**HONK!** Come and join the official server which is my house!\nJust click this link here; https://discord.gg/yVSDgUc')
 
 def setup(bot):
     bot.add_cog(Info(bot))
