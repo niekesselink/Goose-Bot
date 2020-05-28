@@ -16,11 +16,6 @@ class Events(commands.Cog):
     async def on_ready(self):
         """Event that happens once the bot has started."""
 
-        # Let's sync all the guilds we're in to the database and set default language to English.
-        for guild in self.bot.guilds:
-            storage = await self.bot.redis.get_storage(guild)
-            await storage.set('language', 'english')
-
         # But is running.
         print('Bot has started.')
         self.bot.uptime = datetime.utcnow()
