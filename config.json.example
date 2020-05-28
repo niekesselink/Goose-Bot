@@ -1,10 +1,7 @@
 {
+  "redis": "insert redis host url here",
   "token": "insert token here",
-  "description": "insert description for the bot here",
-  "colour": "519f65",
-  "prefix": [
-    "."
-  ],
+  "prefix": ".",
 
   "music": {
     "maxduration": 360,

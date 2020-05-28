@@ -1,6 +1,8 @@
+aioredis
 asyncio
 discord.py
 psutil
 PyNaCl
+python-dateutil
 requests
 youtube-dl

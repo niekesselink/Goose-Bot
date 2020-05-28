@@ -2,46 +2,39 @@ import discord
 import os
 
 from discord.ext import commands
-from utils import json
+from utils import data
 
 class Bot(commands.Bot):
+    """Main class of the bot."""
+
     def __init__(self, *args, **kwargs):
+        """Initial function that runs when the class has been created."""
 
-        # Starting...
-        self.log('Initialising bot', 'Goose-Bot')
-        self.config = json.get('config.json')
-
-        # Declare a memory array for all cogs data for now.
+        # Load config and declare memory.
+        self.config = data.get_json('config.json')
         self.memory = {}
 
-        # Call the initialize of the bot itself...
+        # Call the initialize of the bot itself.
         super().__init__(
             command_prefix=self.config.prefix,
             *args,
             **kwargs
         )
 
-    # Function that returns the token from the config to run the bot.
-    def get_token(self):
-        return self.config.token
+        # Configure database.
+        self.redis = data.Redis(
+            self.config.redis,
+            self.loop
+        )
 
-    # Function to log information into the console.
-    def log(self, value, name):
-        print(f'[{name}]', value)
+# Define the bot.
+bot = Bot()
 
-def main():
+# Add each cog there is in the cogs directory...
+for file in os.listdir('cogs'):
+    if file.endswith('.py'):
+        name = file[:-3]
+        bot.load_extension(f'cogs.{name}')
 
-    # Declare the bot class.
-    bot = Bot()
-
-    # Add each cog there is in the cogs directory...
-    for file in os.listdir('cogs'):
-        if file.endswith('.py'):
-            name = file[:-3]
-            bot.load_extension(f'cogs.{name}')
-
-    # Now let's start the bot. :-)
-    bot.run(bot.get_token())
-
-if __name__ == "__main__":
-    main()
+# Now let's start it.
+bot.run(bot.config.token)

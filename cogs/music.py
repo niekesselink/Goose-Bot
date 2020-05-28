@@ -6,12 +6,13 @@ import youtube_dl
 from datetime import datetime
 from discord import FFmpegPCMAudio
 from discord.ext import commands
-from utils import embed
+from utils import data, embed, language
 
 class Music(commands.Cog):
     """Commands for playing music in a voice channel."""
 
     def __init__(self, bot):
+        """Initial function that runs when the class has been created."""
         self.bot = bot
 
         # Define memory variables...
@@ -25,14 +26,16 @@ class Music(commands.Cog):
 
         # Make sure the person using the command is in a voice channel.
         if ctx.message.author.voice is None:
-            return await ctx.send(f'**Honk honk.** Get first in a channel yourself, {ctx.message.author.mention}!')
+            message = await language.get(ctx, 'music.usernotinchannel')
+            return await ctx.send(message.format(ctx.message.author.mention))
 
         # Are we in a voice client?
         if ctx.voice_client is not None:
 
             # Ignore if we are in the same channel already...
             if ctx.message.author.voice.channel is ctx.voice_client.channel:
-                return await ctx.send(f"**Honk honk.** I'm already there, {ctx.message.author.mention}!")
+                message = await language.get(ctx, 'music.alreadythere')
+                return await ctx.send(message.format(ctx.message.author.mention))
 
             # Move to the same channel.
             await ctx.voice_client.move_to(ctx.message.author.voice.channel)
@@ -52,7 +55,8 @@ class Music(commands.Cog):
 
         # This command only works when the bot is in a voice channel...
         if ctx.voice_client is None:
-            return await ctx.send("**Honk honk.** I'm not in a channel!")
+            message = await language.get(ctx, 'music.botnotinchannel')
+            return await ctx.send(message.format(ctx.message.author.mention))
 
         # Now leave.
         await ctx.voice_client.disconnect()
@@ -64,23 +68,75 @@ class Music(commands.Cog):
     @commands.command()
     @commands.guild_only()
     async def volume(self, ctx, volume: int):
-        """Changes the volume output of the bot."""
+        """Changes the volume."""
 
-        # This command only works when the bot is in a voice channel...
-        if ctx.voice_client is None:
-            return await ctx.send("**Honk honk.** I'm not in a channel!")
-            
-        # And also, only in the same channel...
-        if ctx.message.author.voice.channel is not ctx.voice_client.channel:
-            return await ctx.send(f"**Honk honk.** We're not in the same channel, {ctx.message.author.mention}!")
-
-        # Ensure we have a source.
-        if ctx.voice_client.source is None:
-            return await ctx.send(f"**Honk honk.** {ctx.message.author.mention}, why? I'm not playing something!")
+        # Can we run this command in the current context?
+        if not allowed_to_run_command_check(ctx):
+            return
 
         # Now let's change the volume...
         ctx.voice_client.source.volume = volume / 100
-        await ctx.send("**Honk honk!** Oke, I'll honk now at {}% volume.".format(volume))
+        message = await language.get(ctx, 'music.volume')
+        await ctx.send(message.format(volume))
+
+    @commands.command()
+    async def pause(self, ctx):
+        """Pauses the current song."""
+
+        # Can we run this command in the current context?
+        if not allowed_to_run_command_check(ctx):
+            return
+
+        # Let's pause the song...
+        ctx.voice_client.pause()
+
+    @commands.command()
+    async def resume(self, ctx):
+        """Resumes playing the current song."""
+
+        # Can we run this command in the current context?
+        if not allowed_to_run_command_check(ctx):
+            return
+
+        # Let's resume the song...
+        ctx.voice_client.resume()
+
+    @commands.command()
+    @commands.guild_only()
+    async def skip(self, ctx, volume: int):
+        """Changes the volume output of the bot."""
+
+        # Can we run this command in the current context?
+        if not allowed_to_run_command_check(ctx):
+            return
+
+        # Let's skip the song...
+        ctx.voice_client.stop()
+        await ctx.send(await language.get(ctx, 'music.skip'))
+
+    async def allowed_to_run_command_check(self, ctx):
+        """Function to check if we are playing something, used for various commands above."""
+
+        # Are we in a voice channel voice channel?
+        if ctx.voice_client is None:
+            message = await language.get(ctx, 'music.botnotinchannel')
+            await ctx.send(message.format(ctx.message.author.mention))
+            return False
+            
+        # And also, in the same channel?
+        if ctx.message.author.voice.channel is not ctx.voice_client.channel:
+            message = await language.get(ctx, 'music.notsamechannel')
+            await ctx.send(message.format(ctx.message.author.mention))
+            return False
+
+        # Ensure we have a source...
+        if ctx.voice_client.source is None:
+            message = await language.get(ctx, 'music.notplaying')
+            await ctx.send(message.format(ctx.message.author.mention))
+            return False
+
+        # All is good...
+        return True
 
     @commands.command()
     @commands.guild_only()
@@ -89,23 +145,24 @@ class Music(commands.Cog):
 
         # Do we have a queue or are we still in a channel? If not, no playlist.
         if ctx.guild.id not in self.bot.memory['music'] or ctx.voice_client is None:
-            return await ctx.send("**Honk honk.** I'm not playing anything!")
+            message = await language.get(ctx, 'music.notplaying')
+            return await ctx.send(message.format(ctx.message.author.mention))
 
         # Define fields data with now playing.
         fields = {
-            'Now...': self.bot.memory['music'][ctx.guild.id][0]['title']
+            await language.get(ctx, 'music.playlist.now'): self.bot.memory['music'][ctx.guild.id][0]['title']
         }
 
         # Add the future entries to the fields data.
         if len(self.bot.memory['music'][ctx.guild.id]) < 2:
-            fields.update({ 'Upcoming...': 'Nothing :-(' })
+            fields.update({ await language.get(ctx, 'music.playlist.next'): await language.get(ctx, 'music.playlist.nothing') })
         else:
-            fields.update({ 'Upcoming...': '\n'.join([f"{i}) {self.bot.memory['music'][ctx.guild.id][i]['title']}" for i in range(1, len(self.bot.memory['music'][ctx.guild.id]))]) })
+            fields.update({ await language.get(ctx, 'music.playlist.next'): '\n'.join([f"{i}) {self.bot.memory['music'][ctx.guild.id][i]['title']}" for i in range(1, len(self.bot.memory['music'][ctx.guild.id]))]) })
 
         # Send the embed...
         await ctx.send(embed=embed.create(
-            title="**Honking list.**",
-            description='These are the songs I am honking or going to honk very soon! Remember, you can add songs by using .play followed by a YouTube URL or video id.',
+            title=await language.get(ctx, 'music.playlist.title'),
+            description=await language.get(ctx, 'music.playlist.description'),
             fields=fields
         ))
 
@@ -116,11 +173,13 @@ class Music(commands.Cog):
 
         # This command only works when the bot is in a voice channel...
         if ctx.voice_client is None:
-            return await ctx.send("**Honk honk.** I'm not in a channel!")
+            message = await language.get(ctx, 'music.botnotinchannel')
+            return await ctx.send(message.format(ctx.message.author.mention))
             
         # And also, only in the same channel...
         if ctx.message.author.voice.channel is not ctx.voice_client.channel:
-            return await ctx.send(f"**Honk honk.** We're not in the same channel, {ctx.message.author.mention}!")
+            message = await language.get(ctx, 'music.notsamechannel')
+            return await ctx.send(message.format(ctx.message.author.mention))
             
         # Declare youtube-dl options, simplified.
         ydl_opts = {
@@ -130,66 +189,70 @@ class Music(commands.Cog):
         }
 
         # Start typing incidicator.
-        async with ctx.typing():
+        await ctx.channel.trigger_typing()
 
-            # Download the metadata of the video.
-            meta = None
-            with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-                meta = ydl.extract_info(url, download=False)
+        # Download the metadata of the video.
+        meta = None
+        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+            meta = ydl.extract_info(url, download=False)
 
-                # Only allow if it's not longer than set amount of minutes.
-                if meta['duration'] > self.bot.config.music.maxduration:
-                    return await ctx.send(f"**Honk honk.** {ctx.message.author.mention}, no, I'm not going to honk longer than {self.bot.config.music.maxduration} seconds.")
+            # Only allow if it's not longer than set amount of minutes.
+            if meta['duration'] > self.bot.config.music.maxduration:
+                message = await language.get(ctx, 'music.toolong')
+                return await ctx.send(message.format(ctx.message.author.mention, self.bot.config.music.maxduration))
                     
-            # We can add it, let's define the object for in the queue.
-            entry = {
-                'url': url,
-                'title': meta['title'],
-                'duration': meta['duration'],
-                'start': None
-            }
+        # We can add it, let's define the object for in the queue.
+        entry = {
+            'url': url,
+            'title': meta['title'],
+            'duration': meta['duration'],
+            'start': None
+        }
 
-            # Is there a queue already? If not, make one.
-            if ctx.guild.id not in self.bot.memory['music']:
-                self.bot.memory['music'][ctx.guild.id] = []
+        # Is there a queue already? If not, make one.
+        if ctx.guild.id not in self.bot.memory['music']:
+            self.bot.memory['music'][ctx.guild.id] = []
 
-            # Now add the song the queue.
-            self.bot.memory['music'][ctx.guild.id].append(entry)
+        # Now add the song the queue.
+        self.bot.memory['music'][ctx.guild.id].append(entry)
 
-            # Now let's see if we need to start playing directly, as in, nothing is playing...
-            if not ctx.voice_client.is_playing():
-                self.play_song(ctx)
-                return await ctx.send('**Honk honk.** Beginning to honk!')
+        # Now let's see if we need to start playing directly, as in, nothing is playing...
+        if not ctx.voice_client.is_playing():
+            self.play_song(ctx)
+            return await ctx.send(await language.get(ctx, 'music.start'))
                 
-            # Get total seconds in playlist.
-            total_seconds = 0 - meta['duration']
-            for i in range(0, len(self.bot.memory['music'][ctx.guild.id])):
-                total_seconds += self.bot.memory['music'][ctx.guild.id][i]['duration']
+        # Get total seconds in playlist.
+        total_seconds = 0 - meta['duration']
+        for i in range(0, len(self.bot.memory['music'][ctx.guild.id])):
+            total_seconds += self.bot.memory['music'][ctx.guild.id][i]['duration']
 
-            # Retract how far we are now in current song.
-            total_seconds = total_seconds - (datetime.now() - self.bot.memory['music'][ctx.guild.id][0]['start']).total_seconds()
+        # Retract how far we are now in current song.
+        total_seconds = total_seconds - (datetime.now() - self.bot.memory['music'][ctx.guild.id][0]['start']).total_seconds()
 
-            # Declare variables for converting it into a nice figure...
-            result = []
-            intervals = (
-                ('hours', 3600),    # 60 * 60
-                ('minutes', 60),
-                ('seconds', 1),
-            )
+        # Declare variables for converting it into a nice figure...
+        result = []
+        intervals = (
+            ('hours', 3600),    # 60 * 60
+            ('minutes', 60),
+            ('seconds', 1),
+        )
 
-            # Now make it readable for how long we need to wait for this song...
-            for name, count in intervals:
-                value = round(total_seconds // count)
-                if value:
-                    total_seconds -= value * count
-                    if value == 1:
-                        name = name.rstrip('s')
-                    result.append("{} {}".format(value, name))
+        # Now make it readable for how long we need to wait for this song...
+        for name, count in intervals:
+            value = round(total_seconds // count)
+            if value:
+                total_seconds -= value * count
+                if value == 1:
+                    name = name.rstrip('s')
+                result.append("{} {}".format(value, name))
 
-            # Inform.
-            await ctx.send(f"**Honk honk.** {ctx.message.author.mention}, I've added your song to the queue!\n"
-                           f"Your song is #{len(self.bot.memory['music'][ctx.guild.id]) - 1} in the queue. I will honk it over " +
-                           ', '.join(result[:2])+ '...')
+        # Inform.
+        message = await language.get(ctx, 'music.queued')
+        await ctx.send(message.format(
+            ctx.message.author.mention,
+            len(self.bot.memory['music'][ctx.guild.id]) - 1,
+            ', '.join(result[:2])
+        ))
 
     def play_song(self, ctx, pop=False):
         """Function to actually play a song."""

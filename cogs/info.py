@@ -4,13 +4,16 @@ import psutil
 import subprocess
 
 from discord.ext import commands
-from utils import embed
+from utils import embed, language
 
 class Info(commands.Cog):
     """Information commands about the bot."""
 
     def __init__(self, bot):
+        """Initial function that runs when the class has been created."""
         self.bot = bot
+
+        # Get reference to the current running process.
         self.process = psutil.Process(os.getpid())
 
     @commands.command()
@@ -31,32 +34,26 @@ class Info(commands.Cog):
 
         # Create and send the embed.
         await ctx.send(embed=embed.create(
-            title='**Information.**',
-            description='Open-source Discord bot for providing moderation features, music features and other fun commands to a Discord server.',
+            title=await language.get(ctx, 'info.title'),
+            description=await language.get(ctx, 'info.description'),
             thumbnail=ctx.bot.user.avatar_url,
             fields=fields
         ))
 
     @commands.command()
-    async def source(self, ctx):
-        """Check out the bot's source code."""
-
-        # Just send a message with the GitHub page...
-        await ctx.send(f'**HONK!** I am powered by this source code...\nhttps://github.com/niekesselink/Goose-Bot')
+    async def official(self, ctx):
+        """Get an invite to the official server of Goose bot."""
+        await ctx.send(await language.get(ctx, 'info.official') + '\nhttps://discord.gg/yVSDgUc')
 
     @commands.command()
     async def invite(self, ctx):
         """Get a link to invite the bot to your own server."""
-
-        # Just send a message with the invite link...
-        await ctx.send(f'**HONK!** Use this URL to invite me!\n<{discord.utils.oauth_url(self.bot.user.id)}>')
+        await ctx.send(await language.get(ctx, 'info.invite') + f'\n<{discord.utils.oauth_url(self.bot.user.id)}>')
 
     @commands.command()
-    async def official(self, ctx):
-        """Get an invite to the official server of Goose bot."""
-
-        # Just send a message with the link, just like the other command above.
-        await ctx.send('**HONK!** Come and join the official server which is my house!\nJust click this link here; https://discord.gg/yVSDgUc')
+    async def source(self, ctx):
+        """Check out the bot's source code."""
+        await ctx.send(await language.get(ctx, 'info.source') + '\nhttps://github.com/niekesselink/Goose-Bot')
 
 def setup(bot):
     bot.add_cog(Info(bot))

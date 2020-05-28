@@ -7,6 +7,7 @@ class Image(commands.Cog):
     """Random images commands for fun."""
 
     def __init__(self, bot):
+        """Initial function that runs when the class has been created."""
         self.bot = bot
 
     @commands.command()

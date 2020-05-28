@@ -3,11 +3,13 @@ import discord
 
 from datetime import datetime
 from discord.ext import commands
+from utils import data, language
 
 class Secrets(commands.Cog):
     """Secret commands for some fun easter eggs."""
 
     def __init__(self, bot):
+        """Initial function that runs when the class has been created."""
         self.bot = bot
 
     @commands.cooldown(1, 3600, commands.BucketType.guild)
@@ -38,7 +40,7 @@ class Secrets(commands.Cog):
         self.bot.memory['music'][ctx.guild.id].append(entry)
 
         # We got it coming for ya...
-        await ctx.send('Honk... ehm... **AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH**!')
+        await ctx.send(await language.get(ctx, 'secrets.aaaaaah'))
 
         # Now let's start the AAAH script...
         self.bot.loop.create_task(self.do_aah_script(ctx, total_seconds))
@@ -59,19 +61,19 @@ class Secrets(commands.Cog):
 
         # And now let's go AAAAAAH!
         await asyncio.sleep(16)
-        await ctx.send(file=discord.File(f'assets/aaaaaah/1.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH')
+        await ctx.send(file=discord.File(f'assets/secrets/aaaaaah/1.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH')
         await asyncio.sleep(3)
-        await ctx.send(file=discord.File(f'assets/aaaaaah/2.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH')
+        await ctx.send(file=discord.File(f'assets/secrets/aaaaaah/2.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH')
         await asyncio.sleep(3)
-        await ctx.send(file=discord.File(f'assets/aaaaaah/3.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH')
+        await ctx.send(file=discord.File(f'assets/secrets/aaaaaah/3.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH')
         await asyncio.sleep(3.5)
-        await ctx.send(file=discord.File(f'assets/aaaaaah/4.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH')
+        await ctx.send(file=discord.File(f'assets/secrets/aaaaaah/4.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH')
         await asyncio.sleep(3)
-        await ctx.send(file=discord.File(f'assets/aaaaaah/5.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
+        await ctx.send(file=discord.File(f'assets/secrets/aaaaaah/5.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
         await asyncio.sleep(9)
-        await ctx.send(file=discord.File(f'assets/aaaaaah/6.jpg'), content='AAAAAAEH!')
+        await ctx.send(file=discord.File(f'assets/secrets/aaaaaah/6.jpg'), content='AAAAAAEH!')
         await asyncio.sleep(1)
-        await ctx.send(file=discord.File(f'assets/aaaaaah/7.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAA')
+        await ctx.send(file=discord.File(f'assets/secrets/aaaaaah/7.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAA')
         await asyncio.sleep(5)
 
         # Restore volume, it's bridge time, and wait...
@@ -83,7 +85,7 @@ class Secrets(commands.Cog):
 
         # Here we go, finale!
         await asyncio.sleep(1)
-        await ctx.send(file=discord.File(f'assets/aaaaaah/8.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAAAAAAAH')
+        await ctx.send(file=discord.File(f'assets/secrets/aaaaaah/8.jpg'), content='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAAAAAAAH')
         await asyncio.sleep(14)
 
         # Restore volume, we're done now...
