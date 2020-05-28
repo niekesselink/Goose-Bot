@@ -45,7 +45,7 @@ class Debug(commands.Cog):
         self.bot.load_extension(f'cogs.{name}')
         print(f'Cog {name} has been loaded!')
         message = await language.get(ctx, 'debug.cogload')
-        await honk.edit(content=message.format(name))
+        await ctx.send(content=message.format(name))
 
     @debug.command()
     async def unload(self, ctx, name):
@@ -54,7 +54,7 @@ class Debug(commands.Cog):
         self.bot.unload_extension(f'cogs.{name}')
         print(f'Cog {name} has been unloaded!')
         message = await language.get(ctx, 'debug.cogunload')
-        await honk.edit(content=message.format(name))
+        await ctx.send(content=message.format(name))
 
     @debug.command()
     async def reload(self, ctx, name):
@@ -65,7 +65,7 @@ class Debug(commands.Cog):
             self.bot.reload_extension(f'cogs.{name}')
             print(f'Cog {name} has been reloaded!')
             message = await language.get(ctx, 'debug.cogreload')
-            await honk.edit(content=message.format(name))
+            await ctx.send(content=message.format(name))
 
         # Reload all possible cogs which have been loaded...
         for file in os.listdir('cogs'):
@@ -75,7 +75,7 @@ class Debug(commands.Cog):
                     self.bot.reload_extension(f'cogs.{cog}')
                     print(f'Cog {name} has been reloaded!')
                     message = await language.get(ctx, 'debug.reload')
-                    await honk.edit(content=message.format(name))
+                    await ctx.send(content=message.format(name))
                 except:
                     pass
 
@@ -90,7 +90,7 @@ class Debug(commands.Cog):
         # Inform...
         print(f'Util {name} has been (re)imported!')
         message = await language.get(ctx, 'debug.importutil')
-        await honk.edit(content=message.format(name))
+        await ctx.send(content=message.format(name))
 
     @debug.command()
     async def pull(self, ctx):
