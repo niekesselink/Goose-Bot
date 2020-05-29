@@ -18,7 +18,7 @@ async def get(ctx, line):
 
     # No guild? Then English...
     if ctx.guild is None:
-        return await language.get(line, 'english')
+        return await Languages.array['english'][line]
 
     # Get proper language string for the guild...
     storage = await ctx.bot.redis.get_storage(ctx.guild)
