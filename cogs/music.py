@@ -104,7 +104,7 @@ class Music(commands.Cog):
     @commands.command()
     @commands.guild_only()
     async def skip(self, ctx, volume: int):
-        """Changes the volume output of the bot."""
+        """Skips the current playing song."""
 
         # Can we run this command in the current context?
         if not self.allowed_to_run_command_check(ctx):

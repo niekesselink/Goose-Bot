@@ -12,12 +12,12 @@ class Discomfort(commands.Cog):
 
     @commands.group()
     async def discomfort(self, ctx):
-        """Declaration of the discomfort category."""
+        """Find and meet strangers through the Discomfort program."""
         return    
     
     @discomfort.command()
     async def about(self, ctx):
-        """Shows information about the Discomfort program."""
+        """Shows more information about the Discomfort program."""
         await ctx.send(await language.get(ctx, 'discomfort.about'))
 
     @discomfort.command()
