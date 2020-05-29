@@ -71,7 +71,7 @@ class Music(commands.Cog):
         """Changes the volume."""
 
         # Can we run this command in the current context?
-        if not allowed_to_run_command_check(ctx):
+        if not self.allowed_to_run_command_check(ctx):
             return
 
         # Now let's change the volume...
@@ -84,7 +84,7 @@ class Music(commands.Cog):
         """Pauses the current song."""
 
         # Can we run this command in the current context?
-        if not allowed_to_run_command_check(ctx):
+        if not self.allowed_to_run_command_check(ctx):
             return
 
         # Let's pause the song...
@@ -95,7 +95,7 @@ class Music(commands.Cog):
         """Resumes playing the current song."""
 
         # Can we run this command in the current context?
-        if not allowed_to_run_command_check(ctx):
+        if not self.allowed_to_run_command_check(ctx):
             return
 
         # Let's resume the song...
@@ -107,7 +107,7 @@ class Music(commands.Cog):
         """Changes the volume output of the bot."""
 
         # Can we run this command in the current context?
-        if not allowed_to_run_command_check(ctx):
+        if not self.allowed_to_run_command_check(ctx):
             return
 
         # Let's skip the song...
