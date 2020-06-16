@@ -1,6 +1,7 @@
 import asyncio
 import discord
 import os
+import subprocess
 import youtube_dl
 
 from datetime import datetime
@@ -171,15 +172,15 @@ class Music(commands.Cog):
     async def play(self, ctx, url: str):
         """Plays or queues a song from YouTube, pass video id or url."""
 
-        # This command only works when the bot is in a voice channel...
-        if ctx.voice_client is None:
-            message = await language.get(ctx, 'music.botnotinchannel')
-            return await ctx.send(message.format(ctx.message.author.mention))
+        ## This command only works when the bot is in a voice channel...
+        #if ctx.voice_client is None:
+        #    message = await language.get(ctx, 'music.botnotinchannel')
+        #    return await ctx.send(message.format(ctx.message.author.mention))
             
-        # And also, only in the same channel...
-        if ctx.message.author.voice.channel is not ctx.voice_client.channel:
-            message = await language.get(ctx, 'music.notsamechannel')
-            return await ctx.send(message.format(ctx.message.author.mention))
+        ## And also, only in the same channel...
+        #if ctx.message.author.voice.channel is not ctx.voice_client.channel:
+        #    message = await language.get(ctx, 'music.notsamechannel')
+        #    return await ctx.send(message.format(ctx.message.author.mention))
             
         # Declare youtube-dl options, simplified.
         ydl_opts = {
@@ -191,6 +192,10 @@ class Music(commands.Cog):
         # Start typing incidicator.
         await ctx.channel.trigger_typing()
 
+        # If the url is not starting with http, then we search for the first fitting result.
+        if not url.startswith('http'):
+            url = ctx.message.content.replace('!play ', 'ytsearch:')
+
         # Download the metadata of the video.
         meta = None
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
@@ -200,6 +205,10 @@ class Music(commands.Cog):
             db_result = await self.bot.db.fetch(f"SELECT value FROM guild_settings WHERE guild_id = {ctx.guild.id} AND key = 'music.maxduration'")
             max_duration = int(db_result[0]['value'])
 
+            # Fix for search.
+            if 'duration' not in meta:
+                meta = meta['entries'][0]
+
             # Only allow if it's not longer than set amount of minutes.
             if meta['duration'] > max_duration:
                 message = await language.get(ctx, 'music.toolong')
@@ -207,7 +216,7 @@ class Music(commands.Cog):
                     
         # We can add it, let's define the object for in the queue.
         entry = {
-            'url': url,
+            'url': meta['id'],
             'title': meta['title'],
             'duration': meta['duration'],
             'start': None
