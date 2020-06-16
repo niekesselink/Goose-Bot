@@ -197,7 +197,7 @@ class Music(commands.Cog):
             meta = ydl.extract_info(url, download=False)
 
             # Get how many seconds a song may be.
-            max_duration = int(await self.bot.db.fetch(f"SELECT value FROM guild_settings WHERE guild_id = {guild.id} AND key = 'music.maxduration'"))
+            max_duration = int(await self.bot.db.fetch(f"SELECT value FROM guild_settings WHERE guild_id = {ctx.guild.id} AND key = 'music.maxduration'"))
 
             # Only allow if it's not longer than set amount of minutes.
             if meta['duration'] > max_duration:
