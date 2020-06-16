@@ -98,7 +98,7 @@ class Debug(commands.Cog):
 
         # Migration code.
         await migrate.go(self.bot)
-
+        await ctx.send(await language.get(ctx, 'debug.migrate'))
 
     @debug.command()
     async def pull(self, ctx):
