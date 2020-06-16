@@ -72,7 +72,7 @@ class Music(commands.Cog):
         """Changes the volume."""
 
         # Can we run this command in the current context?
-        if not self.allowed_to_run_command_check(ctx):
+        if not self.allowed_to_run_command_check(ctx, True):
             return
 
         # Now let's change the volume...
@@ -85,7 +85,7 @@ class Music(commands.Cog):
         """Pauses the current song."""
 
         # Can we run this command in the current context?
-        if not self.allowed_to_run_command_check(ctx):
+        if not self.allowed_to_run_command_check(ctx, True):
             return
 
         # Let's pause the song...
@@ -96,7 +96,7 @@ class Music(commands.Cog):
         """Resumes playing the current song."""
 
         # Can we run this command in the current context?
-        if not self.allowed_to_run_command_check(ctx):
+        if not self.allowed_to_run_command_check(ctx, True):
             return
 
         # Let's resume the song...
@@ -108,36 +108,12 @@ class Music(commands.Cog):
         """Skips the current playing song."""
 
         # Can we run this command in the current context?
-        if not self.allowed_to_run_command_check(ctx):
+        if not self.allowed_to_run_command_check(ctx, True):
             return
 
         # Let's skip the song...
         ctx.voice_client.stop()
         await ctx.send(await language.get(ctx, 'music.skip'))
-
-    async def allowed_to_run_command_check(self, ctx):
-        """Function to check if we are playing something, used for various commands above."""
-
-        # Are we in a voice channel voice channel?
-        if ctx.voice_client is None:
-            message = await language.get(ctx, 'music.botnotinchannel')
-            await ctx.send(message.format(ctx.message.author.mention))
-            return False
-            
-        # And also, in the same channel?
-        if ctx.message.author.voice.channel is not ctx.voice_client.channel:
-            message = await language.get(ctx, 'music.notsamechannel')
-            await ctx.send(message.format(ctx.message.author.mention))
-            return False
-
-        # Ensure we have a source...
-        if ctx.voice_client.source is None:
-            message = await language.get(ctx, 'music.notplaying')
-            await ctx.send(message.format(ctx.message.author.mention))
-            return False
-
-        # All is good...
-        return True
 
     @commands.command()
     @commands.guild_only()
@@ -172,15 +148,9 @@ class Music(commands.Cog):
     async def play(self, ctx, url: str):
         """Plays or queues a song from YouTube, pass video id or url."""
 
-        ## This command only works when the bot is in a voice channel...
-        #if ctx.voice_client is None:
-        #    message = await language.get(ctx, 'music.botnotinchannel')
-        #    return await ctx.send(message.format(ctx.message.author.mention))
-            
-        ## And also, only in the same channel...
-        #if ctx.message.author.voice.channel is not ctx.voice_client.channel:
-        #    message = await language.get(ctx, 'music.notsamechannel')
-        #    return await ctx.send(message.format(ctx.message.author.mention))
+        # Can we run this command in the current context?
+        if not self.allowed_to_run_command_check(ctx, False):
+            return
             
         # Declare youtube-dl options, simplified.
         ydl_opts = {
@@ -266,6 +236,35 @@ class Music(commands.Cog):
             len(self.bot.memory['music'][ctx.guild.id]) - 1,
             ', '.join(result[:2])
         ))
+
+    async def allowed_to_run_command_check(self, ctx, need_source):
+        """Function to check if we are playing something, used for various commands above."""
+
+        # Are we in a voice channel voice channel?
+        if ctx.voice_client is None:
+            message = await language.get(ctx, 'music.botnotinchannel')
+            await ctx.send(message.format(ctx.message.author.mention))
+            return False
+ 
+        # Make sure the person using the command is in a voice channel.
+        if ctx.message.author.voice is None:
+            message = await language.get(ctx, 'music.usernotinchannel')
+            return await ctx.send(message.format(ctx.message.author.mention))
+            
+        # And also, in the same channel?
+        if ctx.message.author.voice.channel is not ctx.voice_client.channel:
+            message = await language.get(ctx, 'music.notsamechannel')
+            await ctx.send(message.format(ctx.message.author.mention))
+            return False
+
+        # Ensure we have a source...
+        if need_source and ctx.voice_client.source is None:
+            message = await language.get(ctx, 'music.notplaying')
+            await ctx.send(message.format(ctx.message.author.mention))
+            return False
+
+        # All is good...
+        return True
 
     def play_song(self, ctx, pop=False):
         """Function to actually play a song."""
