@@ -22,7 +22,7 @@ class Music(commands.Cog):
     @commands.command()
     @commands.guild_only()
     async def join(self, ctx):
-        """Brings the bot to your voice channel."""
+        """Brings the bot to to the music channel."""
 
         # Make sure the person using the command is in a voice channel.
         if ctx.message.author.voice is None:
@@ -51,7 +51,7 @@ class Music(commands.Cog):
     @commands.command()
     @commands.guild_only()
     async def leave(self, ctx):
-        """Makes the bot leave any voice channel it is in."""
+        """Makes the bot leave the music channel."""
 
         # This command only works when the bot is in a voice channel...
         if ctx.voice_client is None:
@@ -196,10 +196,13 @@ class Music(commands.Cog):
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
             meta = ydl.extract_info(url, download=False)
 
+            # Get how many seconds a song may be.
+            max_duration = int(await self.bot.db.fetch(f"SELECT value FROM guild_settings WHERE guild_id = {guild.id} AND key = 'music.maxduration'"))
+
             # Only allow if it's not longer than set amount of minutes.
-            if meta['duration'] > self.bot.config.music.maxduration:
+            if meta['duration'] > max_duration:
                 message = await language.get(ctx, 'music.toolong')
-                return await ctx.send(message.format(ctx.message.author.mention, self.bot.config.music.maxduration))
+                return await ctx.send(message.format(ctx.message.author.mention, max_duration))
                     
         # We can add it, let's define the object for in the queue.
         entry = {
@@ -298,7 +301,7 @@ class Music(commands.Cog):
             ydl.download([url])
 
         # Set a proper volume...
-        volume = self.bot.config.music.volume
+        volume = 1
         if ctx.voice_client.source is not None:
             volume = ctx.voice_client.source.volume
 
