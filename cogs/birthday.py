@@ -41,7 +41,7 @@ class Birthday(commands.Cog):
 
         # Now add it to the database.
         await self.bot.db.execute(f"INSERT INTO birthdays (guild_id, member_id, birthday, timezone) VALUES ({ctx.guild.id}, {ctx.author.id}, '{date}', '{timezone}') "
-                                  f"ON CONFLICT (guild_id, member_id) DO UPDATE SET birthday = '{date}' AND timezone = '{timezone}'")
+                                  f"ON CONFLICT (guild_id, member_id) DO UPDATE SET birthday = '{date}', timezone = '{timezone}'")
 
         # Inform the user we've set the birthday.
         message = await language.get(ctx, 'birthday.succes')
