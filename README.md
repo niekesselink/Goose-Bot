@@ -6,7 +6,7 @@ https://discordapp.com/oauth2/authorize?client_id=672445557293187128&scope=bot
 
 ### Requirements ###
 * FFmpeg 
-* Redis
+* PostgreSQL
 
 ### TODO ###
 * Bot configuration per server

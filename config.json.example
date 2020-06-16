@@ -1,7 +1,7 @@
 {
-  "redis": "insert redis host url here",
-  "token": "insert token here",
+  "postgre": "insert url here",
   "prefix": ".",
+  "token": "insert token here",
 
   "music": {
     "maxduration": 360,

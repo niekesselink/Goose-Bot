@@ -21,6 +21,4 @@ async def get(ctx, line):
         return await Languages.array['english'][line]
 
     # Get proper language string for the guild...
-    storage = await ctx.bot.redis.get_storage(ctx.guild)
-    language = await storage.get('language')
-    return Languages.array[language][line]
+    return Languages.array['english'][line]

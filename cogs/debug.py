@@ -5,7 +5,7 @@ import os
 import subprocess
 
 from discord.ext import commands
-from utils import embed, language
+from utils import embed, language, migrate
 
 class Debug(commands.Cog):
     """Debug commands mainly for development/update purposes."""
@@ -91,6 +91,14 @@ class Debug(commands.Cog):
         print(f'Util {name} has been (re)imported!')
         message = await language.get(ctx, 'debug.importutil')
         await ctx.send(content=message.format(name))
+
+    @debug.command()
+    async def migrate(self, ctx):
+        """Migrate the database to ensure it's up to date."""
+
+        # Migration code.
+        await migrate.go(self.bot)
+
 
     @debug.command()
     async def pull(self, ctx):

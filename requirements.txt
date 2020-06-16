@@ -1,5 +1,5 @@
-aioredis
 asyncio
+asyncpg
 discord.py
 psutil
 PyNaCl

@@ -1,3 +1,5 @@
+import asyncio
+import asyncpg
 import discord
 import os
 
@@ -22,9 +24,8 @@ class Bot(commands.Bot):
         )
 
         # Configure database.
-        self.redis = data.Redis(
-            self.config.redis,
-            self.loop
+        self.db = asyncio.get_event_loop().run_until_complete(
+            asyncpg.create_pool(self.config.postgre)
         )
 
 # Define the bot.

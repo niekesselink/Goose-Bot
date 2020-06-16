@@ -27,21 +27,34 @@ class Events(commands.Cog):
         )
             
     @commands.Cog.listener()
+    async def on_guild_join(self, guild):
+        """Event that happens once the bot enters a guild."""
+
+        # Add the guild and the members of said guild to the database.
+        await self.bot.db.execute(f"INSERT INTO guilds (id) VALUES ({guild.id})")
+        for member in guild.members:
+            await self.bot.db.execute(f"INSERT INTO guild_members (guild_id ,id) VALUES ({guild.id}, {member.id})")
+
+    @commands.Cog.listener()
     async def on_guild_leave(self, guild):
         """Event that happens once the bot leaves a guild."""
 
-        # We're leaving, destroy guild data...
-        redis = self.bot.redis.instance
+        # Remove the guild from the database.
+        await self.bot.db.execute(f"DELETE FROM guilds WHERE id = {guild.id}")
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
-        """Event that happens once an user joins the guild the bot is in."""
-        return
+        """Event that happens once a member joins the guild the bot is in."""
+
+        # Add the member to the database.
+        await self.bot.db.execute(f"INSERT INTO guild_members (guild_id, id) VALUES ({member.guild.id}, {member.id})")
 
     @commands.Cog.listener()
     async def on_member_leave(self, member):
-        """Event that happens once an user leaves the guild the bot is in."""
-        return
+        """Event that happens once a member leaves the guild the bot is in."""
+
+        # Remove member from the database.
+        await self.bot.db.execute(f"DELETE FROM guild_members WHERE guild_id = {member.guild.id} AND id = {member.id}")
 
     @commands.Cog.listener()
     async def on_message(self, message):
