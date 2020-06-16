@@ -12,14 +12,11 @@ class Birthday(commands.Cog):
     def __init__(self, bot):
         """Initial function that runs when the class has been created."""
         self.bot = bot
-
-        # Define looping task which checkes for birthdays.
-        #self.check_birthday.add_exception_type(asyncpg.PostgresConnectionError)
-        #self.check_birthday.start()
+        self.check_birthday.start()
 
     def cog_unload(self):
         """Function that happens the when the cog unloads."""
-        #self.check_birthday.cancel()
+        self.check_birthday.cancel()
 
     @commands.command()
     async def birthday(self, ctx, input=None):
@@ -61,18 +58,61 @@ class Birthday(commands.Cog):
     #    if not birthday:
     #        return await ctx.send(await language.get(ctx, 'birthday.notset'))
 
-    #@tasks.loop(minutes=20)
-    #async def check_birthday(self):
-    #    """Function that loops to search the database for birthdays to give or remove."""
+    @tasks.loop(minutes=15.0)
+    async def check_birthday(self):
+        """
+            Function that loops to search the database for birthdays to give or remove.
+            Note that this function is not guild specific; it's used globally for all the servers.
+        """
 
-    #    # Get people who are having their birthday right now and don't have to role already.
-    #    birthdays = f"SELECT member_id FROM birthdays WHERE birthday = date(timezone(timezone, NOW())) AND has_role = false"
+        # Get people who are having their birthday right now and don't have to role already.
+        birthdays = await self.bot.db.fetch("SELECT guild_id, member_id FROM birthdays "
+                                            "WHERE to_char(birthday, 'MM-DD') = to_char(date(timezone(timezone, NOW())), 'MM-DD') AND triggered = FALSE "
+                                            "GROUP BY guild_id, member_id")
 
-    #    # Now loop through them.
+        # Loop through every birthday there is now.
+        for birthday in birthdays:
+            
+            # Get some values required.
+            guild = self.bot.get_guild(birthday['guild_id'])
+            member = guild.get_member(birthday['member_id'])
+            channel_id = await self.bot.db.fetch(f"SELECT value FROM guild_settings WHERE guild_id = {guild.id} AND key = 'birthday.channel'")
+            role_id = await self.bot.db.fetch(f"SELECT value FROM guild_settings WHERE guild_id = {guild.id} AND key = 'birthday.role'")
+            
+            # Announce it if we can.
+            if channel_id:
+                channel = guild.get_channel(int(channel_id[0]['value']))
+                message = await language.get(None, 'birthday.wish');
+                await channel.send(message.format(member.mention))
 
-    #    # Now also look for people who had their birthday yesterday.
+            # Add the role if we can do it, or else make it blank.
+            if role_id:
+                role_id = int(role_id[0]['value'])
+                await member.add_roles(guild.get_role(role_id))
+            else:
+                role_id = ''
+            
+            # We have triggered this person's birthday...
+            await self.bot.db.execute(f"UPDATE birthdays SET triggered = TRUE, given_role = '{role_id}' WHERE guild_id = {guild.id} AND member_id = {member.id}")
 
-    #    # Remove their birthday role if they still have it.
+        # Now also look for people who had their birthday yesterday.
+        old_birthdays = await self.bot.db.fetch("SELECT guild_id, member_id, given_role FROM birthdays "
+                                                "WHERE to_char(birthday, 'MM-DD') != to_char(date(timezone(timezone, NOW())), 'MM-DD') AND triggered = TRUE "
+                                                "GROUP BY guild_id, member_id, given_role")
+
+        # Loop through every old birthday.
+        for old_birthday in old_birthdays:
+            
+            # Get some values required.
+            guild = self.bot.get_guild(old_birthday['guild_id'])
+            member = guild.get_member(old_birthday['member_id'])
+
+            # If we had the birthday role, then remove it.
+            if old_birthday['given_role']:
+                await member.remove_roles(guild.get_role(int(old_birthday['given_role'])))
+
+            # No role given, simple update.
+            await self.bot.db.execute(f"UPDATE birthdays SET triggered = FALSE, given_role = '' WHERE guild_id = {guild.id} AND member_id = {member.id}")
 
 def setup(bot):
     bot.add_cog(Birthday(bot))

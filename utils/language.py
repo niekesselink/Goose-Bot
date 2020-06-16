@@ -17,8 +17,8 @@ async def get(ctx, line):
     """Returns a line in a specific language as set by the guild."""
 
     # No guild? Then English...
-    if ctx.guild is None:
-        return await Languages.array['english'][line]
+    if ctx is None or ctx.guild is None:
+        return Languages.array['english'][line]
 
     # Get proper language string for the guild...
     return Languages.array['english'][line]
