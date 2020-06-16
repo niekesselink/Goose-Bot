@@ -1,7 +1,6 @@
 import asyncio
 import discord
 import os
-import subprocess
 import youtube_dl
 
 from datetime import datetime
@@ -149,8 +148,8 @@ class Music(commands.Cog):
         """Plays or queues a song from YouTube, pass video id or url."""
 
         # Can we run this command in the current context?
-        if not self.allowed_to_run_command_check(ctx, False):
-            return
+        #if not self.allowed_to_run_command_check(ctx, False):
+        #    return
             
         # Declare youtube-dl options, simplified.
         ydl_opts = {
@@ -186,7 +185,7 @@ class Music(commands.Cog):
                     
         # We can add it, let's define the object for in the queue.
         entry = {
-            'url': meta['id'],
+            'url': meta['webpage_url'],
             'title': meta['title'],
             'duration': meta['duration'],
             'start': None
