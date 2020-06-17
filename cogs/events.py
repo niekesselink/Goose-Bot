@@ -49,6 +49,17 @@ class Events(commands.Cog):
         # Add the member to the database.
         await self.bot.db.execute(f"INSERT INTO guild_members (guild_id, id) VALUES ({member.guild.id}, {member.id})")
 
+        # Get a welcome channel if it's set.
+        raw_welcome_channel = await self.bot.db.fetch(f"SELECT value FROM guild_settings WHERE guild_id = {member.guild.id} AND key = 'welcome.channel'")
+
+        # If channel is set, get the channel and continue.
+        if raw_welcome_channel:
+            welcome_channel = member.guild.get_channel(int(raw_welcome_channel[0]['value']))
+
+            # Getting a random welcome message, get the channel, format it, and send it.
+            welcome_messages = await self.bot.db.fetch(f"SELECT text FROM welcomes WHERE guild_id = {member.guild.id} ORDER BY RANDOM() LIMIT 1")
+            welcome_channel.send(welcome_messages[0]['text'].format(member.mention))
+
     @commands.Cog.listener()
     async def on_member_leave(self, member):
         """Event that happens once a member leaves the guild the bot is in."""
