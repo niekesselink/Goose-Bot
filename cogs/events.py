@@ -47,7 +47,7 @@ class Events(commands.Cog):
         """Event that happens once a member joins the guild the bot is in."""
 
         # Add the member to the database.
-        await self.bot.db.execute(f"INSERT INTO guild_members (guild_id, id) VALUES ({member.guild.id}, {member.id})")
+        await self.bot.db.execute(f"INSERT INTO guild_members (guild_id, id) VALUES ({member.guild.id}, {member.id}) ON CONFLICT (guild_id, id) DO NOTHING")
 
         # Get a welcome channel if it's set.
         raw_welcome_channel = await self.bot.db.fetch(f"SELECT value FROM guild_settings WHERE guild_id = {member.guild.id} AND key = 'welcome.channel'")
@@ -58,10 +58,10 @@ class Events(commands.Cog):
 
             # Getting a random welcome message, get the channel, format it, and send it.
             welcome_messages = await self.bot.db.fetch(f"SELECT text FROM welcomes WHERE guild_id = {member.guild.id} ORDER BY RANDOM() LIMIT 1")
-            welcome_channel.send(welcome_messages[0]['text'].format(member.mention))
+            await welcome_channel.send(welcome_messages[0]['text'].format(member.mention))
 
     @commands.Cog.listener()
-    async def on_member_leave(self, member):
+    async def on_member_remove(self, member):
         """Event that happens once a member leaves the guild the bot is in."""
 
         # Remove member from the database.
