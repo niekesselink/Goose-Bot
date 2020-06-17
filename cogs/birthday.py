@@ -27,7 +27,7 @@ class Birthday(commands.Cog):
             return await ctx.send(await language.get(ctx, 'birthday.howto'))
 
         # Parse the given date and get guild timezone.
-        date = parser.parse(input)
+        date = parser.parse(ctx.message.content.replace(f'{self.bot.config.prefix}birthday ', ''))
         timezone = await self.bot.db.fetch(f"SELECT value FROM guild_settings WHERE guild_id = {ctx.guild.id} AND key = 'timezone'")
 
         # Make sure the timezone is an acutual value.
