@@ -148,8 +148,8 @@ class Music(commands.Cog):
         """Plays or queues a song from YouTube, pass video id or url."""
 
         # Can we run this command in the current context?
-        #if not self.allowed_to_run_command_check(ctx, False):
-        #    return
+        if not self.allowed_to_run_command_check(ctx, False):
+            return
             
         # Declare youtube-dl options, simplified.
         ydl_opts = {
@@ -163,7 +163,7 @@ class Music(commands.Cog):
 
         # If the url is not starting with http, then we search for the first fitting result.
         if not url.startswith('http'):
-            url = ctx.message.content.replace('!play ', 'ytsearch:')
+            url = ctx.message.content.replace(f'{self.bot.config.prefix}play ', 'ytsearch:')
 
         # Download the metadata of the video.
         meta = None
