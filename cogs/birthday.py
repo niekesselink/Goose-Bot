@@ -24,7 +24,8 @@ class Birthday(commands.Cog):
 
         # Check for value, if none then tell how to use this command.
         if input is None:
-            return await ctx.send(await language.get(ctx, 'birthday.howto'))
+            message = await language.get(ctx, 'birthday.howto')
+            return await ctx.send(message.format(ctx.message.author.mention))
 
         # Parse the given date and get guild timezone.
         date = parser.parse(ctx.message.content.replace(f'{self.bot.config.prefix}birthday ', ''))
@@ -43,7 +44,7 @@ class Birthday(commands.Cog):
         # Inform the user we've set the birthday.
         message = await language.get(ctx, 'birthday.succes')
         date_formatted = date.strftime(await language.get(ctx, 'birthday.format')).lower()
-        await ctx.send(message.format(date_formatted, timezone))
+        await ctx.send(message.format(ctx.message.author.mention, date_formatted, timezone))
 
     #@commands.command()
     #async def timezone(self, ctx, input=None):
@@ -51,12 +52,14 @@ class Birthday(commands.Cog):
 
     #    # Check for input, if none explain the possible timezones.
     #    if input is None:
-    #        return await ctx.send(await language.get(ctx, 'birthday.timezone'))
+    #        message = await language.get(ctx, 'birthday.timezone')
+    #        return await ctx.send(message.format(ctx.message.author.mention))
 
     #    # Check if user has set a birthday.
     #    birthday = await self.bot.db.fetch(f"SELECT birthday FROM birthdays WHERE guild_id = {ctx.guild.id} AND member_id = {ctx.author.id}")
     #    if not birthday:
-    #        return await ctx.send(await language.get(ctx, 'birthday.notset'))
+    #        message = await language.get(ctx, 'birthday.notset')
+    #        return await ctx.send(message.format(ctx.message.author.mention))
 
     @tasks.loop(minutes=15.0)
     async def check_birthday(self):
