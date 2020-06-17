@@ -179,7 +179,7 @@ class Music(commands.Cog):
                 meta = meta['entries'][0]
 
             # Only allow if it's not longer than set amount of minutes.
-            if meta['duration'] > max_duration:
+            if meta['duration'] > max_duration or meta['is_live']:
                 message = await language.get(ctx, 'music.toolong')
                 return await ctx.send(message.format(ctx.message.author.mention, max_duration))
                     
