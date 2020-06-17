@@ -1,6 +1,6 @@
 {
   "birthday.format": "%d %B %Y",
-  "birthday.howto": "**Honk honk.** {0}, type in `.birthday` followed by the date you're celebrating your birthday!\n`.birthday 18 june 1993` is an example on how to do properly!",
+  "birthday.howto": "**Honk honk.** {0}, type in `.birthday` followed by the date you're celebrating your birthday!\nTyping `.birthday 18 june 1993` is an example on how to do properly!",
   "birthday.notset": "**Honk honk.** You need to set a birthday first using the `.birthday` command, {0}!",
   "birthday.succes": "**Honk!** {0}, I have set your birthday to {1} in the timezone {2}.\nIncorrect? Use the command again! `.birthday 18 june 1993` is an example on how to do properly!",
   "birthday.timezone": "**Honk honk.** {0}, use this command to set your current timezone. `.timezone Europe/Paris` for example.\nGo to http://www.timezoneconverter.com/cgi-bin/findzone if you don't know your timezone or how to type it!",
