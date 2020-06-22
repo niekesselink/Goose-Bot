@@ -82,6 +82,10 @@ class Birthday(commands.Cog):
             channel_id = await self.bot.db.fetch(f"SELECT value FROM guild_settings WHERE guild_id = {guild.id} AND key = 'birthday.channel'")
             role_id = await self.bot.db.fetch(f"SELECT value FROM guild_settings WHERE guild_id = {guild.id} AND key = 'birthday.role'")
             
+            # Ensure we got a guild...
+            if guild is None:
+                continue
+
             # Announce it if we can.
             if channel_id:
                 channel = guild.get_channel(int(channel_id[0]['value']))
@@ -109,6 +113,10 @@ class Birthday(commands.Cog):
             # Get some values required.
             guild = self.bot.get_guild(old_birthday['guild_id'])
             member = guild.get_member(old_birthday['member_id'])
+
+            # Ensure we got a guild...
+            if guild is None:
+                continue
 
             # If we had the birthday role, then remove it.
             if old_birthday['given_role']:
