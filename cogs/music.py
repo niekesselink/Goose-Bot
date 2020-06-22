@@ -103,7 +103,7 @@ class Music(commands.Cog):
 
     @commands.command()
     @commands.guild_only()
-    async def skip(self, ctx, volume: int):
+    async def skip(self, ctx):
         """Skips the current playing song."""
 
         # Can we run this command in the current context?
