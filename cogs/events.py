@@ -93,15 +93,15 @@ class Events(commands.Cog):
 
         # If the argument is missing, then let's say that...
         if isinstance(error, commands.errors.MissingRequiredArgument):
-            message = await language.get(ctx, 'event.missingrequiredargument')
+            message = await language.get(self, ctx.guild.id, 'event.missingrequiredargument')
             return await ctx.send(message.format(ctx.message.author.mention))
 
         # Notice if private message is not allowed for the command.
         if isinstance(error, commands.NoPrivateMessage):
-            return await ctx.author.send(await language.get(ctx, 'event.noprivatemessage'))
+            return await ctx.author.send(await language.get(self, ctx.guild.id, 'event.noprivatemessage'))
 
         # We've hit an error. Inform that the owner is on it...
-        message = await language.get(ctx, 'event.error')
+        message = await language.get(self, ctx.guild.id, 'event.error')
         await ctx.send(message.format(ctx.message.author.mention))
 
         # Create a special error embed for this error and send it to the bot owner.

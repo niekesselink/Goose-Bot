@@ -26,7 +26,7 @@ class Music(commands.Cog):
 
         # Make sure the person using the command is in a voice channel.
         if ctx.message.author.voice is None:
-            message = await language.get(ctx, 'music.usernotinchannel')
+            message = await language.get(self, ctx.guild.id, 'music.usernotinchannel')
             return await ctx.send(message.format(ctx.message.author.mention))
 
         # Are we in a voice client?
@@ -34,7 +34,7 @@ class Music(commands.Cog):
 
             # Ignore if we are in the same channel already...
             if ctx.message.author.voice.channel is ctx.voice_client.channel:
-                message = await language.get(ctx, 'music.alreadythere')
+                message = await language.get(self, ctx.guild.id, 'music.alreadythere')
                 return await ctx.send(message.format(ctx.message.author.mention))
 
             # Move to the same channel.
@@ -55,7 +55,7 @@ class Music(commands.Cog):
 
         # This command only works when the bot is in a voice channel...
         if ctx.voice_client is None:
-            message = await language.get(ctx, 'music.botnotinchannel')
+            message = await language.get(self, ctx.guild.id, 'music.botnotinchannel')
             return await ctx.send(message.format(ctx.message.author.mention))
 
         # Now leave.
@@ -76,7 +76,7 @@ class Music(commands.Cog):
 
         # Now let's change the volume...
         ctx.voice_client.source.volume = volume / 100
-        message = await language.get(ctx, 'music.volume')
+        message = await language.get(self, ctx.guild.id, 'music.volume')
         await ctx.send(message.format(volume))
 
     @commands.command()
@@ -112,7 +112,7 @@ class Music(commands.Cog):
 
         # Let's skip the song...
         ctx.voice_client.stop()
-        await ctx.send(await language.get(ctx, 'music.skip'))
+        await ctx.send(await language.get(self, ctx.guild.id, 'music.skip'))
 
     @commands.command()
     @commands.guild_only()
@@ -121,24 +121,24 @@ class Music(commands.Cog):
 
         # Do we have a queue or are we still in a channel? If not, no playlist.
         if ctx.guild.id not in self.bot.memory['music'] or ctx.voice_client is None:
-            message = await language.get(ctx, 'music.notplaying')
+            message = await language.get(self, ctx.guild.id, 'music.notplaying')
             return await ctx.send(message.format(ctx.message.author.mention))
 
         # Define fields data with now playing.
         fields = {
-            await language.get(ctx, 'music.playlist.now'): self.bot.memory['music'][ctx.guild.id][0]['title']
+            await language.get(self, ctx.guild.id, 'music.playlist.now'): self.bot.memory['music'][ctx.guild.id][0]['title']
         }
 
         # Add the future entries to the fields data.
         if len(self.bot.memory['music'][ctx.guild.id]) < 2:
-            fields.update({ await language.get(ctx, 'music.playlist.next'): await language.get(ctx, 'music.playlist.nothing') })
+            fields.update({ await language.get(self, ctx.guild.id, 'music.playlist.next'): await language.get(self, ctx.guild.id, 'music.playlist.nothing') })
         else:
-            fields.update({ await language.get(ctx, 'music.playlist.next'): '\n'.join([f"{i}) {self.bot.memory['music'][ctx.guild.id][i]['title']}" for i in range(1, len(self.bot.memory['music'][ctx.guild.id]))]) })
+            fields.update({ await language.get(self, ctx.guild.id, 'music.playlist.next'): '\n'.join([f"{i}) {self.bot.memory['music'][ctx.guild.id][i]['title']}" for i in range(1, len(self.bot.memory['music'][ctx.guild.id]))]) })
 
         # Send the embed...
         await ctx.send(embed=embed.create(
-            title=await language.get(ctx, 'music.playlist.title'),
-            description=await language.get(ctx, 'music.playlist.description'),
+            title=await language.get(self, ctx.guild.id, 'music.playlist.title'),
+            description=await language.get(self, ctx.guild.id, 'music.playlist.description'),
             fields=fields
         ))
 
@@ -180,7 +180,7 @@ class Music(commands.Cog):
 
             # Only allow if it's not longer than set amount of minutes.
             if meta['duration'] > max_duration or meta['is_live']:
-                message = await language.get(ctx, 'music.toolong')
+                message = await language.get(self, ctx.guild.id, 'music.toolong')
                 return await ctx.send(message.format(ctx.message.author.mention, max_duration))
                     
         # We can add it, let's define the object for in the queue.
@@ -201,7 +201,7 @@ class Music(commands.Cog):
         # Now let's see if we need to start playing directly, as in, nothing is playing...
         if not ctx.voice_client.is_playing():
             self.play_song(ctx)
-            return await ctx.send(await language.get(ctx, 'music.start'))
+            return await ctx.send(await language.get(self, ctx.guild.id, 'music.start'))
                 
         # Get total seconds in playlist.
         total_seconds = 0 - meta['duration']
@@ -229,7 +229,7 @@ class Music(commands.Cog):
                 result.append("{} {}".format(value, name))
 
         # Inform.
-        message = await language.get(ctx, 'music.queued')
+        message = await language.get(self, ctx.guild.id, 'music.queued')
         await ctx.send(message.format(
             ctx.message.author.mention,
             len(self.bot.memory['music'][ctx.guild.id]) - 1,
@@ -241,24 +241,24 @@ class Music(commands.Cog):
 
         # Are we in a voice channel voice channel?
         if ctx.voice_client is None:
-            message = await language.get(ctx, 'music.botnotinchannel')
+            message = await language.get(self, ctx.guild.id, 'music.botnotinchannel')
             await ctx.send(message.format(ctx.message.author.mention))
             return False
  
         # Make sure the person using the command is in a voice channel.
         if ctx.message.author.voice is None:
-            message = await language.get(ctx, 'music.usernotinchannel')
+            message = await language.get(self, ctx.guild.id, 'music.usernotinchannel')
             return await ctx.send(message.format(ctx.message.author.mention))
             
         # And also, in the same channel?
         if ctx.message.author.voice.channel is not ctx.voice_client.channel:
-            message = await language.get(ctx, 'music.notsamechannel')
+            message = await language.get(self, ctx.guild.id, 'music.notsamechannel')
             await ctx.send(message.format(ctx.message.author.mention))
             return False
 
         # Ensure we have a source...
         if need_source and ctx.voice_client.source is None:
-            message = await language.get(ctx, 'music.notplaying')
+            message = await language.get(self, ctx.guild.id, 'music.notplaying')
             await ctx.send(message.format(ctx.message.author.mention))
             return False
 

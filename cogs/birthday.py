@@ -24,7 +24,7 @@ class Birthday(commands.Cog):
 
         # Check for value, if none then tell how to use this command.
         if input is None:
-            message = await language.get(ctx, 'birthday.howto')
+            message = await language.get(self, ctx.guild.id, 'birthday.howto')
             return await ctx.send(message.format(ctx.message.author.mention))
 
         # Parse the given date and get guild timezone.
@@ -42,8 +42,8 @@ class Birthday(commands.Cog):
                                   f"ON CONFLICT (guild_id, member_id) DO UPDATE SET birthday = '{date}', timezone = '{timezone}'")
 
         # Inform the user we've set the birthday.
-        message = await language.get(ctx, 'birthday.succes')
-        date_formatted = date.strftime(await language.get(ctx, 'birthday.format')).lower()
+        message = await language.get(self, ctx.guild.id, 'birthday.succes')
+        date_formatted = date.strftime(await language.get(self, ctx.guild.id, 'birthday.format')).lower()
         await ctx.send(message.format(ctx.message.author.mention, date_formatted, timezone))
 
     #@commands.command()
@@ -52,13 +52,13 @@ class Birthday(commands.Cog):
 
     #    # Check for input, if none explain the possible timezones.
     #    if input is None:
-    #        message = await language.get(ctx, 'birthday.timezone')
+    #        message = await language.get(self, ctx.guild.id, 'birthday.timezone')
     #        return await ctx.send(message.format(ctx.message.author.mention))
 
     #    # Check if user has set a birthday.
     #    birthday = await self.bot.db.fetch(f"SELECT birthday FROM birthdays WHERE guild_id = {ctx.guild.id} AND member_id = {ctx.author.id}")
     #    if not birthday:
-    #        message = await language.get(ctx, 'birthday.notset')
+    #        message = await language.get(self, ctx.guild.id, 'birthday.notset')
     #        return await ctx.send(message.format(ctx.message.author.mention))
 
     @tasks.loop(minutes=15.0)
@@ -85,7 +85,7 @@ class Birthday(commands.Cog):
             # Announce it if we can.
             if channel_id:
                 channel = guild.get_channel(int(channel_id[0]['value']))
-                message = await language.get(None, 'birthday.wish');
+                message = await language.get(self, guild.id, 'birthday.wish');
                 await channel.send(message.format(member.mention))
 
             # Add the role if we can do it, or else make it blank.

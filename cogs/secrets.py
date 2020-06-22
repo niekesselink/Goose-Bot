@@ -40,7 +40,7 @@ class Secrets(commands.Cog):
         self.bot.memory['music'][ctx.guild.id].append(entry)
 
         # We got it coming for ya...
-        await ctx.send(await language.get(ctx, 'secrets.aaaaaah'))
+        await ctx.send(await language.get(self, ctx.guild.id, 'secrets.aaaaaah'))
 
         # Now let's start the AAAH script...
         self.bot.loop.create_task(self.do_aah_script(ctx, total_seconds))
