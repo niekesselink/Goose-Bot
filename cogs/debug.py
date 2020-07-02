@@ -73,9 +73,9 @@ class Debug(commands.Cog):
                 cog = file[:-3]
                 try:
                     self.bot.reload_extension(f'cogs.{cog}')
-                    print(f'Cog {name} has been reloaded!')
-                    message = await language.get(self, ctx, 'debug.reload')
-                    await ctx.send(content=message.format(name))
+                    print(f'Cog {cog} has been reloaded!')
+                    message = await language.get(self, ctx, 'debug.cog_reload')
+                    await ctx.send(content=message.format(cog))
                 except:
                     pass
 
