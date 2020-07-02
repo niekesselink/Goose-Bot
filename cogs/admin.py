@@ -34,7 +34,7 @@ class Admin(commands.Cog):
         await self.bot.db.execute(f"INSERT INTO guild_settings (guild_id, key, value) VALUES ({ctx.guild.id}, 'language', '{lang}') "
                                   f"ON CONFLICT (guild_id, key) DO UPDATE SET value = '{lang}'")
          # Inform.
-        message = await language.get(self, ctx.guild.id, 'admin.language')
+        message = await language.get(self, ctx, 'admin.language')
         return await ctx.send(message.format(lang))
 
 def setup(bot):

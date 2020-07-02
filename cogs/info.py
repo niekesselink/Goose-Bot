@@ -34,8 +34,8 @@ class Info(commands.Cog):
 
         # Create and send the embed.
         await ctx.send(embed=embed.create(
-            title=await language.get(self, ctx.guild.id, 'info.title'),
-            description=await language.get(self, ctx.guild.id, 'info.description'),
+            title=await language.get(self, ctx, 'info.title'),
+            description=await language.get(self, ctx, 'info.description'),
             thumbnail=ctx.bot.user.avatar_url,
             fields=fields
         ))
@@ -43,17 +43,17 @@ class Info(commands.Cog):
     @commands.command()
     async def official(self, ctx):
         """Get an invite to the official server of Goose bot."""
-        await ctx.send(await language.get(self, ctx.guild.id, 'info.official') + '\nhttps://discord.gg/yVSDgUc')
+        await ctx.send(await language.get(self, ctx, 'info.official') + '\nhttps://discord.gg/yVSDgUc')
 
     @commands.command()
     async def invite(self, ctx):
         """Get a link to invite the bot to your own server."""
-        await ctx.send(await language.get(self, ctx.guild.id, 'info.invite') + f'\n<{discord.utils.oauth_url(self.bot.user.id)}>')
+        await ctx.send(await language.get(self, ctx, 'info.invite') + f'\n<{discord.utils.oauth_url(self.bot.user.id)}>')
 
     @commands.command()
     async def source(self, ctx):
         """Check out the bot's source code."""
-        await ctx.send(await language.get(self, ctx.guild.id, 'info.source') + '\nhttps://github.com/niekesselink/Goose-Bot')
+        await ctx.send(await language.get(self, ctx, 'info.source') + '\nhttps://github.com/niekesselink/Goose-Bot')
 
 def setup(bot):
     bot.add_cog(Info(bot))

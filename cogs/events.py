@@ -58,7 +58,7 @@ class Events(commands.Cog):
 
             # Getting a random welcome message, get the channel, format it, and send it.
             welcome_messages = await self.bot.db.fetch(f"SELECT text FROM welcomes WHERE guild_id = {member.guild.id} ORDER BY RANDOM() LIMIT 1")
-            await welcome_channel.send(welcome_messages[0]['text'].format(member.mention))
+            await welcome_channel.send(language.format(welcome_messages[0]['text']).format(member.mention))
 
     @commands.Cog.listener()
     async def on_member_remove(self, member):
@@ -93,16 +93,14 @@ class Events(commands.Cog):
 
         # If the argument is missing, then let's say that...
         if isinstance(error, commands.errors.MissingRequiredArgument):
-            message = await language.get(self, ctx.guild.id, 'event.missingrequiredargument')
-            return await ctx.send(message.format(ctx.message.author.mention))
+            return await ctx.send(await language.get(self, ctx, 'event.missing_argument'))
 
         # Notice if private message is not allowed for the command.
         if isinstance(error, commands.NoPrivateMessage):
-            return await ctx.author.send(await language.get(self, ctx.guild.id, 'event.noprivatemessage'))
+            return await ctx.author.send(await language.get(self, ctx, 'event.no_private_message'))
 
         # We've hit an error. Inform that the owner is on it...
-        message = await language.get(self, ctx.guild.id, 'event.error')
-        await ctx.send(message.format(ctx.message.author.mention))
+        await ctx.send(await language.get(self, ctx, 'event.error'))
 
         # Create a special error embed for this error and send it to the bot owner.
         owner = self.bot.get_user(462311999980961793)

@@ -19,16 +19,15 @@ class Birthday(commands.Cog):
         self.check_birthday.cancel()
 
     @commands.command()
-    async def birthday(self, ctx, input=None):
+    async def birthday(self, ctx, *, birthday: str=None):
         """Set your birthday date, the format day/month is used."""
 
         # Check for value, if none then tell how to use this command.
-        if input is None:
-            message = await language.get(self, ctx.guild.id, 'birthday.howto')
-            return await ctx.send(message.format(ctx.message.author.mention))
+        if birthday is None:
+            return await ctx.send(await language.get(self, ctx, 'birthday.how_to'))
 
         # Parse the given date and get guild timezone.
-        date = parser.parse(ctx.message.content.replace(f'{self.bot.config.prefix}birthday ', ''))
+        date = parser.parse(birthday)
         timezone = await self.bot.db.fetch(f"SELECT value FROM guild_settings WHERE guild_id = {ctx.guild.id} AND key = 'timezone'")
 
         # Make sure the timezone is an acutual value.
@@ -42,9 +41,9 @@ class Birthday(commands.Cog):
                                   f"ON CONFLICT (guild_id, member_id) DO UPDATE SET birthday = '{date}', timezone = '{timezone}'")
 
         # Inform the user we've set the birthday.
-        message = await language.get(self, ctx.guild.id, 'birthday.succes')
-        date_formatted = date.strftime(await language.get(self, ctx.guild.id, 'birthday.format')).lower()
-        await ctx.send(message.format(ctx.message.author.mention, date_formatted, timezone))
+        message = await language.get(self, ctx, 'birthday.succes')
+        date_formatted = date.strftime(await language.get(self, ctx, 'birthday.format')).lower()
+        await ctx.send(message.format(date_formatted, timezone))
 
     #@commands.command()
     #async def timezone(self, ctx, input=None):
@@ -52,14 +51,12 @@ class Birthday(commands.Cog):
 
     #    # Check for input, if none explain the possible timezones.
     #    if input is None:
-    #        message = await language.get(self, ctx.guild.id, 'birthday.timezone')
-    #        return await ctx.send(message.format(ctx.message.author.mention))
+    #        return await ctx.send(await language.get(self, ctx, 'birthday.timezone'))
 
     #    # Check if user has set a birthday.
     #    birthday = await self.bot.db.fetch(f"SELECT birthday FROM birthdays WHERE guild_id = {ctx.guild.id} AND member_id = {ctx.author.id}")
     #    if not birthday:
-    #        message = await language.get(self, ctx.guild.id, 'birthday.notset')
-    #        return await ctx.send(message.format(ctx.message.author.mention))
+    #        return await ctx.send(await language.get(self, ctx, 'birthday.not_set'))
 
     @tasks.loop(minutes=10.0)
     async def check_birthday(self):
@@ -76,26 +73,36 @@ class Birthday(commands.Cog):
         # Loop through every birthday there is now.
         for birthday in birthdays:
             
-            # Get some values required.
-            guild = self.bot.get_guild(birthday['guild_id'])
-            member = guild.get_member(birthday['member_id'])
-            channel_id = await self.bot.db.fetch(f"SELECT value FROM guild_settings WHERE guild_id = {guild.id} AND key = 'birthday.channel'")
-            role_id = await self.bot.db.fetch(f"SELECT value FROM guild_settings WHERE guild_id = {guild.id} AND key = 'birthday.role'")
-            
             # Ensure we got a guild...
+            guild = self.bot.get_guild(birthday['guild_id'])
             if guild is None:
                 continue
 
-            # Announce it if we can.
+            # Ensure we got the member as well.
+            member = guild.get_member(birthday['member_id'])
+            if member is None:
+                continue
+
+            # Get some values required.
+            channel_id = await self.bot.db.fetch(f"SELECT value FROM guild_settings WHERE guild_id = {guild.id} AND key = 'birthday.channel'")
+            role_id = await self.bot.db.fetch(f"SELECT value FROM guild_settings WHERE guild_id = {guild.id} AND key = 'birthday.role'")
+
+            # Now try to get the channel.
             if channel_id:
                 channel = guild.get_channel(int(channel_id[0]['value']))
-                message = await language.get(self, guild.id, 'birthday.wish');
-                await channel.send(message.format(member.mention))
+                
+                # But before sending, ensure it's there.
+                if channel is None:
+                    message = await language.get(self, None, 'birthday.wish', guild.id);
+                    await channel.send(message.format(member.mention))
 
             # Add the role if we can do it, or else make it blank.
             if role_id:
                 role_id = int(role_id[0]['value'])
-                await member.add_roles(guild.get_role(role_id))
+                try:
+                    await member.add_roles(guild.get_role(role_id))
+                except:
+                    pass
             else:
                 role_id = ''
             
@@ -110,17 +117,22 @@ class Birthday(commands.Cog):
         # Loop through every old birthday.
         for old_birthday in old_birthdays:
             
-            # Get some values required.
-            guild = self.bot.get_guild(old_birthday['guild_id'])
-            member = guild.get_member(old_birthday['member_id'])
-
             # Ensure we got a guild...
+            guild = self.bot.get_guild(old_birthday['guild_id'])
             if guild is None:
                 continue
 
+            # Ensure we got the member as well.
+            member = guild.get_member(old_birthday['member_id'])
+            if member is None:
+                continue
+
             # If we had the birthday role, then remove it.
-            if old_birthday['given_role']:
-                await member.remove_roles(guild.get_role(int(old_birthday['given_role'])))
+            if old_birthday['given_role'] and member:
+                try:
+                    await member.remove_roles(guild.get_role(int(old_birthday['given_role'])))
+                except:
+                    pass
 
             # No role given, simple update.
             await self.bot.db.execute(f"UPDATE birthdays SET triggered = FALSE, given_role = '' WHERE guild_id = {guild.id} AND member_id = {member.id}")

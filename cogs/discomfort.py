@@ -18,12 +18,12 @@ class Discomfort(commands.Cog):
     @discomfort.command()
     async def about(self, ctx):
         """Shows more information about the Discomfort program."""
-        await ctx.send(await language.get(self, ctx.guild.id, 'discomfort.about'))
+        await ctx.send(await language.get(self, ctx, 'discomfort.about'))
 
     @discomfort.command()
     async def join(self, ctx):
         """Joins the Discomfort program."""
-        await ctx.send(await language.get(self, ctx.guild.id, 'discomfort.join'))
+        await ctx.send(await language.get(self, ctx, 'discomfort.join'))
 
 def setup(bot):
     bot.add_cog(Discomfort(bot))

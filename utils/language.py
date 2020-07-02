@@ -13,12 +13,17 @@ class Languages:
         with open(f'assets/languages/{file}') as content:
             array[file[:-5]] = json.load(content)
 
-async def get(self, guild_id, key):
+async def get(self, ctx, key, guild_id=None):
     """Returns a line in a specific language as set by the guild."""
 
-    # No guild? Then English...
+    # Get guild_id from ctx if none.
+    if guild_id is None and ctx.guild:
+        guild_id = ctx.guild.id
+
+    # Still no guild? Then English with only username format...
     if guild_id is None:
-        return Languages.array['english'][key]
+        values = { 'user_mention': ctx.message.author.mention }
+        return Languages.array['english'][key].format(**values)
 
     # Is the guild in the memory?
     if guild_id not in self.bot.memory:
@@ -38,6 +43,26 @@ async def get(self, guild_id, key):
 
         # Set the memory.
         self.bot.memory[guild_id]['language'] = language
+
+    # Skip formatting if no ctx.
+    if ctx is None:
+        return Languages.array[self.bot.memory[guild_id]['language']][key]
     
-        # Get proper language string for the guild...
-    return Languages.array[self.bot.memory[guild_id]['language']][key]
+    # Get proper language string for the guild, but after formatting...
+    return fill(ctx, Languages.array[self.bot.memory[guild_id]['language']][key])
+
+def fill(ctx, string):
+    """Function to fill a string with common used values."""
+
+    # Declare most used values for auto-fill.
+    replace = {
+        '{guild_name}': ctx.guild.name,
+        '{user_mention}': ctx.message.author.mention
+    }
+
+    # Now make it happen.
+    for key in replace:
+        string = string.replace(key, replace[key])
+
+    # Return end result.
+    return string

@@ -28,14 +28,14 @@ class Debug(commands.Cog):
         """Latency test command."""
 
         # Send the first message.
-        honk = await ctx.send(await language.get(self, ctx.guild.id, 'debug.ping1'))
+        honk = await ctx.send(await language.get(self, ctx, 'debug.ping1'))
 
         # Now let's get the difference from when we created the message and when it was created on server.
         difference = honk.created_at - ctx.message.created_at
         miliseconds = int(difference.total_seconds() * 1000)
 
         # Update previous message with the difference.
-        message = await language.get(self, ctx.guild.id, 'debug.ping2')
+        message = await language.get(self, ctx, 'debug.ping2')
         await honk.edit(content=message.format(miliseconds))
 
     @debug.command()
@@ -44,7 +44,7 @@ class Debug(commands.Cog):
 
         self.bot.load_extension(f'cogs.{name}')
         print(f'Cog {name} has been loaded!')
-        message = await language.get(self, ctx.guild.id, 'debug.cogload')
+        message = await language.get(self, ctx, 'debug.cog_load')
         await ctx.send(content=message.format(name))
 
     @debug.command()
@@ -53,7 +53,7 @@ class Debug(commands.Cog):
 
         self.bot.unload_extension(f'cogs.{name}')
         print(f'Cog {name} has been unloaded!')
-        message = await language.get(self, ctx.guild.id, 'debug.cogunload')
+        message = await language.get(self, ctx, 'debug.cog_unload')
         await ctx.send(content=message.format(name))
 
     @debug.command()
@@ -64,8 +64,8 @@ class Debug(commands.Cog):
         if name != 'all':
             self.bot.reload_extension(f'cogs.{name}')
             print(f'Cog {name} has been reloaded!')
-            message = await language.get(self, ctx.guild.id, 'debug.cogreload')
-            await ctx.send(content=message.format(name))
+            message = await language.get(self, ctx, 'debug.cog_reload')
+            return await ctx.send(content=message.format(name))
 
         # Reload all possible cogs which have been loaded...
         for file in os.listdir('cogs'):
@@ -74,7 +74,7 @@ class Debug(commands.Cog):
                 try:
                     self.bot.reload_extension(f'cogs.{cog}')
                     print(f'Cog {name} has been reloaded!')
-                    message = await language.get(self, ctx.guild.id, 'debug.reload')
+                    message = await language.get(self, ctx, 'debug.reload')
                     await ctx.send(content=message.format(name))
                 except:
                     pass
@@ -89,7 +89,7 @@ class Debug(commands.Cog):
 
         # Inform...
         print(f'Util {name} has been (re)imported!')
-        message = await language.get(self, ctx.guild.id, 'debug.importutil')
+        message = await language.get(self, ctx, 'debug.import_util')
         await ctx.send(content=message.format(name))
 
     @debug.command()
@@ -98,7 +98,7 @@ class Debug(commands.Cog):
 
         # Migration code.
         await migrate.go(self.bot)
-        await ctx.send(await language.get(self, ctx.guild.id, 'debug.migrate'))
+        await ctx.send(await language.get(self, ctx, 'debug.migrate'))
 
     @debug.command()
     async def pull(self, ctx):
@@ -112,7 +112,7 @@ class Debug(commands.Cog):
 
         # Inform the report.
         await ctx.send(embed=embed.create(
-            title=await language.get(self, ctx.guild.id, 'debug.gitpull'),
+            title=await language.get(self, ctx, 'debug.git_pull'),
             description=f'```diff\n{stdout}\n{stderr}\n```'
         ))
 
