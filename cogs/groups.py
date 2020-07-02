@@ -50,7 +50,7 @@ class Groups(commands.Cog):
 
     @commands.group()
     async def group(self, ctx):
-        """Declaration of the group category."""
+        """Commands for groups on the server, purposed to ping those interested in an event."""
         return
 
     @group.command()
