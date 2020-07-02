@@ -6,7 +6,7 @@ import youtube_dl
 from datetime import datetime
 from discord import FFmpegPCMAudio
 from discord.ext import commands
-from utils import data, embed, language
+from utils import embed, language
 
 class Music(commands.Cog):
     """Commands for playing music in a voice channel."""

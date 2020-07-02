@@ -3,7 +3,7 @@ import discord
 
 from datetime import datetime
 from discord.ext import commands
-from utils import data, language
+from utils import language
 
 class Secrets(commands.Cog):
     """Secret commands for some fun easter eggs."""

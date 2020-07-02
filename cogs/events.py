@@ -3,7 +3,7 @@ import os
 
 from datetime import datetime
 from discord.ext import commands
-from utils import data, language
+from utils import language
 
 class Events(commands.Cog):
     """General event handler for the bot."""

@@ -4,7 +4,7 @@ import discord
 
 from dateutil import parser
 from discord.ext import commands, tasks
-from utils import data, language
+from utils import language
 
 class Birthday(commands.Cog):
     """Feature to put a person who has his/her birthday on the spotlight."""
@@ -61,7 +61,7 @@ class Birthday(commands.Cog):
     #        message = await language.get(self, ctx.guild.id, 'birthday.notset')
     #        return await ctx.send(message.format(ctx.message.author.mention))
 
-    @tasks.loop(minutes=15.0)
+    @tasks.loop(minutes=10.0)
     async def check_birthday(self):
         """
             Function that loops to search the database for birthdays to give or remove.
