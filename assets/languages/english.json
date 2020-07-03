@@ -27,6 +27,7 @@
   "groups.left": "**Honk!** You're no longer a member of the {0} group, {user_mention}!",
   "groups.joined": "**Honk!** You're now part of the {0} group, {user_mention}!",
   "groups.no_groups": "**Honk!** {user_mention}, I would love to show some groups for you to join, but there are none...",
+  "groups.no_members": "**Honk!** {user_mention}, I would love to mention that group but it has no members, so it's useless...",
   "groups.non_existent": "**Honk!** That group doesn't exist, {user_mention}!",
   "groups.not_a_member": "**Honk!** You're not in this group, {user_mention}!",
   "groups.list.description": "Below is a list of groups which you can join by using `.group join`. Once you've joined a group, you can mention everyone or be mentioned by `@group <name>`.",

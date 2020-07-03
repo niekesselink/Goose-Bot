@@ -58,7 +58,7 @@ class Events(commands.Cog):
 
             # Getting a random welcome message, get the channel, format it, and send it.
             welcome_messages = await self.bot.db.fetch(f"SELECT text FROM welcomes WHERE guild_id = {member.guild.id} ORDER BY RANDOM() LIMIT 1")
-            await welcome_channel.send(language.format(welcome_messages[0]['text']).format(member.mention))
+            await welcome_channel.send(language.fill(welcome_messages[0]['text'], member=member))
 
     @commands.Cog.listener()
     async def on_member_remove(self, member):
@@ -72,7 +72,7 @@ class Events(commands.Cog):
         """Event that happens when user sends a message in a channel."""
 
         # Press F to pay respect.
-        if message.content.strip() == 'F':
+        if message.content.strip() == 'F' or message.content.startswith('F '):
             await message.add_reaction('🇫')
 
     @commands.Cog.listener()

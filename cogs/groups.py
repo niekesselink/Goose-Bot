@@ -29,7 +29,13 @@ class Groups(commands.Cog):
 
         # Did we got a result event?
         if not result:
-            return await message.channel.send(await language.get(self, ctx, 'groups.non_existent'))
+            msg = await language.get(self, None, 'groups.non_existent', message.guild.id)
+            return await message.channel.send(language.fill(msg, message=message))
+
+        # Does the group has members? If not cancel.
+        if not result[0]['members']:
+            msg = await language.get(self, None, 'groups.no_members', message.guild.id)
+            return await message.channel.send(language.fill(msg, message=message))
 
         # Update last call.
         group_id = int(result[0]['id'])
@@ -45,8 +51,10 @@ class Groups(commands.Cog):
             We're doing this here to clean-up old members from groups. It's not possible (yet) through foreign keys.
         """
 
-        # Remove member from all groups in the database.
-        await self.bot.db.execute(f"DELETE FROM guild_members WHERE guild_id = {member.guild.id} AND id = {member.id}")
+        # Remove member from all groups in the database for the guild he/she left.
+        await self.bot.db.execute("DELETE FROM group_members AS gm USING groups AS g "
+                                  f"WHERE g.id = gm.group_id AND gm.member_id = {member.id} AND g.guild_id = {member.guild.id}")
+
 
     @commands.group()
     async def group(self, ctx):

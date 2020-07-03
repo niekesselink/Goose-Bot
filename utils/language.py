@@ -49,16 +49,34 @@ async def get(self, ctx, key, guild_id=None):
         return Languages.array[self.bot.memory[guild_id]['language']][key]
     
     # Get proper language string for the guild, but after formatting...
-    return fill(ctx, Languages.array[self.bot.memory[guild_id]['language']][key])
+    return fill(Languages.array[self.bot.memory[guild_id]['language']][key], ctx=ctx)
 
-def fill(ctx, string):
+def fill(string, ctx=None, member=None, message=None):
     """Function to fill a string with common used values."""
 
     # Declare most used values for auto-fill.
-    replace = {
-        '{guild_name}': ctx.guild.name,
-        '{user_mention}': ctx.message.author.mention
-    }
+    replace = None
+
+    # For ctx.
+    if ctx:
+        replace = {
+            '{guild_name}': ctx.guild.name,
+            '{user_mention}': ctx.message.author.mention
+        }
+
+    # For member.
+    if member:
+        replace = {
+            '{guild_name}': member.guild.name,
+            '{user_mention}': member.mention
+        }
+
+    # For message.
+    if message:
+        replace = {
+            '{guild_name}': message.guild.name,
+            '{user_mention}': message.author.mention
+        }
 
     # Now make it happen.
     for key in replace:

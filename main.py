@@ -1,10 +1,11 @@
 import asyncio
 import asyncpg
 import discord
+import json
 import os
 
+from collections import namedtuple
 from discord.ext import commands
-from utils import data
 
 class Bot(commands.Bot):
     """Main class of the bot."""
@@ -12,9 +13,10 @@ class Bot(commands.Bot):
     def __init__(self, *args, **kwargs):
         """Initial function that runs when the class has been created."""
 
-        # Load config and declare memory.
-        self.config = data.get_json('config.json')
+        # Declare memory and load config.
         self.memory = {}
+        with open('config.json', encoding='utf8') as data:
+            self.config = json.load(data, object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
 
         # Call the initialize of the bot itself.
         super().__init__(
