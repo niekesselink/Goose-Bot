@@ -227,7 +227,6 @@ class Music(commands.Cog):
         # Inform.
         message = await language.get(self, ctx, 'music.queued')
         await ctx.send(message.format(
-            ctx.message.author.mention,
             len(self.bot.memory['music'][ctx.guild.id]) - 1,
             ', '.join(result[:2])
         ))

@@ -158,6 +158,10 @@ class Groups(commands.Cog):
         if result:
             return await ctx.send(await language.get(self, ctx, 'groups.already_exist'))
 
+        # Do we have all data, so even description?
+        if not group_name or not group_description:
+            ctx.send(await language.get(self, ctx, 'event.missing_argument'))
+
         # Now create the group.
         await self.bot.db.execute(f"INSERT INTO groups (guild_id, name, description) VALUES ({ctx.guild.id}, '{group_name}', '{group_description}')")
 
