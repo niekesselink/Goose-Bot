@@ -210,9 +210,9 @@ class Music(commands.Cog):
         # Declare variables for converting it into a nice figure...
         result = []
         intervals = (
-            ('hours', 3600),    # 60 * 60
-            ('minutes', 60),
-            ('seconds', 1),
+            ('core.hours', 3600), # 60 * 60
+            ('core.minutes', 60),
+            ('core.seconds', 1),
         )
 
         # Now make it readable for how long we need to wait for this song...
@@ -222,7 +222,7 @@ class Music(commands.Cog):
                 total_seconds -= value * count
                 if value == 1:
                     name = name.rstrip('s')
-                result.append("{} {}".format(value, name))
+                result.append("{} {}".format(value, await language.get(self, ctx, name)))
 
         # Inform.
         message = await language.get(self, ctx, 'music.queued')

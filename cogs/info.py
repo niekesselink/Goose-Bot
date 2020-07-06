@@ -41,19 +41,16 @@ class Info(commands.Cog):
         ))
 
     @commands.command()
-    async def official(self, ctx):
-        """Get an invite to the official server of Goose bot."""
-        await ctx.send(await language.get(self, ctx, 'info.official') + '\nhttps://discord.gg/yVSDgUc')
-
-    @commands.command()
     async def invite(self, ctx):
         """Get a link to invite the bot to your own server."""
-        await ctx.send(await language.get(self, ctx, 'info.invite') + f'\n<{discord.utils.oauth_url(self.bot.user.id)}>')
+        message = await language.get(self, ctx, 'info.invite')
+        await ctx.send(message.format(discord.utils.oauth_url(self.bot.user.id)))
 
     @commands.command()
     async def source(self, ctx):
         """Check out the bot's source code."""
-        await ctx.send(await language.get(self, ctx, 'info.source') + '\nhttps://github.com/niekesselink/Goose-Bot')
+        message = await language.get(self, ctx, 'info.source')
+        await ctx.send(message.format('https://github.com/niekesselink/Goose-Bot'))
 
 def setup(bot):
     bot.add_cog(Info(bot))
