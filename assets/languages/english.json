@@ -6,8 +6,6 @@
   "birthday.succes": "**Honk!** {user_mention}, I have set your birthday to {0} in the timezone {1}.\nIncorrect? Use the command again! `.birthday 18 june 1993` is an example on how to do properly!",
   "birthday.timezone": "**Honk honk.** {user_mention}, use this command to set your current timezone. `.timezone Europe/Paris` for example.\nGo to http://www.timezoneconverter.com/cgi-bin/findzone if you don't know your timezone or how to type it!",
   "birthday.wish": "**HONK HONK!** Hey @everyone, the human people, it's the birthday of {0} today!\nBe a friendly human and honk happy birthday would you?",
-  "discomfort.about": "**Honk honk.** Discomfort is a feature to meet new strangers. When you sign up using `.discomfort join` I will send you a few a few messages in a direct message. Answer those questions and eventually you will be matched with a random stranger around the world who also joined this program. I will give some kick-start question you can ask your stranger for a fun conversation.\n\n**Note:** To join this program, you will need to be in the official Goose server as this is where you will meet each other. Matches are also shared between the servers the Goose bot is part of and is not limited to the people on this server.",
-  "discomfort.join": "**Honk honk.** Discomfort is not live yet. Try again later!",
   "debug.cog_load": "**Honk!** Cog {0} has been loaded!",
   "debug.cog_unload": "**Honk!** Cog {0} has been unloaded!",
   "debug.cog_reload": "**Honk!** Cog {0} has been reloaded!",
