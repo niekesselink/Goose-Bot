@@ -18,10 +18,6 @@ https://discordapp.com/oauth2/authorize?client_id=672445557293187128&scope=bot
 	* Prune messages of an user
 * Music feature
 	* Role check on skip to force, else voting.
-	* Allow typing the title of a song instead of the url
 * Role management
 	* Auto-add roles to new users
 	* Click reaction to assign a role
-* New features
-	* Group mentions
-	* Discomfort, meet strangers
