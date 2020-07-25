@@ -92,7 +92,7 @@ class Birthday(commands.Cog):
                 channel = guild.get_channel(int(channel_id[0]['value']))
                 
                 # But before sending, ensure it's there.
-                if channel is None:
+                if channel is not None:
                     message = await language.get(self, None, 'birthday.wish', guild.id);
                     await channel.send(message.format(member.mention))
 
