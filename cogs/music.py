@@ -1,4 +1,3 @@
-import asyncio
 import discord
 import os
 import youtube_dl
@@ -55,8 +54,9 @@ class Music(commands.Cog):
         if ctx.voice_client is None:
             return await ctx.send(await language.get(self, ctx, 'music.not_in_channel'))
 
-        # Now leave.
+        # Now leave and react.
         await ctx.voice_client.disconnect()
+        await ctx.message.add_reaction('👋')
 
         # Destroy the queue if we had one...
         if ctx.guild.id in self.bot.memory['music']:
@@ -75,28 +75,6 @@ class Music(commands.Cog):
         ctx.voice_client.source.volume = volume / 100
         message = await language.get(self, ctx, 'music.volume')
         await ctx.send(message.format(volume))
-
-    @commands.command()
-    async def pause(self, ctx):
-        """Pauses the current song."""
-
-        # Can we run this command in the current context?
-        if not await self.allowed_to_run_command_check(ctx, True):
-            return
-
-        # Let's pause the song...
-        ctx.voice_client.pause()
-
-    @commands.command()
-    async def resume(self, ctx):
-        """Resumes playing the current song."""
-
-        # Can we run this command in the current context?
-        if not await self.allowed_to_run_command_check(ctx, True):
-            return
-
-        # Let's resume the song...
-        ctx.voice_client.resume()
 
     @commands.command()
     @commands.guild_only()
@@ -226,9 +204,11 @@ class Music(commands.Cog):
 
         # Inform.
         message = await language.get(self, ctx, 'music.queued')
+        separator = await language.get(self, ctx, 'core.separator')
         await ctx.send(message.format(
+            meta['title'],
             len(self.bot.memory['music'][ctx.guild.id]) - 1,
-            ', '.join(result[:2])
+            f' {separator} '.join([', '.join(result[:-1]),result[-1]])
         ))
 
     async def allowed_to_run_command_check(self, ctx, need_source):

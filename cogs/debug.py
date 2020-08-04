@@ -24,21 +24,6 @@ class Debug(commands.Cog):
         return
 
     @debug.command()
-    async def honk(self, ctx):
-        """Latency test command."""
-
-        # Send the first message.
-        honk = await ctx.send(await language.get(self, ctx, 'debug.ping1'))
-
-        # Now let's get the difference from when we created the message and when it was created on server.
-        difference = honk.created_at - ctx.message.created_at
-        miliseconds = int(difference.total_seconds() * 1000)
-
-        # Update previous message with the difference.
-        message = await language.get(self, ctx, 'debug.ping2')
-        await honk.edit(content=message.format(miliseconds))
-
-    @debug.command()
     async def load(self, ctx, name):
         """Load a cog."""
 
