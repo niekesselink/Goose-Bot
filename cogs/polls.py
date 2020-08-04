@@ -1,7 +1,7 @@
 ﻿import discord
 
 from discord.ext import commands
-from utils import embed, language
+from utils import language
 
 class Polls(commands.Cog):
     """Commands for creating polls."""
@@ -86,7 +86,7 @@ class Polls(commands.Cog):
         await ctx.send(await language.get(self, ctx, 'polls.nextpost'), delete_after=10)
         await ctx.message.delete()
 
-    @commands.command()
+    @commands.command(hidden=True)
     @commands.has_permissions(administrator=True)
     async def setpollschannel(self, ctx):
         """Sets the current channel as the guild's channel for polls."""
