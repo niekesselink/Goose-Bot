@@ -48,25 +48,35 @@ class Polls(commands.Cog):
         else:
             self.bot.memory['polls']['pending'].remove(key)
 
-        # Integer to track if we have reacted with an option or not.
+        # Put content of the message in a variable and declare an integer to track how many reactions we did.
+        content = message.content
         reactions = 0
 
         # Time to react! There are two types of A, check if either of them is present and react with the regional one.
-        if '🅰️' in message.content or '🇦' in message.content: 
+        if '🅰️' in message.content or '🇦' in content: 
             await message.add_reaction('🇦')
             reactions += 1
 
         # Same goes for the B, also two types of them.
-        if '🅱️' in message.content or '🇧' in message.content: 
+        if '🅱️' in message.content or '🇧' in content: 
             await message.add_reaction('🇧')
             reactions += 1
 
-        # Now let's loop through all the other options of which there are only one to check if they are present, if so, react with it.
-        options = ['🇨', '🇩', '🇪', '🇫', '🇬', '🇭', '🇮', '🇯', '🇰', '🇱', '🇲', '🇳', '🇴', '🇵', '🇶', '🇷', '🇸', '🇹', '🇺', '🇻', '🇼', '🇽', '🇾', '🇿']
+        # Declare the rest of the options.
+        options = [
+            '🇨', '🇩', '🇪', '🇫', '🇬', '🇭', '🇮', '🇯', '🇰', '🇱', '🇲', '🇳', '🇴', '🇵', '🇶', '🇷', '🇸', '🇹', '🇺', '🇻', '🇼', '🇽', '🇾', '🇿',
+            '0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟'
+        ]
+
+        # Now let's loop through all the options to check if they are present, if so, react with it.
         for option in options:
-            if option in message.content:
+            if option in content:
                 await message.add_reaction(option)
                 reactions += 1
+
+                # Discord only allows 20 reactions to a single post, so when we hit that mark make a new post for continuation.
+                if reactions % 20 == 0:
+                    message = await message.channel.send(await language.get(self, None, 'polls.continuation', message.guild.id))
 
         # Now if it's in the poll channel, let's make sure we have at least two options, if not inform and remove it...
         if is_poll_channel and reactions < 2:
