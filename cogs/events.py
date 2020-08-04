@@ -50,7 +50,7 @@ class Events(commands.Cog):
         await self.bot.db.execute(f"INSERT INTO guild_members (guild_id, id) VALUES ({member.guild.id}, {member.id}) ON CONFLICT (guild_id, id) DO NOTHING")
 
         # Get a welcome channel if it's set.
-        raw_welcome_channel = await self.bot.db.fetch(f"SELECT value FROM guild_settings WHERE guild_id = {member.guild.id} AND key = 'welcome.channel'")
+        raw_welcome_channel = await self.bot.db.fetch(f"SELECT value FROM guild_settings WHERE guild_id = {member.guild.id} AND key = 'events.welcomechannel'")
 
         # If channel is set, get the channel and continue.
         if raw_welcome_channel:
@@ -93,14 +93,14 @@ class Events(commands.Cog):
 
         # If the argument is missing, then let's say that...
         if isinstance(error, commands.errors.MissingRequiredArgument):
-            return await ctx.send(await language.get(self, ctx, 'event.missing_argument'))
+            return await ctx.send(await language.get(self, ctx, 'events.missing_argument'))
 
         # Notice if private message is not allowed for the command.
         if isinstance(error, commands.NoPrivateMessage):
-            return await ctx.author.send(await language.get(self, ctx, 'event.no_private_message'))
+            return await ctx.author.send(await language.get(self, ctx, 'events.no_private_message'))
 
         # We've hit an error. Inform that the owner is on it...
-        await ctx.send(await language.get(self, ctx, 'event.error'))
+        await ctx.send(await language.get(self, ctx, 'events.error'))
 
         # Create a special error embed for this error and send it to the bot owner.
         owner = self.bot.get_user(462311999980961793)
@@ -109,6 +109,19 @@ class Events(commands.Cog):
             description=f'`{str(error)}`',
             colour=0xFF7E62,
         ))
+
+    @commands.command(hidden=True)
+    @commands.has_permissions(administrator=True)
+    async def setwelcomechannel(self, ctx):
+        """Sets the current channel as the welcoming channel for new users."""
+
+        # Put it in the database.
+        await self.bot.db.execute(f"INSERT INTO guild_settings (guild_id, key, value) VALUES ({ctx.guild.id}, 'events.welcomechannel', '{ctx.channel.id}') "
+                                  f"ON CONFLICT (guild_id, key) DO UPDATE SET value = '{ctx.channel.id}'")
+
+        # Inform and delete message!
+        await ctx.send(await language.get(self, ctx, 'events.set_welcome_channel'), delete_after=10)
+        await ctx.message.delete()
         
 def setup(bot):
     bot.add_cog(Events(bot))
