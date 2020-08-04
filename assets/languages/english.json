@@ -56,7 +56,7 @@
   "music.too_long": "**Honk honk.** {user_mention}, no, I'm not going to honk longer than {0} seconds.",
   "music.user_not_in_channel": "**Honk honk.** Get first in a channel yourself, {user_mention}!",
   "music.volume": "**Honk honk!** Oke, I'll honk now at {0}% volume.",
-  "polls.nextpost": "**Honk!** I'll consider your next message as a poll, {user_mention}! Make sure to use the A, B, C, etc. emoji's for options. By the way, I have deleted your message and will delete mine within 10 seconds.",
-  "polls.notapoll": "**Honk!** That's not a poll, {0}! Where are the emoji's like A, B, C, etc.?",
-  "polls.setchannel": "**Honk!** This channel is now the designated channel for polls! Be aware, there can only be one..."
+  "polls.next_post": "**Honk!** I'll consider your next message as a poll, {user_mention}! Make sure to use the A, B, C, etc. emoji's for options. By the way, I have deleted your message and will delete mine within 10 seconds.",
+  "polls.not_a_poll": "**Honk!** That's not a poll, {0}! Where are the emoji's like A, B, C, etc.?",
+  "polls.set_channel": "**Honk!** This channel is now the designated channel for polls! Be aware, there can only be one..."
 }

@@ -70,7 +70,7 @@ class Polls(commands.Cog):
 
         # Now if it's in the poll channel, let's make sure we have at least two options, if not inform and remove it...
         if is_poll_channel and reactions < 2:
-            msg = await language.get(self, None, 'polls.notapoll', message.guild.id)
+            msg = await language.get(self, None, 'polls.not_a_poll', message.guild.id)
             await message.channel.send(msg.format(message.author.mention), delete_after=10)
             await message.delete()
 
@@ -83,7 +83,7 @@ class Polls(commands.Cog):
         self.bot.memory['polls']['pending'].append(key)
 
         # Send the message that removes itself after 10 seconds to confirm the action, and the delete one of the user.
-        await ctx.send(await language.get(self, ctx, 'polls.nextpost'), delete_after=10)
+        await ctx.send(await language.get(self, ctx, 'polls.next_post'), delete_after=10)
         await ctx.message.delete()
 
     @commands.command(hidden=True)
@@ -99,7 +99,7 @@ class Polls(commands.Cog):
                                   f"ON CONFLICT (guild_id, key) DO UPDATE SET value = '{ctx.channel.id}'")
 
         # Inform and delete message!
-        await ctx.send(await language.get(self, ctx, 'polls.setchannel'), delete_after=10)
+        await ctx.send(await language.get(self, ctx, 'polls.set_channel'), delete_after=10)
         await ctx.message.delete()
 
 def setup(bot):
