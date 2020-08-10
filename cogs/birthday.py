@@ -1,6 +1,7 @@
 ﻿import asyncpg
 import datetime
 import discord
+import json
 
 from dateutil import parser
 from discord.ext import commands, tasks
@@ -26,11 +27,14 @@ class Birthday(commands.Cog):
         if birthday is None:
             return await ctx.send(await language.get(self, ctx, 'birthday.how_to'))
 
-        # Parse the given date and get guild timezone.
-        date = parser.parse(birthday)
-        timezone = await self.bot.db.fetch(f"SELECT value FROM guild_settings WHERE guild_id = {ctx.guild.id} AND key = 'timezone'")
+        # Parse the given date and get guild timezone, return error if something is not working.
+        try:
+            date = parser.parse(birthday)
+        except:
+            return await ctx.send(await language.get(self, ctx, 'birthday.incorrect'))
 
-        # Make sure the timezone is an acutual value.
+        # Get guild timezone and ensure we have something...
+        timezone = await self.bot.db.fetch(f"SELECT value FROM guild_settings WHERE guild_id = {ctx.guild.id} AND key = 'timezone'")
         if not timezone:
             timezone = 'CEST'
         else:
@@ -45,18 +49,36 @@ class Birthday(commands.Cog):
         date_formatted = date.strftime(await language.get(self, ctx, 'birthday.format')).lower()
         await ctx.send(message.format(date_formatted, timezone))
 
-    #@commands.command()
-    #async def timezone(self, ctx, input=None):
-    #    """Change the timezone of your current location."""
+    @commands.command()
+    async def timezone(self, ctx, *, timezone: str=None):
+        """Change the timezone of your current location."""
 
-    #    # Check for input, if none explain the possible timezones.
-    #    if input is None:
-    #        return await ctx.send(await language.get(self, ctx, 'birthday.timezone'))
+        # Check for input, if none explain the possible timezones.
+        if timezone is None:
+            return await ctx.send(await language.get(self, ctx, 'birthday.timezone'))
 
-    #    # Check if user has set a birthday.
-    #    birthday = await self.bot.db.fetch(f"SELECT birthday FROM birthdays WHERE guild_id = {ctx.guild.id} AND member_id = {ctx.author.id}")
-    #    if not birthday:
-    #        return await ctx.send(await language.get(self, ctx, 'birthday.not_set'))
+        # Check if user has set a birthday.
+        birthday = await self.bot.db.fetch(f"SELECT birthday FROM birthdays WHERE guild_id = {ctx.guild.id} AND member_id = {ctx.author.id}")
+        if not birthday:
+            return await ctx.send(await language.get(self, ctx, 'birthday.not_set'))
+
+        # Get the Json array of possible timezones.
+        # Declare memory and load config.
+        timezones = {}
+        with open('assets/json/timezones.json', encoding='utf8') as data:
+            timezones = json.load(data)
+
+        # Now let's check if the given timezone is present, return error if none.
+        matching_timezones = [string for string in timezones if timezone.lower() in string.lower()]
+        if not matching_timezones:
+            return await ctx.send(await language.get(self, ctx, 'birthday.timezone_unknown'))
+
+        # Now let's save it.
+        await self.bot.db.execute(f"UPDATE birthdays SET timezone = '{matching_timezones[0]}' WHERE guild_id = {ctx.guild.id} AND member_id = {ctx.author.id}")
+
+        # Inform.
+        message = await language.get(self, ctx, 'birthday.timezone_set')
+        await ctx.send(message.format(matching_timezones[0]))
 
     @tasks.loop(minutes=10.0)
     async def check_birthday(self):
