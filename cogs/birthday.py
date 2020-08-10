@@ -19,8 +19,13 @@ class Birthday(commands.Cog):
         """Function that happens the when the cog unloads."""
         self.check_birthday.cancel()
 
-    @commands.command()
-    async def birthday(self, ctx, *, birthday: str=None):
+    @commands.group()
+    async def birthday(self, ctx):
+        """Commands for setting and changing your birthday."""
+        return
+
+    @birthday.command()
+    async def set(self, ctx, *, birthday: str=None):
         """Set your birthday date, the format day/month is used."""
 
         # Check for value, if none then tell how to use this command.
@@ -49,7 +54,7 @@ class Birthday(commands.Cog):
         date_formatted = date.strftime(await language.get(self, ctx, 'birthday.format')).lower()
         await ctx.send(message.format(date_formatted, timezone))
 
-    @commands.command()
+    @birthday.command()
     async def timezone(self, ctx, *, timezone: str=None):
         """Change the timezone of your current location."""
 
