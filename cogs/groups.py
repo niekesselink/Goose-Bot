@@ -57,11 +57,11 @@ class Groups(commands.Cog):
 
 
     @commands.group()
-    async def group(self, ctx):
+    async def groups(self, ctx):
         """Commands for groups on the server, purposed to ping those interested in an event."""
         return
 
-    @group.command()
+    @groups.command()
     async def list(self, ctx):
         """"Gives a list of groups."""
 
@@ -90,7 +90,7 @@ class Groups(commands.Cog):
             fields=fields
         ))
 
-    @group.command()
+    @groups.command()
     async def join(self, ctx, group: str):
         """"Join an existing group."""
 
@@ -115,7 +115,7 @@ class Groups(commands.Cog):
         message = await language.get(self, ctx, 'groups.joined')
         await ctx.send(message.format(result[0]['name']))
 
-    @group.command()
+    @groups.command()
     async def leave(self, ctx, group: str):
         """"Leave a group you're currently in."""
 
@@ -140,7 +140,7 @@ class Groups(commands.Cog):
         message = await language.get(self, ctx, 'groups.left')
         await ctx.send(message.format(result[0]['name']))
 
-    @group.command()
+    @groups.command()
     @commands.has_permissions(administrator=True)
     async def create(self, ctx, *, data: str):
         """Create a new public group for people to join."""
@@ -169,7 +169,7 @@ class Groups(commands.Cog):
         message = await language.get(self, ctx, 'groups.created')
         await ctx.send(message.format(group_name))
 
-    @group.command()
+    @groups.command()
     @commands.has_permissions(administrator=True)
     async def delete(self, ctx, group: str):
         """Delete an existing group."""
