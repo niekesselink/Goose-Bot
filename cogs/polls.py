@@ -22,7 +22,7 @@ class Polls(commands.Cog):
         # Ignore the poll and setpollschannel command, it's triggered first before this event so we have to do this.
         # Also ignore message by the bot, we don't want a loop.
         prefix = self.bot.config.prefix
-        if message.content.lower() == f'{prefix}poll' or message.content.lower() == f'{prefix}setpollschannel' or message.author == self.bot.user:
+        if message.content.lower() == f'{prefix}poll' or message.content.lower() == f'{prefix}setpollschannel' or message.author.bot:
             return
 
         # Declare some variables.
