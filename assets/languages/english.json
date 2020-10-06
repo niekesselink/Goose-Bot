@@ -56,7 +56,7 @@
   "music.playlist.title": "**Honking list.**",
   "music.queued": "**Honk!** {user_mention}, I'll honk **{0}** for you soon!\nIt's on position #{1} in the queue, so you have to wait roughly {2}...",
   "music.skip": "**Honk!** Chasing the current song away!",
-  "music.start": "**Honk honk.** Beginning to honk!",
+  "music.start": "**Honk honk.** Beginning to honk this song called **{0}**!",
   "music.too_long": "**Honk!** {user_mention}, no, I'm not going to honk longer than {0} seconds.",
   "music.user_not_in_channel": "**Honk!** Maybe I need to chase you into a voice channel first, {user_mention}?",
   "music.volume": "**Honk!** Fine, I'll honk now at {0}% volume.",

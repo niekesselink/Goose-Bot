@@ -175,8 +175,9 @@ class Music(commands.Cog):
 
         # Now let's see if we need to start playing directly, as in, nothing is playing...
         if not ctx.voice_client.is_playing():
-            self.play_song(ctx)
-            return await ctx.send(await language.get(self, ctx, 'music.start'))
+            message = await language.get(self, ctx, 'music.start')
+            await ctx.send(message.format(meta['title']))
+            return self.play_song(ctx)
                 
         # Get total seconds in playlist.
         total_seconds = 0 - meta['duration']
