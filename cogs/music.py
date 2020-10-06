@@ -1,3 +1,4 @@
+import asyncio
 import discord
 import os
 import youtube_dl
@@ -289,6 +290,28 @@ class Music(commands.Cog):
         self.bot.memory['music'][ctx.guild.id][0]['start'] = datetime.now()
         source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(f'{ctx.guild.id}.mp3'), volume)
         ctx.voice_client.play(source, after=lambda e: self.play_song(ctx, pop=True))
+
+    @commands.Cog.listener()
+    async def on_voice_state_update(self, member, before, after):
+
+        # Only continue the code if there's only one user left which is the bot.
+        if before.channel is None or len(before.channel.members) != 1 or before.channel.members[0].id != self.bot.user.id:
+            return
+
+        # Grace period of 10 seconds..
+        await asyncio.sleep(10)
+
+        # Cancel in case someone joined.
+        if len(before.channel.members) != 1:
+            return
+
+        # So, it's the bot, and we're alone. Let's leave.
+        voice_client = discord.utils.get(self.bot.voice_clients, guild=before.channel.guild)
+        await voice_client.disconnect()
+
+        # Destroy the queue if we had one...
+        if before.channel.guild.id in self.bot.memory['music']:
+            del(self.bot.memory['music'][before.channel.guild.id])
 
 def setup(bot):
     bot.add_cog(Music(bot))
