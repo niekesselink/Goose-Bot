@@ -124,7 +124,7 @@ class Music(commands.Cog):
         # Add all the songs we have queued.
         if len(self.bot.memory['music'][ctx.guild.id]) > 1:
             for i in range(1, len(self.bot.memory['music'][ctx.guild.id])):
-                message += '{0}) {1}'.format(i, self.bot.memory['music'][ctx.guild.id][i]['title'])
+                message += '{0}) {1}\n'.format(i, self.bot.memory['music'][ctx.guild.id][i]['title'])
 
         # Add an end message and send.
         message += '\n{0}```'.format(await language.get(self, ctx, 'music.playlist.end'))
