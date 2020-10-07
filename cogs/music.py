@@ -90,7 +90,20 @@ class Music(commands.Cog):
         ctx.voice_client.stop()
         await ctx.send(await language.get(self, ctx, 'music.skip'))
 
-    @commands.command(alisases=['queue'])
+    @commands.command(aliases=['playing', 'np'])
+    @commands.guild_only()
+    async def now(self, ctx):
+        """Shows the current playing song."""
+
+        # Do we have a queue or are we still in a channel? If not, no playlist.
+        if ctx.guild.id not in self.bot.memory['music'] or ctx.voice_client is None:
+            return await ctx.send(await language.get(self, ctx, 'music.not_playing'))
+        
+        # Send what we are playing now.
+        message = await language.get(self, ctx, 'music.now')
+        await ctx.send(message.format(self.bot.memory['music'][ctx.guild.id][0]['title']))
+
+    @commands.command(aliases=['queue', 'q'])
     @commands.guild_only()
     async def playlist(self, ctx):
         """Shows the playlist of the bot if present."""
@@ -99,23 +112,23 @@ class Music(commands.Cog):
         if ctx.guild.id not in self.bot.memory['music'] or ctx.voice_client is None:
             return await ctx.send(await language.get(self, ctx, 'music.not_playing'))
 
-        # Define fields data with now playing.
-        fields = {
-            await language.get(self, ctx, 'music.playlist.now'): self.bot.memory['music'][ctx.guild.id][0]['title']
-        }
-
-        # Add the future entries to the fields data.
+        # Is there something coming up, if not just a plain message.
         if len(self.bot.memory['music'][ctx.guild.id]) < 2:
-            fields.update({ await language.get(self, ctx, 'music.playlist.next'): await language.get(self, ctx, 'music.playlist.nothing') })
-        else:
-            fields.update({ await language.get(self, ctx, 'music.playlist.next'): '\n'.join([f"{i}) {self.bot.memory['music'][ctx.guild.id][i]['title']}" for i in range(1, len(self.bot.memory['music'][ctx.guild.id]))]) })
+            return await ctx.send(await language.get(self, ctx, 'music.playlist.nothing'))
 
-        # Send the embed...
-        await ctx.send(embed=embed.create(
-            title=await language.get(self, ctx, 'music.playlist.title'),
-            description=await language.get(self, ctx, 'music.playlist.description'),
-            fields=fields
-        ))
+        # Declare top part of the message...
+        message = await language.get(self, ctx, 'music.playlist')
+        message += '```nim\n   ⬐ {0}\n0) {1}'.format(await language.get(self, ctx, 'music.playlist.now'), self.bot.memory['music'][ctx.guild.id][0]['title'])
+        message += '\n\n   ⬐ {0}\n'.format(await language.get(self, ctx, 'music.playlist.next'))
+
+        # Add all the songs we have queued.
+        if len(self.bot.memory['music'][ctx.guild.id]) > 1:
+            for i in range(1, len(self.bot.memory['music'][ctx.guild.id])):
+                message += '{0}) {1}'.format(i, self.bot.memory['music'][ctx.guild.id][i]['title'])
+
+        # Add an end message and send.
+        message += '\n{0}```'.format(await language.get(self, ctx, 'music.playlist.end'))
+        return await ctx.send(message)
 
     @commands.command(aliases=['p'])
     @commands.guild_only()
@@ -208,9 +221,9 @@ class Music(commands.Cog):
         message = await language.get(self, ctx, 'music.queued')
         separator = await language.get(self, ctx, 'core.separator')
         await ctx.send(message.format(
-            meta['title'],
             len(self.bot.memory['music'][ctx.guild.id]) - 1,
-            f' {separator} '.join([', '.join(result[:-1]),result[-1]])
+            result[0] if len(result) == 1 else f' {separator} '.join([', '.join(result[:-1]), result[-1]]),
+            meta['title']
         ))
 
     async def allowed_to_run_command_check(self, ctx, need_source):
