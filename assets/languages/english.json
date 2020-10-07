@@ -51,7 +51,7 @@
   "music.not_playing": "**Honk!** {user_mention}, why? I'm not honking anything at all!",
   "music.now": "I'm honking **{0}** right now!",
   "music.playlist": "**Honk!** Here's my honking queue...",
-  "music.playlist.end": "\n   And that is the end of the honking list.\n   Use .play to add something to it!",
+  "music.playlist.end": "   And that is the end of the honking list.\n   Use .play to add something to it!",
   "music.playlist.next": "Upcoming honks.",
   "music.playlist.nothing": "**Honk!** There's no playlist for me to honk, this is the last song! Go add something using .play if you want.",
   "music.playlist.now": "Honking now!",
