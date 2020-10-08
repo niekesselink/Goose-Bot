@@ -19,10 +19,10 @@ class Polls(commands.Cog):
     async def on_message(self, message):
         """Event that happens when user sends a message in a channel."""
 
-        # Ignore the poll and setpollschannel command, it's triggered first before this event so we have to do this.
+        # Ignore the poll command, it's triggered first before this event so we have to do this.
         # Also ignore message by the bot, we don't want a loop.
         prefix = self.bot.config.prefix
-        if message.content.lower() == f'{prefix}poll' or message.content.lower() == f'{prefix}setpollschannel' or message.author.bot:
+        if message.content.lower() == f'{prefix}poll' or message.author.bot:
             return
 
         # Declare some variables.
@@ -94,22 +94,6 @@ class Polls(commands.Cog):
 
         # Send the message that removes itself after 10 seconds to confirm the action, and the delete one of the user.
         await ctx.send(await language.get(self, ctx, 'polls.next_post'), delete_after=10)
-        await ctx.message.delete()
-
-    @commands.command(hidden=True)
-    @commands.has_permissions(administrator=True)
-    async def setpollschannel(self, ctx):
-        """Sets the current channel as the guild's channel for polls."""
-
-        # Put it in the memory.
-        self.bot.memory['polls'][ctx.guild.id] = ctx.channel.id
-
-        # Also, put it in the database.
-        await self.bot.db.execute(f"INSERT INTO guild_settings (guild_id, key, value) VALUES ({ctx.guild.id}, 'polls.channel', '{ctx.channel.id}') "
-                                  f"ON CONFLICT (guild_id, key) DO UPDATE SET value = '{ctx.channel.id}'")
-
-        # Inform and delete message!
-        await ctx.send(await language.get(self, ctx, 'polls.set_channel'), delete_after=10)
         await ctx.message.delete()
 
 def setup(bot):

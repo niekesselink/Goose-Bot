@@ -65,16 +65,16 @@ class Debug(commands.Cog):
                     pass
 
     @debug.command()
-    async def importutil(self, ctx, name):
-        """Imports an util."""
+    async def reloadutil(self, ctx, name):
+        """(Re)Load an util."""
 
         # Import it...
         util = importlib.import_module(f'utils.{name}')
         importlib.reload(util)
 
         # Inform...
-        print(f'Util {name} has been (re)imported!')
-        message = await language.get(self, ctx, 'debug.import_util')
+        print(f'Util {name} has been (re)loaded!')
+        message = await language.get(self, ctx, 'debug.reload_util')
         await ctx.send(content=message.format(name))
 
     @debug.command()
