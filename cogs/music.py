@@ -6,7 +6,7 @@ import youtube_dl
 from datetime import datetime
 from discord import FFmpegPCMAudio
 from discord.ext import commands
-from utils import embed, language
+from utils import language
 
 class Music(commands.Cog):
     """Commands for playing music in a voice channel."""
@@ -16,8 +16,10 @@ class Music(commands.Cog):
         self.bot = bot
 
         # Define memory variables...
-        if 'music' not in self.bot.memory:
-            self.bot.memory['music'] = {}
+        if 'music.playlists' not in self.bot.memory:
+            self.bot.memory['music.playlists'] = {}
+        if 'music.volumes' not in self.bot.memory:
+            self.bot.memory['music.volumes'] = {}
 
     @commands.command()
     @commands.guild_only()
@@ -42,8 +44,12 @@ class Music(commands.Cog):
         else:
             await ctx.message.author.voice.channel.connect()
 
-        # Do we have a playlist but not playing? Also known as techincal difficulty...
-        if ctx.guild.id in self.bot.memory['music'] and ctx.voice_client.source is None:
+        # Create a playlist if not present.
+        if ctx.guild.id not in self.bot.memory['music.playlists']:
+            self.bot.memory['music.playlists'][ctx.guild.id] = []
+
+        # Do we have a playlist but not playing? Let's start playing again then...
+        if len(self.bot.memory['music.playlists'][ctx.guild.id]) > 0 and ctx.voice_client.source is None:
             self.play_song(ctx)
 
     @commands.command()
@@ -59,9 +65,48 @@ class Music(commands.Cog):
         await ctx.voice_client.disconnect()
         await ctx.message.add_reaction('👋')
 
-        # Destroy the queue if we had one...
-        if ctx.guild.id in self.bot.memory['music']:
-            del(self.bot.memory['music'][ctx.guild.id])
+        # Clean up since we're done...
+        self.clean_up(ctx.guild.id)
+
+    @commands.command(aliases=['playing', 'np'])
+    @commands.guild_only()
+    async def now(self, ctx):
+        """Shows the current playing song."""
+
+        # Do we have a queue or are we still in a channel? If not, no playlist.
+        if ctx.guild.id not in self.bot.memory['music.playlists'] or ctx.voice_client is None:
+            return await ctx.send(await language.get(self, ctx, 'music.not_playing'))
+        
+        # Send what we are playing now.
+        message = await language.get(self, ctx, 'music.now')
+        await ctx.send(message.format(self.bot.memory['music.playlists'][ctx.guild.id][0]['title']))
+
+    @commands.command(aliases=['queue', 'q'])
+    @commands.guild_only()
+    async def playlist(self, ctx):
+        """Shows the playlist of the bot if present."""
+
+        # Do we have a queue or are we still in a channel? If not, no playlist.
+        if ctx.guild.id not in self.bot.memory['music.playlists'] or ctx.voice_client is None:
+            return await ctx.send(await language.get(self, ctx, 'music.not_playing'))
+
+        # Is there something coming up, if not just a plain message.
+        if len(self.bot.memory['music.playlists'][ctx.guild.id]) < 2:
+            return await ctx.send(await language.get(self, ctx, 'music.playlist.nothing'))
+
+        # Declare top part of the message...
+        message = await language.get(self, ctx, 'music.playlist')
+        message += '```nim\n   ⬐ {0}\n0) {1}'.format(await language.get(self, ctx, 'music.playlist.now'), self.bot.memory['music.playlists'][ctx.guild.id][0]['title'])
+        message += '\n\n   ⬐ {0}\n'.format(await language.get(self, ctx, 'music.playlist.next'))
+
+        # Add all the songs we have queued.
+        if len(self.bot.memory['music.playlists'][ctx.guild.id]) > 1:
+            for i in range(1, len(self.bot.memory['music.playlists'][ctx.guild.id])):
+                message += '{0}) {1}\n'.format(i, self.bot.memory['music.playlists'][ctx.guild.id][i]['title'])
+
+        # Add an end message and send.
+        message += '\n{0}```'.format(await language.get(self, ctx, 'music.playlist.end'))
+        return await ctx.send(message)
 
     @commands.command()
     @commands.guild_only()
@@ -73,7 +118,11 @@ class Music(commands.Cog):
             return
 
         # Now let's change the volume...
-        ctx.voice_client.source.volume = volume / 100
+        volume = volume / 100
+        ctx.voice_client.source.volume = volume
+        self.bot.memory['music.volumes'][ctx.guild.id] = volume
+
+        # Inform as well.
         message = await language.get(self, ctx, 'music.volume')
         await ctx.send(message.format(volume))
 
@@ -89,46 +138,6 @@ class Music(commands.Cog):
         # Let's skip the song...
         ctx.voice_client.stop()
         await ctx.send(await language.get(self, ctx, 'music.skip'))
-
-    @commands.command(aliases=['playing', 'np'])
-    @commands.guild_only()
-    async def now(self, ctx):
-        """Shows the current playing song."""
-
-        # Do we have a queue or are we still in a channel? If not, no playlist.
-        if ctx.guild.id not in self.bot.memory['music'] or ctx.voice_client is None:
-            return await ctx.send(await language.get(self, ctx, 'music.not_playing'))
-        
-        # Send what we are playing now.
-        message = await language.get(self, ctx, 'music.now')
-        await ctx.send(message.format(self.bot.memory['music'][ctx.guild.id][0]['title']))
-
-    @commands.command(aliases=['queue', 'q'])
-    @commands.guild_only()
-    async def playlist(self, ctx):
-        """Shows the playlist of the bot if present."""
-
-        # Do we have a queue or are we still in a channel? If not, no playlist.
-        if ctx.guild.id not in self.bot.memory['music'] or ctx.voice_client is None:
-            return await ctx.send(await language.get(self, ctx, 'music.not_playing'))
-
-        # Is there something coming up, if not just a plain message.
-        if len(self.bot.memory['music'][ctx.guild.id]) < 2:
-            return await ctx.send(await language.get(self, ctx, 'music.playlist.nothing'))
-
-        # Declare top part of the message...
-        message = await language.get(self, ctx, 'music.playlist')
-        message += '```nim\n   ⬐ {0}\n0) {1}'.format(await language.get(self, ctx, 'music.playlist.now'), self.bot.memory['music'][ctx.guild.id][0]['title'])
-        message += '\n\n   ⬐ {0}\n'.format(await language.get(self, ctx, 'music.playlist.next'))
-
-        # Add all the songs we have queued.
-        if len(self.bot.memory['music'][ctx.guild.id]) > 1:
-            for i in range(1, len(self.bot.memory['music'][ctx.guild.id])):
-                message += '{0}) {1}\n'.format(i, self.bot.memory['music'][ctx.guild.id][i]['title'])
-
-        # Add an end message and send.
-        message += '\n{0}```'.format(await language.get(self, ctx, 'music.playlist.end'))
-        return await ctx.send(message)
 
     @commands.command(aliases=['p'])
     @commands.guild_only()
@@ -159,10 +168,10 @@ class Music(commands.Cog):
             meta = ydl.extract_info(url, download=False)
 
             # Get how many seconds a song may be.
-            db_result = await self.bot.db.fetch(f"SELECT value FROM guild_settings WHERE guild_id = {ctx.guild.id} AND key = 'music.maxduration'")
+            db_result = await self.bot.db.fetch(f"SELECT value FROM guild_settings WHERE guild_id = {ctx.guild.id} AND key = 'music.max_duration'")
             max_duration = int(db_result[0]['value'])
 
-            # Fix for search.
+            # Hack fix for search.
             if 'duration' not in meta:
                 meta = meta['entries'][0]
 
@@ -179,12 +188,8 @@ class Music(commands.Cog):
             'start': None
         }
 
-        # Is there a queue already? If not, make one.
-        if ctx.guild.id not in self.bot.memory['music']:
-            self.bot.memory['music'][ctx.guild.id] = []
-
         # Now add the song the queue.
-        self.bot.memory['music'][ctx.guild.id].append(entry)
+        self.bot.memory['music.playlists'][ctx.guild.id].append(entry)
 
         # Now let's see if we need to start playing directly, as in, nothing is playing...
         if not ctx.voice_client.is_playing():
@@ -194,11 +199,11 @@ class Music(commands.Cog):
                 
         # Get total seconds in playlist.
         total_seconds = 0 - meta['duration']
-        for i in range(0, len(self.bot.memory['music'][ctx.guild.id])):
-            total_seconds += self.bot.memory['music'][ctx.guild.id][i]['duration']
+        for i in range(0, len(self.bot.memory['music.playlists'][ctx.guild.id])):
+            total_seconds += self.bot.memory['music.playlists'][ctx.guild.id][i]['duration']
 
         # Retract how far we are now in current song.
-        total_seconds = total_seconds - (datetime.now() - self.bot.memory['music'][ctx.guild.id][0]['start']).total_seconds()
+        total_seconds = total_seconds - (datetime.now() - self.bot.memory['music.playlists'][ctx.guild.id][0]['start']).total_seconds()
 
         # Declare variables for converting it into a nice figure...
         result = []
@@ -221,10 +226,83 @@ class Music(commands.Cog):
         message = await language.get(self, ctx, 'music.queued')
         separator = await language.get(self, ctx, 'core.separator')
         await ctx.send(message.format(
-            len(self.bot.memory['music'][ctx.guild.id]) - 1,
+            len(self.bot.memory['music.playlists'][ctx.guild.id]) - 1,
             result[0] if len(result) == 1 else f' {separator} '.join([', '.join(result[:-1]), result[-1]]),
             meta['title']
         ))
+
+    def play_song(self, ctx, pop=False):
+        """Function to actually play a song."""
+
+        # Remove previous downloaded file.
+        song_there = os.path.isfile(f'{ctx.guild.id}.mp3')
+        try:
+            if song_there:
+                os.remove(f'{ctx.guild.id}.mp3')
+        except:
+            pass
+
+        # Do we still have a queue or are we still in a channel? If one check fails then end.
+        if ctx.guild.id not in self.bot.memory['music.playlists'] or ctx.voice_client is None:
+            return
+
+        # Pop the previous song from the queue if we have to.
+        if pop:
+            self.bot.memory['music.playlists'][ctx.guild.id].pop(0)
+
+        # Now let's make sure we still can play something...
+        if len(self.bot.memory['music.playlists'][ctx.guild.id]) == 0:
+            return
+
+        # We can still play, let's get the next song.
+        url = self.bot.memory['music.playlists'][ctx.guild.id][0]['url']
+
+        # Declare the options for youtube-dl.
+        ydl_opts = {
+            'noplaylist': True,
+            'format': 'bestaudio/best',
+            'outtmpl': f'{ctx.guild.id}.mp3',
+            'postprocessors': [{
+                'key': 'FFmpegExtractAudio',
+                'preferredcodec': 'mp3',
+                'preferredquality': '192',
+            }]
+        }
+
+        # Declare the youtube-dl downloader and download the song.
+        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+            ydl.download([url])
+
+        # Set a proper volume...
+        volume = 1
+        if ctx.guild.id in self.bot.memory['music.volumes']:
+            volume = self.bot.memory['music.volumes'][ctx.guild.id]
+
+        # Now let's actually start playing..
+        self.bot.memory['music.playlists'][ctx.guild.id][0]['start'] = datetime.now()
+        source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(f'{ctx.guild.id}.mp3'), volume)
+        ctx.voice_client.play(source, after=lambda e: self.play_song(ctx, pop=True))
+
+    @commands.Cog.listener()
+    async def on_voice_state_update(self, member, before, after):
+
+        # Only continue the code if there's only one user left which is the bot.
+        if before.channel is None or len(before.channel.members) != 1 or before.channel.members[0].id != self.bot.user.id:
+            return
+
+        # Grace period of 10 seconds..
+        await asyncio.sleep(10)
+
+        # Cancel in case someone joined.
+        if len(before.channel.members) != 1:
+            return
+
+        # So, it's the bot, and we're alone. Let's leave.
+        voice_client = discord.utils.get(self.bot.voice_clients, guild=before.channel.guild)
+        await voice_client.disconnect()
+
+        # Clean up since we're done...
+        self.clean_up(before.channel.guild.id)
 
     async def allowed_to_run_command_check(self, ctx, need_source):
         """Function to check if we are playing something, used for various commands above."""
@@ -252,80 +330,16 @@ class Music(commands.Cog):
         # All is good...
         return True
 
-    def play_song(self, ctx, pop=False):
-        """Function to actually play a song."""
-
-        # Remove previous downloaded file.
-        song_there = os.path.isfile(f'{ctx.guild.id}.mp3')
-        try:
-            if song_there:
-                os.remove(f'{ctx.guild.id}.mp3')
-        except:
-            pass
-
-        # Do we have a queue or are we still in a channel? If not, end.
-        if ctx.guild.id not in self.bot.memory['music'] or ctx.voice_client is None:
-            return
-
-        # Pop the previous song from the queue if we have to.
-        if pop:
-            self.bot.memory['music'][ctx.guild.id].pop(0)
-
-        # Now let's make sure we still can play something, if not delete queue from memory.
-        if len(self.bot.memory['music'][ctx.guild.id]) == 0:
-            del(self.bot.memory['music'][ctx.guild.id])
-            return
-
-        # Now get an url, since we do have one in the queue.
-        url = self.bot.memory['music'][ctx.guild.id][0]['url']
-
-        # Declare the options for youtube-dl.
-        ydl_opts = {
-            'noplaylist': True,
-            'format': 'bestaudio/best',
-            'outtmpl': f'{ctx.guild.id}.mp3',
-            'postprocessors': [{
-                'key': 'FFmpegExtractAudio',
-                'preferredcodec': 'mp3',
-                'preferredquality': '192',
-            }]
-        }
-
-        # Declare the youtube-dl downloader and download the song.
-        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-            ydl.download([url])
-
-        # Set a proper volume...
-        volume = 1
-        if ctx.voice_client.source is not None:
-            volume = ctx.voice_client.source.volume
-
-        # Now let's actually start playing..
-        self.bot.memory['music'][ctx.guild.id][0]['start'] = datetime.now()
-        source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(f'{ctx.guild.id}.mp3'), volume)
-        ctx.voice_client.play(source, after=lambda e: self.play_song(ctx, pop=True))
-
-    @commands.Cog.listener()
-    async def on_voice_state_update(self, member, before, after):
-
-        # Only continue the code if there's only one user left which is the bot.
-        if before.channel is None or len(before.channel.members) != 1 or before.channel.members[0].id != self.bot.user.id:
-            return
-
-        # Grace period of 10 seconds..
-        await asyncio.sleep(10)
-
-        # Cancel in case someone joined.
-        if len(before.channel.members) != 1:
-            return
-
-        # So, it's the bot, and we're alone. Let's leave.
-        voice_client = discord.utils.get(self.bot.voice_clients, guild=before.channel.guild)
-        await voice_client.disconnect()
+    def clean_up(self, guild_id):
+        """Function to clean up the playing bot for a guild."""
 
         # Destroy the queue if we had one...
-        if before.channel.guild.id in self.bot.memory['music']:
-            del(self.bot.memory['music'][before.channel.guild.id])
+        if guild_id in self.bot.memory['music.playlists']:
+            del(self.bot.memory['music.playlists'][guild_id])
+
+        # Destory the stored volume.
+        if guild_id in self.bot.memory['music.volumes']:
+            del(self.bot.memory['music.volumes'][guild_id])
 
 def setup(bot):
     bot.add_cog(Music(bot))
