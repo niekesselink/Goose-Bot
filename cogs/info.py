@@ -44,12 +44,12 @@ class Info(commands.Cog):
 
         # Get some data...
         ramUsage = self.process.memory_full_info().rss / 1024**2
-        avgMembers = round(len(self.bot.users) / len(self.bot.guilds))
+        #avgMembers = round(len(self.bot.users) / len(self.bot.guilds))
 
         # Define embed fields data.
         fields = {
             'Creator': '<@462311999980961793>',
-            'Servers active': f'{len(ctx.bot.guilds)} (avg: {avgMembers} users/server)',
+            'Servers active': f'{len(ctx.bot.guilds)}',
             'Last update': f'{subprocess.check_output(["git", "log", "-1", "--format=%cd "]).strip().decode("utf-8")}',
             'RAM usage': f'{ramUsage:.2f} MB'
         }
