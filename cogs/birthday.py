@@ -68,7 +68,6 @@ class Birthday(commands.Cog):
             return await ctx.send(await language.get(self, ctx, 'birthday.not_set'))
 
         # Get the Json array of possible timezones.
-        # Declare memory and load config.
         timezones = {}
         with open('assets/json/timezones.json', encoding='utf8') as data:
             timezones = json.load(data)
