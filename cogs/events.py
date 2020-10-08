@@ -25,55 +25,6 @@ class Events(commands.Cog):
             activity=discord.Activity(type=discord.ActivityType.listening, name='humans.'),
             status=discord.Status.online
         )
-            
-    @commands.Cog.listener()
-    async def on_guild_join(self, guild):
-        """Event that happens once the bot enters a guild."""
-
-        # Add the guild and the members of said guild to the database.
-        await self.bot.db.execute(f"INSERT INTO guilds (id) VALUES ({guild.id})")
-        for member in guild.members:
-            await self.bot.db.execute(f"INSERT INTO guild_members (guild_id ,id) VALUES ({guild.id}, {member.id})")
-
-    @commands.Cog.listener()
-    async def on_guild_leave(self, guild):
-        """Event that happens once the bot leaves a guild."""
-
-        # Remove the guild from the database.
-        await self.bot.db.execute(f"DELETE FROM guilds WHERE id = {guild.id}")
-
-    @commands.Cog.listener()
-    async def on_member_join(self, member):
-        """Event that happens once a member joins the guild the bot is in."""
-
-        # Add the member to the database.
-        await self.bot.db.execute(f"INSERT INTO guild_members (guild_id, id) VALUES ({member.guild.id}, {member.id}) ON CONFLICT (guild_id, id) DO NOTHING")
-
-        # Get a welcome channel if it's set.
-        raw_welcome_channel = await self.bot.db.fetch(f"SELECT value FROM guild_settings WHERE guild_id = {member.guild.id} AND key = 'events.welcomechannel'")
-
-        # If channel is set, get the channel and continue.
-        if raw_welcome_channel:
-            welcome_channel = member.guild.get_channel(int(raw_welcome_channel[0]['value']))
-
-            # Getting a random welcome message, get the channel, format it, and send it.
-            welcome_messages = await self.bot.db.fetch(f"SELECT text FROM welcomes WHERE guild_id = {member.guild.id} ORDER BY RANDOM() LIMIT 1")
-            await welcome_channel.send(language.fill(welcome_messages[0]['text'], member=member))
-
-    @commands.Cog.listener()
-    async def on_member_remove(self, member):
-        """Event that happens once a member leaves the guild the bot is in."""
-
-        # Remove member from the database.
-        await self.bot.db.execute(f"DELETE FROM guild_members WHERE guild_id = {member.guild.id} AND id = {member.id}")
-
-    @commands.Cog.listener()
-    async def on_message(self, message):
-        """Event that happens when user sends a message in a channel."""
-
-        # Press F to pay respect.
-        if message.content.strip() == 'F' or message.content.startswith('F '):
-            await message.add_reaction('🇫')
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
@@ -109,19 +60,64 @@ class Events(commands.Cog):
             description=f'`{str(error)}`',
             colour=0xFF7E62,
         ))
+            
+    @commands.Cog.listener()
+    async def on_guild_join(self, guild):
+        """Event that happens once the bot enters a guild."""
 
-    @commands.command(hidden=True)
-    @commands.has_permissions(administrator=True)
-    async def setwelcomechannel(self, ctx):
-        """Sets the current channel as the welcoming channel for new users."""
+        # Add the guild and the members of said guild to the database.
+        await self.bot.db.execute(f"INSERT INTO guilds (id) VALUES ({guild.id})")
+        for member in guild.members:
+            await self.bot.db.execute(f"INSERT INTO guild_members (guild_id ,id) VALUES ({guild.id}, {member.id})")
 
-        # Put it in the database.
-        await self.bot.db.execute(f"INSERT INTO guild_settings (guild_id, key, value) VALUES ({ctx.guild.id}, 'events.welcomechannel', '{ctx.channel.id}') "
-                                  f"ON CONFLICT (guild_id, key) DO UPDATE SET value = '{ctx.channel.id}'")
+    @commands.Cog.listener()
+    async def on_guild_leave(self, guild):
+        """Event that happens once the bot leaves a guild."""
 
-        # Inform and delete message!
-        await ctx.send(await language.get(self, ctx, 'events.set_welcome_channel'), delete_after=10)
-        await ctx.message.delete()
+        # Remove the guild from the database.
+        await self.bot.db.execute(f"DELETE FROM guilds WHERE id = {guild.id}")
+
+    @commands.Cog.listener()
+    async def on_member_join(self, member):
+        """Event that happens once a member joins the guild the bot is in."""
+
+        # Add the member to the database.
+        await self.bot.db.execute(f"INSERT INTO guild_members (guild_id, id) VALUES ({member.guild.id}, {member.id}) ON CONFLICT (guild_id, id) DO NOTHING")
+
+        # Send welcome message in case it's set...
+        await self.send_welcome_or_bye_message(self, member, 'welcome')
+
+    @commands.Cog.listener()
+    async def on_member_remove(self, member):
+        """Event that happens once a member leaves the guild the bot is in."""
+
+        # Remove member from the database.
+        await self.bot.db.execute(f"DELETE FROM guild_members WHERE guild_id = {member.guild.id} AND id = {member.id}")
+
+        # Send goodbye message in case it's set...
+        await self.send_welcome_or_bye_message(self, member, 'bye')
+
+    async def send_welcome_or_bye_message(self, member, event):
+        """Function to send the proper welcome or bye message."""
+
+        # Get the channel ID if it's set.
+        channel_id = await self.bot.db.fetch(f"SELECT value FROM guild_settings WHERE guild_id = {member.guild.id} AND key = 'events.{event}_channel'")
+
+        # If channel is set, get the channel and continue.
+        if channel_id:
+            channel = member.guild.get_channel(int(channel_id[0]['value']))
+
+            # Getting a random message, gformat it, and send it.
+            messages = await self.bot.db.fetch(f"SELECT text FROM {event}s WHERE guild_id = {member.guild.id} ORDER BY RANDOM() LIMIT 1")
+            await channel.send(language.fill(messages[0]['text'], member=member))
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        """Event that happens when user sends a message in a channel."""
+
+        # Press F to pay respect.
+        if message.content.strip() == 'F':
+            await message.add_reaction('🇫')
         
 def setup(bot):
     bot.add_cog(Events(bot))
