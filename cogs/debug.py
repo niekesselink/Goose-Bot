@@ -113,7 +113,7 @@ class Debug(commands.Cog):
 
         # Inform the report.
         await ctx.send(embed=embed.create(
-            title=await language.get(self, ctx, 'debug.update_pip'),
+            title=await language.get(self, ctx, 'debug.update'),
             description=f'```diff\n{stdout}\n{stderr}\n```'
         ))
 
