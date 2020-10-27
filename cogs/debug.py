@@ -101,6 +101,22 @@ class Debug(commands.Cog):
             description=f'```diff\n{stdout}\n{stderr}\n```'
         ))
 
+    @debug.command()
+    async def updateapp(self, ctx, name):
+        """Pulls the most recent version from the repository."""
+
+        # Start typing indicator.
+        await ctx.channel.trigger_typing()
+
+        # Execture "git pull" command in shell...
+        stdout, stderr = await self.run_process(f'apt-get --only-upgrade install {name}')
+
+        # Inform the report.
+        await ctx.send(embed=embed.create(
+            title=await language.get(self, ctx, 'debug.update_app'),
+            description=f'```diff\n{stdout}\n{stderr}\n```'
+        ))
+
     async def run_process(self, command):
         """Function for running progams on the VPS."""
 
