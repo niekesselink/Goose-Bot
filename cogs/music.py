@@ -118,9 +118,8 @@ class Music(commands.Cog):
             return
 
         # Now let's change the volume...
-        volume = volume / 100
-        ctx.voice_client.source.volume = volume
-        self.bot.memory['music.volumes'][ctx.guild.id] = volume
+        ctx.voice_client.source.volume = volume / 100
+        self.bot.memory['music.volumes'][ctx.guild.id] = volume / 100
 
         # Inform as well.
         message = await language.get(self, ctx, 'music.volume')
