@@ -26,6 +26,7 @@ class Bot(commands.Bot):
         # Call the initialize of the bot itself.
         super().__init__(
             command_prefix=self.config.prefix,
+            intents=intents,
             *args,
             **kwargs
         )
