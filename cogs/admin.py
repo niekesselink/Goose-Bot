@@ -58,5 +58,44 @@ class Admin(commands.Cog):
         message = await language.get(self, ctx, 'admin.config')
         await ctx.send(message.format(config_name, config_value))
 
+    @admin.command()
+    @commands.guild_only()
+    @commands.has_permissions(administrator=True)
+    async def status(self, ctx, *, data: str):
+        """Change the status of the bot."""
+
+        # For a non-fork, so Goose bot, only the real owner can do this..
+        if self.bot.user.id == 672445557293187128 and self.bot.is_owner(ctx.author) is False:
+            return ctx.send(await language.get(self, ctx, 'admin.status_not_allowed'))
+
+        # Get the correct data from the message.
+        data = data.split(' ', 1)
+        activityType = data[0].lower()
+        activityText = data[1].lower()
+
+        # Turn the type, which is a string now, into a discord object.
+        if activityType == "playing":
+            activityType = discord.ActivityType.playing
+        elif activityType == "streaming":
+            activityType = discord.ActivityType.streaming
+        elif activityType == "listening":
+            activityType = discord.ActivityType.listening
+        elif activityType == "watching":
+            activityType = discord.ActivityType.watching
+        elif activityType == "custom":
+            activityType = discord.ActivityType.custom
+        elif activityType == "competing":
+            activityType = discord.ActivityType.competing
+
+        # Check-double-check to ensure the type is not a string...
+        if isinstance(activityType, str):
+            return ctx.send(await language.get(self, ctx, 'admin.status_incorrect'))
+
+        # Now change the bot's status. An empty one is boring...
+        await self.bot.change_presence(
+            activity=discord.Activity(type=activityType, name=activityText),
+            status=discord.Status.online
+        )
+
 def setup(bot):
     bot.add_cog(Admin(bot))

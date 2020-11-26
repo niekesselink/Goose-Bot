@@ -1,5 +1,8 @@
 {
-  "postgre": "insert url here",
+  "activityType": "listening",
+  "activityText": "humans.",
   "prefix": ".",
+
+  "postgre": "insert url here",
   "token": "insert token here"
 }

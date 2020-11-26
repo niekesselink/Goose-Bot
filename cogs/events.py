@@ -20,11 +20,27 @@ class Events(commands.Cog):
         print('Bot has started.')
         self.bot.uptime = datetime.utcnow()
 
-        # Now change the bot's status. An empty one is boring...
-        await self.bot.change_presence(
-            activity=discord.Activity(type=discord.ActivityType.listening, name='humans.'),
-            status=discord.Status.online
-        )
+        # Get the right activity type.
+        activityType = self.bot.config.activityType.lower()
+        if activityType == "playing":
+            activityType = discord.ActivityType.playing
+        elif activityType == "streaming":
+            activityType = discord.ActivityType.streaming
+        elif activityType == "listening":
+            activityType = discord.ActivityType.listening
+        elif activityType == "watching":
+            activityType = discord.ActivityType.watching
+        elif activityType == "custom":
+            activityType = discord.ActivityType.custom
+        elif activityType == "competing":
+            activityType = discord.ActivityType.competing
+
+        # Check-double-check to ensure the type is not a string, if correct, go and change...
+        if isinstance(activityType, str) is False:
+            await self.bot.change_presence(
+                activity=discord.Activity(type=activityType, name=self.bot.config.activityText),
+                status=discord.Status.online
+            )
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
