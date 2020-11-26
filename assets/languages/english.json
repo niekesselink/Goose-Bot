@@ -46,7 +46,6 @@
   "info.description": "Open-source Discord bot for providing moderation features, music features and other fun commands to a Discord server.",
   "info.honk": "That took me {0} miliseconds. I'm pro. **HONK!**",
   "info.title": "**Information.**",
-  "info.invite": "**Honk!** {user_mention}, use the following URL to invite me to your Discord!\n{0}",
   "info.source": "**Honk!** {user_mention}, I am powered by the following source code...\n{0}",
   "music.already_there": "**Honk!** {user_mention}, I'm already there!",
   "music.not_in_channel": "**Honk!** {user_mention}, I'm not in a channel!",
