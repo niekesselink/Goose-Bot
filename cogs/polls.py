@@ -22,7 +22,7 @@ class Polls(commands.Cog):
         # Ignore the poll command, it's triggered first before this event so we have to do this.
         # Also ignore message by the bot, we don't want a loop, and ignore if private message.
         prefix = self.bot.config.prefix
-        if message.content.lower() == f'{prefix}poll' or message.author.bot or message.guild is False:
+        if message.content.lower() == f'{prefix}poll' or message.author.bot or message.guild is None:
             return
 
         # Declare some variables.

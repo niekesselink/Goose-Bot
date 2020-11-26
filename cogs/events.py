@@ -101,7 +101,7 @@ class Events(commands.Cog):
         await self.bot.db.execute(f"INSERT INTO guild_members (guild_id, id) VALUES ({member.guild.id}, {member.id}) ON CONFLICT (guild_id, id) DO NOTHING")
 
         # Send welcome message in case it's set...
-        await self.send_welcome_or_bye_message(self, member, 'welcome')
+        await self.send_welcome_or_bye_message(member, 'welcome')
 
     @commands.Cog.listener()
     async def on_member_remove(self, member):
@@ -111,7 +111,7 @@ class Events(commands.Cog):
         await self.bot.db.execute(f"DELETE FROM guild_members WHERE guild_id = {member.guild.id} AND id = {member.id}")
 
         # Send goodbye message in case it's set...
-        await self.send_welcome_or_bye_message(self, member, 'bye')
+        await self.send_welcome_or_bye_message(member, 'bye')
 
     async def send_welcome_or_bye_message(self, member, event):
         """Function to send the proper welcome or bye message."""
