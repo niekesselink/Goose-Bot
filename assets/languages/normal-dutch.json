@@ -1,6 +1,8 @@
 {
   "admin.config": "De config variable *{0}* is veranderd naar *{1}*!",
   "admin.config_unknown": "*{0}* is geen config variable...",
+  "admin.status_not_allowed": "{user_mention}, je kan niet zegggen wat ik ga zeggen.",
+  "admin.status_incorrect": "{user_mention}, dat is geen geldige activiteit type!",
   "birthday.format": "%d %B %Y",
   "birthday.how_to": "{user_mention}, je moet jouw geboortedatum wel meegeven!\nHet intypen van `.birthday set 18 june 1993` is een voorbeeld van hoe het werkt!",
   "birthday.incorrect": "{user_mention}, is dat een datum? Volgens mij niet. `.birthday set 18 june 1993` is een voorbeeld van hoe het moet!",

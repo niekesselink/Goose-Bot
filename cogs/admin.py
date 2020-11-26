@@ -71,7 +71,7 @@ class Admin(commands.Cog):
         # Get the correct data from the message.
         data = data.split(' ', 1)
         activityType = data[0].lower()
-        activityText = data[1].lower()
+        activityText = data[1]
 
         # Turn the type, which is a string now, into a discord object.
         if activityType == "playing":
@@ -96,6 +96,9 @@ class Admin(commands.Cog):
             activity=discord.Activity(type=activityType, name=activityText),
             status=discord.Status.online
         )
+
+        # Add reaction to confirm it's done.
+        await ctx.message.add_reaction('👍')
 
 def setup(bot):
     bot.add_cog(Admin(bot))

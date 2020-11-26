@@ -1,6 +1,8 @@
 {
   "admin.config": "The config setting *{0}* has been changed to *{1}*!",
   "admin.config_unknown": "*{0}* is not a valid setting...",
+  "admin.status_not_allowed": "{user_mention}, you can't say what I'll say.",
+  "admin.status_incorrect": "{user_mention}, that's not a valid activity type!",
   "birthday.format": "%d %B %Y",
   "birthday.how_to": "{user_mention}, you didn't give a date for me to set as your birthday.\nTyping `.birthday set 18 june 1993` is an example on how to do properly!",
   "birthday.incorrect": "{user_mention}, is that a date? I don't think so. Typing `.birthday set 18 june 1993` is an example on how to do properly!",
