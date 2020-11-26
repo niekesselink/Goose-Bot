@@ -20,9 +20,9 @@ class Polls(commands.Cog):
         """Event that happens when user sends a message in a channel."""
 
         # Ignore the poll command, it's triggered first before this event so we have to do this.
-        # Also ignore message by the bot, we don't want a loop.
+        # Also ignore message by the bot, we don't want a loop, and ignore if private message.
         prefix = self.bot.config.prefix
-        if message.content.lower() == f'{prefix}poll' or message.author.bot:
+        if message.content.lower() == f'{prefix}poll' or message.author.bot or message.guild is False:
             return
 
         # Declare some variables.
