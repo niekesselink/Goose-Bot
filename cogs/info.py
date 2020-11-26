@@ -43,13 +43,16 @@ class Info(commands.Cog):
         """Shows information about the Goose bot."""
 
         # Get some data...
+        guilds = await self.bot.db.fetch("SELECT COUNT(*) FROM guilds")
+        guilds = int(guilds[0][0])
+        members = await self.bot.db.fetch("SELECT COUNT(*) FROM guild_members")
+        members = int(members[0][0])
         ramUsage = self.process.memory_full_info().rss / 1024**2
-        #avgMembers = round(len(self.bot.users) / len(self.bot.guilds))
 
         # Define embed fields data.
         fields = {
             'Creator': '<@462311999980961793>',
-            'Servers active': f'{len(ctx.bot.guilds)}',
+            'Servers active': f'{guilds} ({members} total members)',
             'Last update': f'{subprocess.check_output(["git", "log", "-1", "--format=%cd "]).strip().decode("utf-8")}',
             'RAM usage': f'{ramUsage:.2f} MB'
         }
@@ -61,6 +64,11 @@ class Info(commands.Cog):
             thumbnail=ctx.bot.user.avatar_url,
             fields=fields
         ))
+
+        # Check if the guild count from database matches the one from the bot, if not, inform owner, but only for Goose bot!
+        if self.bot.user.id == 672445557293187128 and len(ctx.bot.guilds) != guilds:
+            owner = self.bot.get_user(462311999980961793)
+            await owner.send("**ERROR** Guild count data mismatch!")
 
     @commands.command()
     async def source(self, ctx):
