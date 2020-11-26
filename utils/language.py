@@ -20,10 +20,15 @@ async def get(self, ctx, key, guild_id=None):
     if guild_id is None and ctx.guild:
         guild_id = ctx.guild.id
 
-    # Still no guild? Then English with only username format...
+    # Still no guild? Then normal English with only username format...
     if guild_id is None:
-        values = { 'user_mention': ctx.message.author.mention }
-        return Languages.array['english'][key].format(**values)
+        replace = { 'user_mention': ctx.message.author.mention }
+
+        # Format and return!
+        string = Languages.array['normal-english'][key]
+        for index in replace:
+            string = string.replace(index, replace[index])
+        return string
 
     # Is the guild in the memory?
     if guild_id not in self.bot.memory:
