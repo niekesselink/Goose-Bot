@@ -20,11 +20,13 @@ class Birthday(commands.Cog):
         self.check_birthday.cancel()
 
     @commands.group()
+    @commands.guild_only()
     async def birthday(self, ctx):
         """Commands for setting and changing your birthday."""
         return
 
     @birthday.command()
+    @commands.guild_only()
     async def set(self, ctx, *, birthday: str=None):
         """Set your birthday date, the format day/month is used."""
 
@@ -55,6 +57,7 @@ class Birthday(commands.Cog):
         await ctx.send(message.format(date_formatted, timezone))
 
     @birthday.command()
+    @commands.guild_only()
     async def timezone(self, ctx, *, timezone: str=None):
         """Change the timezone of your current location."""
 

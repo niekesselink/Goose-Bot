@@ -85,6 +85,7 @@ class Polls(commands.Cog):
             await message.delete()
 
     @commands.command()
+    @commands.guild_only()
     async def poll(self, ctx):
         """Start a poll in any channel if allowed."""
 
