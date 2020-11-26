@@ -84,7 +84,7 @@ class Events(commands.Cog):
         # Add the guild and the members of said guild to the database.
         await self.bot.db.execute(f"INSERT INTO guilds (id) VALUES ({guild.id})")
         for member in guild.members:
-            await self.bot.db.execute(f"INSERT INTO guild_members (guild_id ,id) VALUES ({guild.id}, {member.id})")
+            await self.bot.db.execute(f"INSERT INTO guild_members (guild_id, id) VALUES ({guild.id}, {member.id})")
 
     @commands.Cog.listener()
     async def on_guild_leave(self, guild):
