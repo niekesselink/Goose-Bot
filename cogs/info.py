@@ -63,12 +63,6 @@ class Info(commands.Cog):
         ))
 
     @commands.command()
-    async def invite(self, ctx):
-        """Get a link to invite the bot to your own server."""
-        message = await language.get(self, ctx, 'info.invite')
-        await ctx.send(message.format(discord.utils.oauth_url(self.bot.user.id)))
-
-    @commands.command()
     async def source(self, ctx):
         """Check out the bot's source code."""
         message = await language.get(self, ctx, 'info.source')
