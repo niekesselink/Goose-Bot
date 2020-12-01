@@ -1,8 +1,10 @@
 {
   "activityType": "listening",
   "activityText": "humans.",
+  "token": "insert token here",
   "prefix": ".",
 
   "postgre": "insert url here",
-  "token": "insert token here"
+  "spotify_client_id": "insert client id here",
+  "spotify_client_secret": "insert client secret here"
 }

@@ -1,11 +1,13 @@
 import asyncio
 import discord
 import os
+import spotipy
 import youtube_dl
 
 from datetime import datetime
 from discord import FFmpegPCMAudio
 from discord.ext import commands
+from spotipy.oauth2 import SpotifyClientCredentials
 from utils import language
 
 class Music(commands.Cog):
@@ -157,6 +159,20 @@ class Music(commands.Cog):
         # Start typing incidicator.
         await ctx.channel.trigger_typing()
 
+        # Extract the right data in case it's a Spotify link, we want to make it a search string.
+        if 'spotify.com' in url:
+
+            # First, let's set up a connection to Spotify to do so through Spotipy and get information about the track from the URL.
+            credentials = SpotifyClientCredentials(client_id=self.bot.config.spotify_client_id, client_secret=self.bot.config.spotify_client_secret)
+            spotify = spotipy.Spotify(client_credentials_manager=credentials)
+            track = spotify.track(url)
+
+            # Now format it with all the possible artists.
+            url = f"{track['name']} - {track['album']['artists'][0]['name']}"
+            if len(track['album']['artists']) > 1:
+                for i in range(1, len(track['album']['artists'])):
+                    url += f", {track['album']['artists'][i]['name']}"
+            
         # If the url is not from YouTube then we search for the first fitting result matching the search string...
         if not 'youtube.com' in url and not 'youtu.be' in url:
             url = f'ytsearch:{url}'
