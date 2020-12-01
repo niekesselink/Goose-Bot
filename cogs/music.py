@@ -157,21 +157,34 @@ class Music(commands.Cog):
         # Start typing incidicator.
         await ctx.channel.trigger_typing()
 
-        # If the url is not starting with http, then we search for the first fitting result.
-        if not url.startswith('http'):
+        # If the url is not from YouTube then we search for the first fitting result matching the search string...
+        if not 'youtube.com' in url and not 'youtu.be' in url:
             url = f'ytsearch:{url}'
 
         # Download the metadata of the video.
         meta = None
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-            meta = ydl.extract_info(url, download=False)
+
+            # Sometimes an error occurs here for unknown reasons due to youtube-dl.
+            # If it occurs, we will try again by appending lyrics, but only if it's not a hyperlink and we didn't do it before already...
+            try:
+                meta = ydl.extract_info(url, download=False)
+            except:
+                if url.startswith('ytsearch:') and not url.endswith(' lyrics'):
+                    meta = ydl.extract_info(f'{url} lyrics', download=False)
+                else:
+                    raise
 
             # Get how many seconds a song may be.
             db_result = await self.bot.db.fetch(f"SELECT value FROM guild_settings WHERE guild_id = {ctx.guild.id} AND key = 'music.max_duration'")
             max_duration = int(db_result[0]['value'])
 
-            # Hack fix for search.
+            # Fix for search, sometimes we won't get any results without lyrics being appened...
+            # so we have to do a check here as well and run the extraction again but with lyrics appended this time.
             if 'duration' not in meta:
+                if len(meta['entries']) < 1 and url.startswith('ytsearch:') and not url.endswith(' lyrics'):
+                    meta = ydl.extract_info(f'{url} lyrics', download=False)
+
                 meta = meta['entries'][0]
 
             # Only allow if it's not longer than set amount of minutes.
