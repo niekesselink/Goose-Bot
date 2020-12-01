@@ -18,6 +18,8 @@ class Music(commands.Cog):
         self.bot = bot
 
         # Define memory variables...
+        if 'music.initiator' not in self.bot.memory:
+            self.bot.memory['music.initiator'] = {}
         if 'music.playlists' not in self.bot.memory:
             self.bot.memory['music.playlists'] = {}
         if 'music.volumes' not in self.bot.memory:
@@ -29,22 +31,31 @@ class Music(commands.Cog):
         """Brings the bot to to the music channel."""
 
         # Make sure the person using the command is in a voice channel.
-        if ctx.message.author.voice is None:
+        if ctx.author.voice is None:
             return await ctx.send(await language.get(self, ctx, 'music.user_not_in_channel'))
 
         # Are we in a voice client?
         if ctx.voice_client is not None:
 
+            # Only allow if we are the initial starter.
+            if self.bot.memory['music.initiator'][ctx.guild.id] != ctx.author.id:
+                return await ctx.send(await language.get(self, ctx, 'music.not_initiator'))
+
             # Ignore if we are in the same channel already...
-            if ctx.message.author.voice.channel is ctx.voice_client.channel:
+            if ctx.author.voice.channel is ctx.voice_client.channel:
                 return await ctx.send(await language.get(self, ctx, 'music.already_there'))
 
             # Move to the same channel.
-            await ctx.voice_client.move_to(ctx.message.author.voice.channel)
+            await ctx.voice_client.move_to(ctx.author.voice.channel)
 
         # We're not in a channel but are going to now...
+        # Let's store the id of who started the session to prevent annoyences to happen.
         else:
-            await ctx.message.author.voice.channel.connect()
+            self.bot.memory['music.initiator'][ctx.guild.id] = ctx.author.id
+            await ctx.author.voice.channel.connect()
+
+        # Let's deafen ourselves...
+        await ctx.guild.change_voice_state(channel=ctx.author.voice.channel, self_deaf=True)
 
         # Create a playlist if not present.
         if ctx.guild.id not in self.bot.memory['music.playlists']:
@@ -62,6 +73,10 @@ class Music(commands.Cog):
         # This command only works when the bot is in a voice channel...
         if ctx.voice_client is None:
             return await ctx.send(await language.get(self, ctx, 'music.not_in_channel'))
+
+        # Only allow if we are the initial starter, or if we are admin.
+        if self.bot.memory['music.initiator'][ctx.guild.id] != ctx.author.id and not ctx.author.guild_permissions.administrator:
+            return await ctx.send(await language.get(self, ctx, 'music.not_initiator'))
 
         # Now leave and react.
         await ctx.voice_client.disconnect()
@@ -341,12 +356,12 @@ class Music(commands.Cog):
             return False
  
         # Make sure the person using the command is in a voice channel.
-        if ctx.message.author.voice is None:
+        if ctx.author.voice is None:
             await ctx.send(await language.get(self, ctx, 'music.user_not_in_channel'))
             return False
             
         # And also, in the same channel?
-        if ctx.message.author.voice.channel is not ctx.voice_client.channel:
+        if ctx.author.voice.channel is not ctx.voice_client.channel:
             await ctx.send(await language.get(self, ctx, 'music.not_in_same_channel'))
             return False
 
@@ -360,6 +375,10 @@ class Music(commands.Cog):
 
     def clean_up(self, guild_id):
         """Function to clean up the playing bot for a guild."""
+
+        # Destroy the initiator if we had one...
+        if guild_id in self.bot.memory['music.initiator']:
+            del(self.bot.memory['music.initiator'][guild_id])
 
         # Destroy the queue if we had one...
         if guild_id in self.bot.memory['music.playlists']:

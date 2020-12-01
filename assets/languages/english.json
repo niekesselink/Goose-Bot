@@ -50,6 +50,7 @@
   "music.already_there": "**Honk!** {user_mention}, I'm already there!",
   "music.not_in_channel": "**Honk!** {user_mention}, I'm not in a channel!",
   "music.not_in_same_channel": "**Honk!** {user_mention}, we're not in the same channel!",
+  "music.not_initiator": "**Honk!** {user_mention}, don't be a dick. Other people are using the bot already.",
   "music.not_playing": "**Honk!** {user_mention}, why? I'm not honking anything at all!",
   "music.now": "I'm honking **{0}** right now!",
   "music.playlist": "**Honk!** Here's my honking queue...",

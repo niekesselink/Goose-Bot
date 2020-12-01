@@ -50,6 +50,7 @@
   "music.already_there": "Ik ben er al {user_mention}!",
   "music.not_in_channel": "Ik ben niet in een kanaal {user_mention}!",
   "music.not_in_same_channel": "Wij zitten niet in dezelfde kanaal {user_mention}!",
+  "music.not_initiator": "{user_mention}, nee. Andere mensen gebruiken de bot al!",
   "music.not_playing": "{user_mention}, waarom? Ik speel niks!",
   "music.now": "Ik speel **{0}** nu af!",
   "music.playlist": "Dit is mijn afspeellijst...",
