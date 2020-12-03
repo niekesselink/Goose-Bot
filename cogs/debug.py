@@ -117,6 +117,14 @@ class Debug(commands.Cog):
             description=f'```diff\n{stdout}\n{stderr}\n```'
         ))
 
+    @debug.command()
+    async def eval(self, ctx, *args):
+        """Execute Python code. Could be dangerous."""
+
+        eval_string = " ".join(args)
+        eval_result = eval(eval_string)
+        await ctx.send(f"```py\n{eval_result}\n```")
+
     async def run_process(self, command):
         """Function for running progams on the VPS."""
 
