@@ -222,8 +222,8 @@ class Music(commands.Cog):
         # Now add the song the queue.
         self.bot.memory['music.playlists'][ctx.guild.id].append(entry)
 
-        # Now let's see if we need to start playing directly, as in, nothing is playing...
-        if not ctx.voice_client.is_playing():
+        # Now let's see if we need to start playing directly, as in, nothing is playing or queued to play...
+        if not ctx.voice_client.is_playing() and len(self.bot.memory['music.playlists'][ctx.guild.id]) == 0:
             message = await language.get(self, ctx, 'music.start')
             await ctx.send(message.format(meta['title']))
             return self.play_song(ctx)
