@@ -222,8 +222,8 @@ class Music(commands.Cog):
         # Now add the song the queue.
         self.bot.memory['music.playlists'][ctx.guild.id].append(entry)
 
-        # Now let's see if we need to start playing directly, as in, nothing is playing or queued to play...
-        if not ctx.voice_client.is_playing() and len(self.bot.memory['music.playlists'][ctx.guild.id]) == 0:
+        # Now let's see if we need to start playing directly, as in, nothing is queued to play...
+        if len(self.bot.memory['music.playlists'][ctx.guild.id]) == 1:
             message = await language.get(self, ctx, 'music.start')
             await ctx.send(message.format(meta['title']))
             return self.play_song(ctx)
@@ -241,7 +241,7 @@ class Music(commands.Cog):
         intervals = (
             ('core.hours', 3600), # 60 * 60
             ('core.minutes', 60),
-            ('core.seconds', 1),
+            ('core.seconds', 1)
         )
 
         # Now make it readable for how long we need to wait for this song...
