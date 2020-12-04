@@ -66,5 +66,10 @@
   "music.volume": "**Honk!** Fine, I'll honk now at {0}% volume.",
   "polls.continuation": "**Honk!** Here are the rest of the options for the poll above...",
   "polls.next_post": "**Honk!** {user_mention}, I'll consider your next message as a poll! Make sure to use the A, B, C, etc. emoji's for options. By the way, I have deleted your message and will delete mine within 10 seconds.",
-  "polls.not_a_poll": "**Honk!** {0}, that's not a poll! Where are the emoji's like A, B, C, etc.?"
+  "polls.not_a_poll": "**Honk!** {0}, that's not a poll! Where are the emoji's like A, B, C, etc.?",
+  "roles.added": "**Honk!** I've added the reaction with the role trigger to the message! Make sure to test it.",
+  "roles.already_exist": "**Honk!** Either that role is already given within the message through a different reaction trigger or the emoji is already in use!",
+  "roles.deleted": "**Honk!** I've chased away the role trigger, if it existed...",
+  "roles.message_not_found": "**Honk!** That message doesn't exist! Make sure to do this command in the channel where the message is..",
+  "roles.role_not_found": "**Honk!** That role ID doesn't exist!"
 }

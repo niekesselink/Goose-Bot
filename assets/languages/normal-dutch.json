@@ -66,5 +66,10 @@
   "music.volume": "Oke, ik speel nu op {0}% volume.",
   "polls.continuation": "Hier zijn de rest van de opties van de poll hierboven...",
   "polls.next_post": "Ik hanteer jouw volgende bericht als een poll {user_mention}! Wees zeker dat je de emoji's A, B, C, etc. gebruikt voor de stem opties. Dit bericht verwijderd zichzelf over 10 seconden...",
-  "polls.not_a_poll": "Dat is geen poll {0}! Waar zijn de emoji's zoals A, B, C?"
+  "polls.not_a_poll": "Dat is geen poll {0}! Waar zijn de emoji's zoals A, B, C?",
+  "roles.added": "Ik heb de reaction met de role trigger toegevoegd!",
+  "roles.already_exist": "Die reactie trigger is al in gebruik! Of de rol, of de emoji...",
+  "roles.deleted": "Ik heb de reactie trigger verwijderd, als die bestond.",
+  "roles.message_not_found": "Kan het bericht niet vinden! Je moet deze commando uitvoeren in de kanaal waar het bericht staat.",
+  "roles.role_not_found": "Die role ID bestaat niet..."
 }
