@@ -234,7 +234,8 @@ class Music(commands.Cog):
             total_seconds += self.bot.memory['music.playlists'][ctx.guild.id][i]['duration']
 
         # Retract how far we are now in current song.
-        total_seconds = total_seconds - (datetime.now() - self.bot.memory['music.playlists'][ctx.guild.id][0]['start']).total_seconds()
+        if self.bot.memory['music.playlists'][ctx.guild.id][0]['start'] is not None:
+            total_seconds = total_seconds - (datetime.now() - self.bot.memory['music.playlists'][ctx.guild.id][0]['start']).total_seconds()
 
         # Declare variables for converting it into a nice figure...
         result = []
