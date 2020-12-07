@@ -121,7 +121,7 @@ class Roles(commands.Cog):
             return
 
         # Now try and get a role that goes with the reaction from the database...
-        role_id = await self.bot.db.fetch(f"SELECT role_id FROM roles_reaction WHERE guild_id = {payload.guild_id} AND channel_id = {payload.channel_id} AND message_id = {payload.message_id} AND reaction = '{payload.emoji.name}'")
+        role_id = await self.bot.db.fetch(f"SELECT role_id FROM roles_reaction WHERE guild_id = {payload.guild_id} AND channel_id = {payload.channel_id} AND message_id = {payload.message_id} AND reaction = '{str(payload.emoji)}'")
 
         # Add the role to the user who reacted if there is a match.
         if role_id:
@@ -141,7 +141,7 @@ class Roles(commands.Cog):
             return
 
         # Now try and get a role that goes with the reaction from the database...
-        role_id = await self.bot.db.fetch(f"SELECT role_id FROM roles_reaction WHERE guild_id = {payload.guild_id} AND channel_id = {payload.channel_id} AND message_id = {payload.message_id} AND reaction = '{payload.emoji.name}'")
+        role_id = await self.bot.db.fetch(f"SELECT role_id FROM roles_reaction WHERE guild_id = {payload.guild_id} AND channel_id = {payload.channel_id} AND message_id = {payload.message_id} AND reaction = '{str(payload.emoji)}'")
 
         # Remove the role if match...
         if role_id:
