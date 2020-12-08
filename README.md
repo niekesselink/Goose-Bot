@@ -11,7 +11,7 @@ Please note that this bot may not be perfect and may contain errors. If you enco
 * PostgreSQL
 
 ### TODO ###
-* Add SQL creation files. I got a shitty SQL client so it's delayed.
+* Website for adding/controlling the bot
 * Bot configuration per server
 	* Limit cogs to certain channels
 * Moderation features
