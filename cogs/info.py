@@ -65,11 +65,6 @@ class Info(commands.Cog):
             fields=fields
         ))
 
-        # Check if the guild count from database matches the one from the bot, if not, inform owner, but only for Goose bot!
-        if self.bot.user.id == 672445557293187128 and len(ctx.bot.guilds) != guilds:
-            owner = self.bot.get_user(462311999980961793)
-            await owner.send("**ERROR** Guild count data mismatch!")
-
     @commands.command()
     async def source(self, ctx):
         """Check out the bot's source code."""

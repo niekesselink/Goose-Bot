@@ -97,35 +97,29 @@ class Events(commands.Cog):
     async def on_member_join(self, member):
         """Event that happens once a member joins the guild the bot is in."""
 
-        # Add the member to the database.
+        # Add the member to the database and send welcome message.
         await self.bot.db.execute(f"INSERT INTO guild_members (guild_id, id) VALUES ({member.guild.id}, {member.id}) ON CONFLICT (guild_id, id) DO NOTHING")
-
-        # Send welcome message in case it's set...
         await self.send_welcome_or_bye_message(member, 'welcome')
 
     @commands.Cog.listener()
     async def on_member_remove(self, member):
         """Event that happens once a member leaves the guild the bot is in."""
 
-        # Remove member from the database.
+        # Remove member from the database, send a goodbye message.
         await self.bot.db.execute(f"DELETE FROM guild_members WHERE guild_id = {member.guild.id} AND id = {member.id}")
-
-        # Send goodbye message in case it's set...
         await self.send_welcome_or_bye_message(member, 'bye')
 
     async def send_welcome_or_bye_message(self, member, event):
         """Function to send the proper welcome or bye message."""
 
-        # Get the channel ID if it's set.
+        # Get the channel ID and only continue if it's set.
         channel_id = await self.bot.db.fetch(f"SELECT value FROM guild_settings WHERE guild_id = {member.guild.id} AND key = 'events.{event}_channel'")
-
-        # If channel is set, get the channel and continue.
         if channel_id:
             channel = member.guild.get_channel(int(channel_id[0]['value']))
 
             # Getting a random message, gformat it, and send it.
-            messages = await self.bot.db.fetch(f"SELECT text FROM {event}s WHERE guild_id = {member.guild.id} ORDER BY RANDOM() LIMIT 1")
-            await channel.send(language.fill(messages[0]['text'], member=member))
+            message = await self.bot.db.fetch(f"SELECT text FROM event_{event}s WHERE guild_id = {member.guild.id} ORDER BY RANDOM() LIMIT 1")
+            await channel.send(language.fill(message[0]['text'], member=member))
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -133,7 +127,7 @@ class Events(commands.Cog):
 
         # Press F to pay respect.
         if message.content.strip() == 'F':
-            await message.add_reaction('🇫')
-        
+            return await message.add_reaction('🇫')
+
 def setup(bot):
     bot.add_cog(Events(bot))

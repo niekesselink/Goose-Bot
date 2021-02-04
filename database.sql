@@ -10,18 +10,18 @@ CREATE TABLE public.guilds (
 );
 
 
--- public.byes definition
+-- public.event_byes definition
 
 -- Drop table
 
--- DROP TABLE public.byes;
+-- DROP TABLE public.event_byes;
 
-CREATE TABLE public.byes (
+CREATE TABLE public.event_byes (
 	id int8 NOT NULL,
 	guild_id int8 NOT NULL,
 	"text" text NOT NULL DEFAULT ''::text,
-	CONSTRAINT byes_pkey PRIMARY KEY (id),
-	CONSTRAINT "FK_byes_guilds" FOREIGN KEY (guild_id) REFERENCES guilds(id) ON DELETE CASCADE
+	CONSTRAINT event_byes_pkey PRIMARY KEY (id),
+	CONSTRAINT "FK_event_byes_guilds" FOREIGN KEY (guild_id) REFERENCES guilds(id) ON DELETE CASCADE
 );
 
 
@@ -94,14 +94,14 @@ CREATE TABLE public.roles_reaction (
 
 -- Drop table
 
--- DROP TABLE public.welcomes;
+-- DROP TABLE public.event_welcomes;
 
-CREATE TABLE public.welcomes (
+CREATE TABLE public.event_welcomes (
 	id int8 NOT NULL,
 	guild_id int8 NOT NULL,
 	"text" text NOT NULL DEFAULT ''::text,
-	CONSTRAINT welcomes_pkey PRIMARY KEY (id),
-	CONSTRAINT "FK_welcomes_guilds" FOREIGN KEY (guild_id) REFERENCES guilds(id) ON DELETE CASCADE
+	CONSTRAINT event_welcomes_pkey PRIMARY KEY (id),
+	CONSTRAINT "FK_event_welcomes_guilds" FOREIGN KEY (guild_id) REFERENCES guilds(id) ON DELETE CASCADE
 );
 
 
