@@ -35,27 +35,27 @@ class Roles(commands.Cog):
         """Commands for adding role reactions."""
         return
 
-    @roles.command()
-    @commands.guild_only()
-    @commands.has_permissions(administrator=True)
-    async def give(self, ctx, role_name):
-        """Add a role to a member or to everyone if 'all' is given."""
+    #@roles.command()
+    #@commands.guild_only()
+    #@commands.has_permissions(administrator=True)
+    #async def give(self, ctx, role_name):
+    #    """Add a role to a member or to everyone if 'all' is given."""
 
-        # Get role by name.
-        role = discord.utils.get(ctx.guild.roles, name=role_name)
-        if role is None:
-            return await ctx.send(await language.get(self, ctx, 'roles.role_not_found'))
+    #    # Get role by name.
+    #    role = discord.utils.get(ctx.guild.roles, name=role_name)
+    #    if role is None:
+    #        return await ctx.send(await language.get(self, ctx, 'roles.role_not_found'))
 
-        # Inform the progress is starting.
-        await ctx.send(f'Starting to add the role `{role_name}` to everyone. This could take some time depending on amount of members due to Discord API rate limit.')
+    #    # Inform the progress is starting.
+    #    await ctx.send(f'Starting to add the role `{role_name}` to everyone. This could take some time depending on amount of members due to Discord API rate limit.')
 
-        # Let's loop through all the members and add the roles. There is a sleep due to rate limit.
-        for member in ctx.guild.members:
-            await member.add_roles(role)
-            await asyncio.sleep(0.5)
+    #    # Let's loop through all the members and add the roles. There is a sleep due to rate limit.
+    #    for member in ctx.guild.members:
+    #        await member.add_roles(role)
+    #        await asyncio.sleep(0.5)
 
-        # Done!
-        await ctx.send('Done adding roles!')
+    #    # Done!
+    #    await ctx.send('Done adding roles!')
 
     @roles.command()
     @commands.guild_only()
