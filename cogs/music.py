@@ -209,9 +209,9 @@ class Music(commands.Cog):
             
         # Declare youtube-dl options, simplified.
         ydl_opts = {
-            'noplaylist': True,
+            #'noplaylist': True,
             'skip_download': True,
-            'quiet': True
+            'quiet': False
         }
 
         # Start typing incidicator.
@@ -370,7 +370,7 @@ class Music(commands.Cog):
         await voice_client.disconnect()
 
         # Clean up since we're done...
-        self.clean_up(before.channel.guild.id)
+        del(self.bot.memory['music'][before.channel.guild.id])
 
     async def allowed_to_run_command_check(self, ctx, need_source):
         """Function to check if we are playing something, used for various commands above."""
