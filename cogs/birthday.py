@@ -168,7 +168,7 @@ class Birthday(commands.Cog):
             await self.bot.db.execute(f"UPDATE birthdays SET triggered = FALSE, given_role = '' WHERE guild_id = {guild.id} AND member_id = {member.id}")
 
     @check_birthday.before_loop
-    async def before_check_birthday():
+    async def before_check_birthday(self):
         """Event that happens before the check_birthday task loop starts."""
 
         # Get the current time.
