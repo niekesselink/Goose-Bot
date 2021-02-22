@@ -1,4 +1,5 @@
-﻿import asyncpg
+﻿import asyncio
+import asyncpg
 import datetime
 import discord
 import json
@@ -43,7 +44,7 @@ class Birthday(commands.Cog):
         # Get guild timezone and ensure we have something...
         timezone = await self.bot.db.fetch(f"SELECT value FROM guild_settings WHERE guild_id = {ctx.guild.id} AND key = 'timezone'")
         if not timezone:
-            timezone = 'CEST'
+            timezone = 'CET'
         else:
             timezone = timezone[0]['value']
 
@@ -87,7 +88,7 @@ class Birthday(commands.Cog):
         message = await language.get(self, ctx, 'birthday.timezone_set')
         await ctx.send(message.format(matching_timezones[0]))
 
-    @tasks.loop(minutes=10.0)
+    @tasks.loop(minutes=15.0)
     async def check_birthday(self):
         """
             Function that loops to search the database for birthdays to give or remove.
@@ -165,6 +166,22 @@ class Birthday(commands.Cog):
 
             # No role given, simple update.
             await self.bot.db.execute(f"UPDATE birthdays SET triggered = FALSE, given_role = '' WHERE guild_id = {guild.id} AND member_id = {member.id}")
+
+    @check_birthday.before_loop
+    async def before_check_birthday():
+        """Event that happens before the check_birthday task loop starts."""
+
+        # Get the current time.
+        now = datetime.datetime.now()
+
+        # Get the nearest upcoming hourly 15 minute timemark.
+        target = (now.minute // 15 + 1) * 15
+        target = now + datetime.timedelta(minutes=target - now.minute)
+        target = target.replace(second=0, microsecond=0)
+
+        # Get the difference in seconds and wait that amount of seconds...
+        difference = (target - now).total_seconds()
+        await asyncio.sleep(difference)
 
 def setup(bot):
     bot.add_cog(Birthday(bot))
