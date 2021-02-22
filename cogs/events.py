@@ -99,7 +99,7 @@ class Events(commands.Cog):
 
         # Add the member to the database and send welcome message.
         await self.bot.db.execute(f"INSERT INTO guild_members (guild_id, id) VALUES ({member.guild.id}, {member.id}) ON CONFLICT (guild_id, id) DO NOTHING")
-        await self.send_welcome_or_bye_message(member, 'welcome')
+        await self.send_event_message(member, 'welcome')
 
     @commands.Cog.listener()
     async def on_member_remove(self, member):
@@ -107,9 +107,17 @@ class Events(commands.Cog):
 
         # Remove member from the database, send a goodbye message.
         await self.bot.db.execute(f"DELETE FROM guild_members WHERE guild_id = {member.guild.id} AND id = {member.id}")
-        await self.send_welcome_or_bye_message(member, 'bye')
+        await self.send_event_message(member, 'bye')
 
-    async def send_welcome_or_bye_message(self, member, event):
+    @commands.Cog.listener()
+    async def on_member_update(before, after):
+        """Event that happens when a member gets updated."""
+
+        # Check if user boosted the server, if so, send a message.
+        if before.premium_since is None and after.premium_since is not None:
+            await self.send_event_message(after, 'boost')
+
+    async def send_event_message(self, member, event):
         """Function to send the proper welcome or bye message."""
 
         # Get the channel ID and only continue if it's set.
@@ -117,9 +125,10 @@ class Events(commands.Cog):
         if channel_id:
             channel = member.guild.get_channel(int(channel_id[0]['value']))
 
-            # Getting a random message, gformat it, and send it.
+            # Getting a random message, again, only continue and send it if it is set.
             message = await self.bot.db.fetch(f"SELECT text FROM event_{event}s WHERE guild_id = {member.guild.id} ORDER BY RANDOM() LIMIT 1")
-            await channel.send(language.fill(message[0]['text'], member=member))
+            if message:
+                await channel.send(language.fill(message[0]['text'], member=member))
 
     @commands.Cog.listener()
     async def on_message(self, message):

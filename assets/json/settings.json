@@ -1,6 +1,7 @@
 [
   "birthday.channel",
   "birthday.role",
+  "events.boost_channel",
   "events.bye_channel",
   "events.welcome_channel",
   "language",
