@@ -2,11 +2,26 @@
 
 -- Drop table
 
--- DROP TABLE public.guilds;
+-- DROP TABLE guilds;
 
-CREATE TABLE public.guilds (
+CREATE TABLE guilds (
 	id int8 NOT NULL,
 	CONSTRAINT guilds_pkey PRIMARY KEY (id)
+);
+
+
+-- public.event_boosts definition
+
+-- Drop table
+
+-- DROP TABLE event_boosts;
+
+CREATE TABLE event_boosts (
+	id int8 NOT NULL,
+	guild_id int8 NOT NULL,
+	"text" text NOT NULL DEFAULT ''::text,
+	CONSTRAINT byes_pkey_1 PRIMARY KEY (id),
+	CONSTRAINT event_boosts_fk FOREIGN KEY (guild_id) REFERENCES guilds(id) ON DELETE CASCADE
 );
 
 
@@ -14,14 +29,29 @@ CREATE TABLE public.guilds (
 
 -- Drop table
 
--- DROP TABLE public.event_byes;
+-- DROP TABLE event_byes;
 
-CREATE TABLE public.event_byes (
+CREATE TABLE event_byes (
 	id int8 NOT NULL,
 	guild_id int8 NOT NULL,
 	"text" text NOT NULL DEFAULT ''::text,
-	CONSTRAINT event_byes_pkey PRIMARY KEY (id),
-	CONSTRAINT "FK_event_byes_guilds" FOREIGN KEY (guild_id) REFERENCES guilds(id) ON DELETE CASCADE
+	CONSTRAINT byes_pkey PRIMARY KEY (id),
+	CONSTRAINT "FK_byes_guilds" FOREIGN KEY (guild_id) REFERENCES guilds(id) ON DELETE CASCADE
+);
+
+
+-- public.event_welcomes definition
+
+-- Drop table
+
+-- DROP TABLE event_welcomes;
+
+CREATE TABLE event_welcomes (
+	id int8 NOT NULL,
+	guild_id int8 NOT NULL,
+	"text" text NOT NULL DEFAULT ''::text,
+	CONSTRAINT welcomes_pkey PRIMARY KEY (id),
+	CONSTRAINT "FK_welcomes_guilds" FOREIGN KEY (guild_id) REFERENCES guilds(id) ON DELETE CASCADE
 );
 
 
@@ -29,12 +59,12 @@ CREATE TABLE public.event_byes (
 
 -- Drop table
 
--- DROP TABLE public."groups";
+-- DROP TABLE "groups";
 
-CREATE TABLE public."groups" (
+CREATE TABLE "groups" (
 	id serial NOT NULL,
 	guild_id int8 NOT NULL,
-	name text NOT NULL,
+	"name" text NOT NULL,
 	description text NOT NULL,
 	last_called timestamp NULL,
 	CONSTRAINT groups_pkey PRIMARY KEY (id),
@@ -46,9 +76,9 @@ CREATE TABLE public."groups" (
 
 -- Drop table
 
--- DROP TABLE public.guild_members;
+-- DROP TABLE guild_members;
 
-CREATE TABLE public.guild_members (
+CREATE TABLE guild_members (
 	guild_id int8 NOT NULL,
 	id int8 NOT NULL,
 	CONSTRAINT guild_members_pkey PRIMARY KEY (guild_id, id),
@@ -61,9 +91,9 @@ CREATE UNIQUE INDEX guild_members_guild_id_id_key ON public.guild_members USING 
 
 -- Drop table
 
--- DROP TABLE public.guild_settings;
+-- DROP TABLE guild_settings;
 
-CREATE TABLE public.guild_settings (
+CREATE TABLE guild_settings (
 	guild_id int8 NOT NULL,
 	"key" text NOT NULL DEFAULT ''::text,
 	value text NOT NULL DEFAULT ''::text,
@@ -76,32 +106,17 @@ CREATE TABLE public.guild_settings (
 
 -- Drop table
 
--- DROP TABLE public.roles_reaction;
+-- DROP TABLE roles_reaction;
 
-CREATE TABLE public.roles_reaction (
+CREATE TABLE roles_reaction (
 	guild_id int8 NOT NULL,
-	channel_id int8 NOT NULL,
 	message_id int8 NOT NULL,
 	role_id int8 NOT NULL,
 	reaction text NOT NULL,
+	channel_id int8 NOT NULL,
 	CONSTRAINT roles_reaction_un UNIQUE (guild_id, message_id, role_id, reaction, channel_id),
 	CONSTRAINT roles_reaction_un2 UNIQUE (guild_id, message_id, role_id, channel_id),
 	CONSTRAINT roles_reaction_fk FOREIGN KEY (guild_id) REFERENCES guilds(id) ON DELETE CASCADE
-);
-
-
--- public.welcomes definition
-
--- Drop table
-
--- DROP TABLE public.event_welcomes;
-
-CREATE TABLE public.event_welcomes (
-	id int8 NOT NULL,
-	guild_id int8 NOT NULL,
-	"text" text NOT NULL DEFAULT ''::text,
-	CONSTRAINT event_welcomes_pkey PRIMARY KEY (id),
-	CONSTRAINT "FK_event_welcomes_guilds" FOREIGN KEY (guild_id) REFERENCES guilds(id) ON DELETE CASCADE
 );
 
 
@@ -109,9 +124,9 @@ CREATE TABLE public.event_welcomes (
 
 -- Drop table
 
--- DROP TABLE public.birthdays;
+-- DROP TABLE birthdays;
 
-CREATE TABLE public.birthdays (
+CREATE TABLE birthdays (
 	guild_id int8 NOT NULL,
 	member_id int8 NOT NULL,
 	birthday date NOT NULL,
@@ -128,9 +143,9 @@ CREATE UNIQUE INDEX birthdays_guild_id_member_id_key ON public.birthdays USING b
 
 -- Drop table
 
--- DROP TABLE public.group_members;
+-- DROP TABLE group_members;
 
-CREATE TABLE public.group_members (
+CREATE TABLE group_members (
 	group_id int4 NOT NULL DEFAULT 0,
 	member_id int8 NOT NULL,
 	CONSTRAINT group_members_group_id_member_id_key UNIQUE (group_id, member_id),
