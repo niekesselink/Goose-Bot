@@ -110,7 +110,7 @@ class Events(commands.Cog):
         await self.send_event_message(member, 'bye')
 
     @commands.Cog.listener()
-    async def on_member_update(before, after):
+    async def on_member_update(self, before, after):
         """Event that happens when a member gets updated."""
 
         # Check if user boosted the server, if so, send a message.
