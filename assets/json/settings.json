@@ -5,7 +5,6 @@
   "events.bye_channel",
   "events.welcome_channel",
   "language",
-  "music.max_duration",
   "polls.channel",
   "timezone"
 ]
