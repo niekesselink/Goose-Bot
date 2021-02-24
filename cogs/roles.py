@@ -138,8 +138,8 @@ class Roles(commands.Cog):
     async def handle_reaction_event(self, payload, action):
         """Uniform function to handle the reaction add/remove event."""
 
-        # Check if the message where the reaction was removed is a trigger.
-        if f'{payload.guild_id}_{payload.channel_id}_{payload.message_id}' not in self.bot.memory['roles.triggers']:
+        # Ignore bot and check if the message where the reaction was done is a trigger.
+        if (payload.member and payload.member.bot) or f'{payload.guild_id}_{payload.channel_id}_{payload.message_id}' not in self.bot.memory['roles.triggers']:
             return
 
         # Now try and get a role that goes with the reaction from the database...
