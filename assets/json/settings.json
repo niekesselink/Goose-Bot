@@ -1,10 +1,10 @@
-[
-  "birthday.channel",
-  "birthday.role",
-  "events.boost_channel",
-  "events.bye_channel",
-  "events.welcome_channel",
-  "language",
-  "polls.channel",
-  "timezone"
-]
+{
+  "birthday.channel": "",
+  "birthday.role": "",
+  "events.boost_channel": "",
+  "events.bye_channel": "",
+  "events.welcome_channel": "",
+  "language": "english",
+  "polls.channel": "",
+  "timezone": "CEST"
+}

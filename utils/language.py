@@ -37,17 +37,9 @@ async def get(self, ctx, key, guild_id=None):
     # Now set the language in memory if it's not there.
     if 'language' not in self.bot.memory[guild_id]:
 
-        # Get the data from the database.
+        # Get the data from the database and set in memory.
         language = await self.bot.db.fetch(f"SELECT value FROM guild_settings WHERE guild_id = {guild_id} AND key = 'language'")
-
-        # Default if not exist.
-        if not language:
-            language = 'english'
-        else:
-            language = language[0]['value']
-
-        # Set the memory.
-        self.bot.memory[guild_id]['language'] = language
+        self.bot.memory[guild_id]['language'] = language[0]['value']
 
     # Skip formatting if no ctx.
     if ctx is None:

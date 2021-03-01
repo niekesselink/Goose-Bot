@@ -43,7 +43,7 @@ class Birthday(commands.Cog):
 
         # Get guild timezone and ensure we have something...
         timezone = await self.bot.db.fetch(f"SELECT value FROM guild_settings WHERE guild_id = {ctx.guild.id} AND key = 'timezone'")
-        if not timezone:
+        if timezone[0]['value'] == '':
             timezone = 'CET'
         else:
             timezone = timezone[0]['value']
@@ -118,7 +118,7 @@ class Birthday(commands.Cog):
             role_id = await self.bot.db.fetch(f"SELECT value FROM guild_settings WHERE guild_id = {guild.id} AND key = 'birthday.role'")
 
             # Now try to get the channel.
-            if channel_id:
+            if channel_id[0]['value'] != '':
                 channel = guild.get_channel(int(channel_id[0]['value']))
                 
                 # But before sending, ensure it's there.
@@ -127,7 +127,7 @@ class Birthday(commands.Cog):
                     await channel.send(message.format(member.mention))
 
             # Add the role if we can do it, or else make it blank.
-            if role_id:
+            if role_id[0]['value'] != '':
                 role_id = int(role_id[0]['value'])
                 try:
                     await member.add_roles(guild.get_role(role_id))

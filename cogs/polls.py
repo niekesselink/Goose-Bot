@@ -40,7 +40,7 @@ class Polls(commands.Cog):
             # Is the polls channel set in the memory? If not, get it from the database.
             if message.guild.id not in self.bot.memory['polls']:
                 channel_id = await self.bot.db.fetch(f"SELECT value FROM guild_settings WHERE guild_id = {message.guild.id} AND key = 'polls.channel'")
-                self.bot.memory['polls'][message.guild.id] = int(channel_id[0]['value']) if channel_id else 0
+                self.bot.memory['polls'][message.guild.id] = int(channel_id[0]['value']) if channel_id[0]['value'] != '' else 0
 
             # Check if the message is posted in the polls channel, if not, return.
             if self.bot.memory['polls'][message.guild.id] != message.channel.id:

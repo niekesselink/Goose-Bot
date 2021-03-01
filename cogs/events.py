@@ -1,4 +1,5 @@
 import discord
+import json
 import os
 
 from datetime import datetime
@@ -81,8 +82,16 @@ class Events(commands.Cog):
     async def on_guild_join(self, guild):
         """Event that happens once the bot enters a guild."""
 
-        # Add the guild and the members of said guild to the database.
+        # Add the guild to the database.
         await self.bot.db.execute(f"INSERT INTO guilds (id) VALUES ({guild.id})")
+
+        # Now add the configs and their default to the database.
+        with open('assets/json/settings.json') as content:
+            configs = json.load(content)
+            for config in configs:
+                await bot.db.execute(f"INSERT INTO guild_settings (guild_id, key, value) VALUES ({guild.id}, '{config}', '{configs[config]}')")
+
+        # Finally, add a list of all members to be used further into the bot's features.
         for member in guild.members:
             await self.bot.db.execute(f"INSERT INTO guild_members (guild_id, id) VALUES ({guild.id}, {member.id})")
 
@@ -122,7 +131,7 @@ class Events(commands.Cog):
 
         # Get the channel ID and only continue if it's set.
         channel_id = await self.bot.db.fetch(f"SELECT value FROM guild_settings WHERE guild_id = {member.guild.id} AND key = 'events.{event}_channel'")
-        if channel_id:
+        if channel_id[0]['value'] != '':
             channel = member.guild.get_channel(int(channel_id[0]['value']))
 
             # Getting a random message, again, only continue and send it if it is set.

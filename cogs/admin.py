@@ -40,19 +40,12 @@ class Admin(commands.Cog):
             message = await language.get(self, ctx, 'admin.config_unknown')
             return await ctx.send(message.format(config_name))
 
-        # Language is set in memory, so here's a little hack fix for that.
-        if config_name == 'language':
-
-            # Is the guild in the memory? If not set it.
-            if ctx.guild.id not in self.bot.memory:
-                self.bot.memory[ctx.guild.id] = {}
-
-            # Now set the config in memory.
+        # Check if the config is set in memory, if so, update that.
+        if ctx.guild.id in self.bot.memory and config_name in self.bot.memory[ctx.guild.id]:
             self.bot.memory[ctx.guild.id][config_name] = config_value
 
         # Now add it to the database.
-        await self.bot.db.execute(f"INSERT INTO guild_settings (guild_id, key, value) VALUES ({ctx.guild.id}, '{config_name}', '{config_value}') "
-                                  f"ON CONFLICT (guild_id, key) DO UPDATE SET value = '{config_value}'")
+        await self.bot.db.execute(f"UPDATE guild_settings SET value = '{config_value}' WHERE 'key' = '{config_name}' and 'guild_id' = {ctx.guild.id}")
 
         # Inform.
         message = await language.get(self, ctx, 'admin.config')
