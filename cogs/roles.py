@@ -12,8 +12,9 @@ class Roles(commands.Cog):
         self.bot = bot
 
         # Create memory and run a task to fill it...
-        self.bot.memory['roles.triggers'] = []
-        self.bot.loop.create_task(self.populate_memory())
+        if 'roles.triggers' not in self.bot.memory:
+            self.bot.memory['roles.triggers'] = []
+            self.bot.loop.create_task(self.populate_memory())
 
     async def populate_memory(self):
         """Task to populate the memory for the trigger reactions to get roles."""
@@ -22,10 +23,6 @@ class Roles(commands.Cog):
         triggers = await self.bot.db.fetch("SELECT guild_id, channel_id, message_id FROM roles_reaction")
         for trigger in triggers:
             self.bot.memory['roles.triggers'].append(f"{trigger['guild_id']}_{trigger['channel_id']}_{trigger['message_id']}")
-
-    def cog_unload(self):
-        """Function that happens the when the cog unloads."""
-        self.bot.memory['roles.triggers'] = []
 
     @commands.group()
     @commands.guild_only()

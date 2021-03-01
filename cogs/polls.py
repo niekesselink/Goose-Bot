@@ -13,7 +13,8 @@ class Polls(commands.Cog):
         # Define memory variables...
         if 'polls' not in self.bot.memory:
             self.bot.memory['polls'] = {}
-            self.bot.memory['polls']['pending'] = []
+        if 'polls.pending' not in self.bot.memory:
+            self.bot.memory['polls.pending'] = []
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -30,7 +31,7 @@ class Polls(commands.Cog):
         is_poll_channel = False
 
         # Check if the user used the !poll command before.
-        if key not in self.bot.memory['polls']['pending']:
+        if key not in self.bot.memory['polls.pending']:
 
             # Is the polls channel set in the memory? If not, get it from the database.
             if message.guild.id not in self.bot.memory['polls']:
@@ -46,7 +47,7 @@ class Polls(commands.Cog):
 
         # It's a poll, if we got through by using !poll command then let's first remove the key.
         else:
-            self.bot.memory['polls']['pending'].remove(key)
+            self.bot.memory['polls.pending'].remove(key)
 
         # Put content of the message in a variable and declare an integer to track how many reactions we did.
         content = message.content
@@ -91,7 +92,7 @@ class Polls(commands.Cog):
 
         # Create an unique key and set it in the memory.
         key = f'{ctx.guild.id}_{ctx.channel.id}_{ctx.author.id}'
-        self.bot.memory['polls']['pending'].append(key)
+        self.bot.memory['polls.pending'].append(key)
 
         # Send the message that removes itself after 10 seconds to confirm the action, and the delete one of the user.
         await ctx.send(await language.get(self, ctx, 'polls.next_post'), delete_after=10)
