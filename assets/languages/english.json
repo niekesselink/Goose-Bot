@@ -65,6 +65,7 @@
   "music.playlist.now": "Honking now!",
   "music.queued": "**Honk!** {user_mention}, your song **{0}** is added to the queue at position #{1}!",
   "music.queued_playlist": "**Honk!** {user_mention}, I've queued **{0}** tracks to the playlist!",
+  "music.shuffle": "**Honk!** Shuffeling the playlist!",
   "music.skip": "**Honk!** I got ya, chasing the current song away!",
   "music.start": "**Honk honk.** Beginning to honk **{0}** right now!",
   "music.user_not_in_channel": "**Honk!** {user_mention}, maybe I need to chase you into a voice channel first?",

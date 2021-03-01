@@ -1,6 +1,7 @@
 import asyncio
 import discord
 import os
+import random
 import spotipy
 import youtube_dl
 
@@ -54,7 +55,7 @@ class Music(commands.Cog):
                 'playlistMessages': {},
                 'playing': False,
                 'playingIndex': 0,
-                'looping': 'off',
+                'playingLoop': 'off',
                 'volume': 1   
             }
 
@@ -254,12 +255,12 @@ class Music(commands.Cog):
             
         # Stop looping in case that keyword is given.
         if trigger == 'off' or trigger == 'stop':
-            self.bot.memory['music'][ctx.guild.id]['looping'] = 'off'
+            self.bot.memory['music'][ctx.guild.id]['playingLoop'] = 'off'
             await ctx.send(await language.get(self, ctx, 'music.loop.off'))
 
         # Start looping the current track.
         elif trigger == 'track' or trigger == 'song':
-            self.bot.memory['music'][ctx.guild.id]['looping'] = 'track'
+            self.bot.memory['music'][ctx.guild.id]['playingLoop'] = 'track'
             await ctx.send(await language.get(self, ctx, 'music.loop.track'))
 
             # Now let's see if we need to start playing directly, as in, nothing is playing...
@@ -270,13 +271,36 @@ class Music(commands.Cog):
 
         # Start looping the whole queue.
         elif trigger == 'queue' or trigger == 'playlist':
-            self.bot.memory['music'][ctx.guild.id]['looping'] = 'queue'
+            self.bot.memory['music'][ctx.guild.id]['playingLoop'] = 'queue'
             await ctx.send(await language.get(self, ctx, 'music.loop.queue'))
 
             # Now let's see if we need to start playing directly, as in, nothing is playing...
             if not self.bot.memory['music'][ctx.guild.id]['playing']:
                 self.bot.memory['music'][ctx.guild.id]['playing'] = True
                 self.play_song(ctx)
+
+    @commands.command()
+    @commands.guild_only()
+    async def shuffle(self, ctx):
+        """Enables or disable shuffeling mode."""
+
+        # Can we run this command in the current context?
+        if not await self.allowed_to_run_command_check(ctx, False):
+            return
+
+        # Let's get current entry object first, and remove it.
+        entry = self.bot.memory['music'][ctx.guild.id]['playlist'][self.bot.memory['music'][ctx.guild.id]['playingIndex']]
+        self.bot.memory['music'][ctx.guild.id]['playlist'].remove(entry)
+
+        # Everyday I'm shuffeling...
+        random.shuffle(self.bot.memory['music'][ctx.guild.id]['playlist'])
+
+        # Now set the entry back at first spot, and update playing index.
+        self.bot.memory['music'][ctx.guild.id]['playlist'].insert(0, entry)
+        self.bot.memory['music'][ctx.guild.id]['playingIndex'] = 0
+
+        # And finally, inform..
+        await ctx.send(await language.get(self, ctx, 'music.shuffle'))
 
     @commands.command(aliases=['p'])
     @commands.guild_only()
@@ -387,25 +411,26 @@ class Music(commands.Cog):
         if index is None:
 
             # Are we looping the track? Then do that, otherwise fall into the else clause...
-            if self.bot.memory['music'][ctx.guild.id]['looping'] == 'track':
+            if self.bot.memory['music'][ctx.guild.id]['playingLoop'] == 'track':
                 index = self.bot.memory['music'][ctx.guild.id]['playingIndex']
             else:
 
                 # We're going for the next in queue, so increment the playing.
-                self.bot.memory['music'][ctx.guild.id]['playingIndex'] = self.bot.memory['music'][ctx.guild.id]['playingIndex'] + 1
-                index = self.bot.memory['music'][ctx.guild.id]['playingIndex']
+                index = self.bot.memory['music'][ctx.guild.id]['playingIndex'] + 1
 
                 # Are we at the end of the queue?
                 if len(self.bot.memory['music'][ctx.guild.id]['playlist']) <= index:
 
                     # If we're not looping the playlist, then end playing.
-                    if self.bot.memory['music'][ctx.guild.id]['looping'] != 'queue':
+                    if self.bot.memory['music'][ctx.guild.id]['playingLoop'] != 'queue':
                         self.bot.memory['music'][ctx.guild.id]['playing'] = False
                         return
 
                     # List is done, but we are looping. So, resetting the playing index.
-                    self.bot.memory['music'][ctx.guild.id]['playingIndex'] = 0
                     index = 0
+
+                # Save the new index.
+                self.bot.memory['music'][ctx.guild.id]['playingIndex'] = index
 
         # Let's get the entry of next song.
         entry = self.bot.memory['music'][ctx.guild.id]['playlist'][index]

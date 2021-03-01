@@ -65,6 +65,7 @@
   "music.playlist.now": "Nu spelend.",
   "music.queued": "{user_mention}, jouw liedje **{0}** staat op plaats #{1} in de wachtrij.",
   "music.queued_playlist": "{user_mention}, ik heb **{0}** liedjes toegevoegd aan de afspeellijst!",
+  "music.shuffle": "De afspeellijst is nu geshuffeld!",
   "music.skip": "Het huidige liedje wordt overgeslagen!",
   "music.start": "Ik ben begonnen met afspelen!",
   "music.user_not_in_channel": "Kom eerst zelf in een kanaal {user_mention}!",

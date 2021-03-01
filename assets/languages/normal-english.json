@@ -65,6 +65,7 @@
   "music.playlist.now": "Playing!",
   "music.queued": "{user_mention}, your song **{0}** is added to the queue at position #{1}!",
   "music.queued_playlist": "{user_mention}, I've queued **{0}** tracks to the playlist!",
+  "music.shuffle": "Shuffeling the playlist!",
   "music.skip": "Skipping the current playing song!",
   "music.start": "Beginning to play **{0}** right now!",
   "music.user_not_in_channel": "Get first in a channel yourself, {user_mention}!",
