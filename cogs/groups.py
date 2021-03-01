@@ -87,6 +87,7 @@ class Groups(commands.Cog):
 
         # Send the embed...
         await ctx.send(embed=embed.create(
+            self,
             title=await language.get(self, ctx, 'groups.list.title'),
             description=await language.get(self, ctx, 'groups.list.description'),
             fields=fields

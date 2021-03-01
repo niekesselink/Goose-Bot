@@ -59,6 +59,7 @@ class Info(commands.Cog):
 
         # Create and send the embed.
         await ctx.send(embed=embed.create(
+            self,
             title=await language.get(self, ctx, 'info.title'),
             description=await language.get(self, ctx, 'info.description'),
             thumbnail=ctx.bot.user.avatar_url,

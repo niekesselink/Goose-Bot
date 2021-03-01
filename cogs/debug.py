@@ -1,10 +1,13 @@
 import asyncio
 import discord
 import importlib
+import json
 import os
 import subprocess
 
+from collections import namedtuple
 from discord.ext import commands
+from urllib.request import urlopen
 from utils import embed, language, migrate
 
 class Debug(commands.Cog):
@@ -65,6 +68,17 @@ class Debug(commands.Cog):
                     pass
 
     @debug.command()
+    async def reloadconfig(self, ctx):
+        """Reloads the config.json file."""
+
+        # Let's do the reload...
+        with open('config.json', encoding='utf8') as data:
+            self.bot.config = json.load(data, object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
+
+        # Inform.
+        await ctx.send(await language.get(self, ctx, 'debug.reload_config'))
+
+    @debug.command()
     async def reloadutil(self, ctx, name):
         """(Re)Load an util."""
 
@@ -76,6 +90,13 @@ class Debug(commands.Cog):
         print(f'Util {name} has been (re)loaded!')
         message = await language.get(self, ctx, 'debug.reload_util')
         await ctx.send(content=message.format(name))
+
+    @debug.command()
+    async def avatar(self, ctx, url):
+        """Update profile image of the bot."""
+
+        await self.bot.user.edit(avatar=urlopen(url).read())
+        await ctx.send(await language.get(self, ctx, 'debug.avatar'))
 
     @debug.command()
     async def migrate(self, ctx):
@@ -97,6 +118,7 @@ class Debug(commands.Cog):
 
         # Inform the report.
         await ctx.send(embed=embed.create(
+            self,
             title=await language.get(self, ctx, 'debug.git_pull'),
             description=f'```diff\n{stdout}\n{stderr}\n```'
         ))
@@ -113,6 +135,7 @@ class Debug(commands.Cog):
 
         # Inform the report.
         await ctx.send(embed=embed.create(
+            self,
             title=await language.get(self, ctx, 'debug.update'),
             description=f'```diff\n{stdout}\n{stderr}\n```'
         ))

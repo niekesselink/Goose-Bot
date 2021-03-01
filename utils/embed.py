@@ -1,13 +1,13 @@
 ﻿import discord
 
-def create(title, description, thumbnail=None, fields=None):
+def create(self, title, description, thumbnail=None, fields=None):
     """Function to create a Discord embed the easy way."""
 
     # Create the base embed.
     embed = discord.Embed(
         title=title,
         description=description,
-        colour=0x73BBFF,
+        colour=discord.Color(value=int(self.bot.config.colour, 16)),
     )
 
     # Add thumbnail if given.

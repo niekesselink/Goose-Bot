@@ -2,6 +2,7 @@
   "activityType": "listening",
   "activityText": "humans.",
   "token": "insert token here",
+  "colour": "73BBFF",
   "prefix": ".",
 
   "postgre": "insert url here",
