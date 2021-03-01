@@ -139,7 +139,7 @@ class Roles(commands.Cog):
                 member = guild.get_member(payload.user_id)
                 await member.remove_roles(role)
 
-    @commands.cog.listener()
+    @commands.Cog.listener()
     async def on_raw_message_delete(self, payload):
         """Even that happens when a message gets deleted."""
 
