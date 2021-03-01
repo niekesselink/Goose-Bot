@@ -1,8 +1,7 @@
-import asyncio
 import asyncpg
 import discord
 
-from discord.ext import commands, tasks
+from discord.ext import commands
 from utils import language
 
 class Roles(commands.Cog):
@@ -30,36 +29,14 @@ class Roles(commands.Cog):
 
     @commands.group()
     @commands.guild_only()
-    @commands.has_permissions(administrator=True)
+    @commands.has_permissions(manage_roles=True)
     async def roles(self, ctx):
         """Commands for adding role reactions."""
         return
 
-    #@roles.command()
-    #@commands.guild_only()
-    #@commands.has_permissions(administrator=True)
-    #async def give(self, ctx, role_name):
-    #    """Add a role to a member or to everyone if 'all' is given."""
-
-    #    # Get role by name.
-    #    role = discord.utils.get(ctx.guild.roles, name=role_name)
-    #    if role is None:
-    #        return await ctx.send(await language.get(self, ctx, 'roles.role_not_found'))
-
-    #    # Inform the progress is starting.
-    #    await ctx.send(f'Starting to add the role `{role_name}` to everyone. This could take some time depending on amount of members due to Discord API rate limit.')
-
-    #    # Let's loop through all the members and add the roles. There is a sleep due to rate limit.
-    #    for member in ctx.guild.members:
-    #        await member.add_roles(role)
-    #        await asyncio.sleep(0.5)
-
-    #    # Done!
-    #    await ctx.send('Done adding roles!')
-
     @roles.command()
     @commands.guild_only()
-    @commands.has_permissions(administrator=True)
+    @commands.has_permissions(manage_roles=True)
     async def reaction(self, ctx, *, data: str):
         """Add a role trigger on a specific reaction."""
 
@@ -83,19 +60,24 @@ class Roles(commands.Cog):
         # Now, if the action is adding a reaction, then do the following code.
         if action == 'add':
 
-            # Split rest of data.
-            role_id = int(data[2])
+            # Define variables.
+            role = None
             reaction = data[3]
 
-            # Get the role by ID.
-            role = ctx.guild.get_role(role_id)
+            # Get the role by ID, but only if it's an id, otherwise look it up in case of a name match.
+            if data[2].isdigit():
+                role = ctx.guild.get_role(int(data[2]))
+            else:
+                role = discord.utils.get(ctx.guild.roles, name=data[2])
+
+            # Abort if nothing found...
             if role is None:
                 return await ctx.send(await language.get(self, ctx, 'roles.role_not_found'), delete_after=10)
 
             # Store this in the database, but make sure to catch duplicates...
             # If any other exception we will throw it so it can be solved by the developer.
             try:
-                await self.bot.db.execute(f"INSERT INTO roles_reaction (guild_id, channel_id, message_id, role_id, reaction) VALUES ({ctx.guild.id}, {message.channel.id}, {message_id}, {role_id}, '{reaction}')")
+                await self.bot.db.execute(f"INSERT INTO roles_reaction (guild_id, channel_id, message_id, role_id, reaction) VALUES ({ctx.guild.id}, {message.channel.id}, {message_id}, {role.id}, '{reaction}')")
             except asyncpg.exceptions.UniqueViolationError:
                 return await ctx.send(await language.get(self, ctx, 'roles.already_exist'), delete_after=10)
             except:
@@ -118,12 +100,12 @@ class Roles(commands.Cog):
 
             # Now let's remove the trigger...
             await self.bot.db.execute(f"DELETE FROM roles_reaction WHERE guild_id = {ctx.guild.id} AND channel_id = {message.channel.id} AND message_id = {message_id} AND reaction = '{reaction}'")
-            self.bot.memory['roles.triggers'].remove(f'{ctx.guild.id}_{message.channel.id}_{message.id}')
 
-            # Now let's remove the reaction to the post and inform the success.
+            # Now let's remove the reaction to the post, also the trigger if no reactions are left.
             await message.clear_reaction(reaction)
-            await ctx.send(await language.get(self, ctx, 'roles.deleted'), delete_after=10)
 
+            # Inform success..
+            await ctx.send(await language.get(self, ctx, 'roles.deleted'), delete_after=10)
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
@@ -156,6 +138,21 @@ class Roles(commands.Cog):
             elif action == 'remove':
                 member = guild.get_member(payload.user_id)
                 await member.remove_roles(role)
+
+    @commands.cog.listener()
+    async def on_raw_message_delete(self, payload):
+        """Even that happens when a message gets deleted."""
+
+        # Check if the message where the reaction was done is a trigger.
+        message_ids = []
+        for id in payload.message_ids:
+            if f"{payload.guild_id}_{payload.channel_id}_{id}" in self.bot.memory['roles.triggers']:
+                message_ids.append(id)
+
+        # Delete the message entry for matching id's.
+        for id in message_ids:
+            await self.bot.db.fetch(f"DELETE FROM roles_reaction WHERE guild_id = {payload.guild_id} AND channel_id = {payload.channel_id} AND message_id = {id}")
+            self.bot.memory['roles.triggers'].remove(f'{ctx.guild.id}_{message.channel.id}_{id}')
 
 def setup(bot):
     bot.add_cog(Roles(bot))
