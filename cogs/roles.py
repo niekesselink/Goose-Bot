@@ -145,9 +145,9 @@ class Roles(commands.Cog):
             return
 
         # Check if the message where the reaction was done is a trigger, and if so, delete it.
-        if f"{payload.guild_id}_{payload.channel_id}_{payload.message_id}" in self.bot.memory['roles.triggers']:
-            await self.bot.db.fetch(f"DELETE FROM roles_reaction WHERE guild_id = {payload.guild_id} AND channel_id = {payload.channel_id} AND message_id = {id}")
-            self.bot.memory['roles.triggers'].remove(f'{ctx.guild.id}_{message.channel.id}_{id}')
+        if f'{payload.guild_id}_{payload.channel_id}_{payload.message_id}' in self.bot.memory['roles.triggers']:
+            await self.bot.db.fetch(f"DELETE FROM roles_reaction WHERE guild_id = {payload.guild_id} AND channel_id = {payload.channel_id} AND message_id = {payload.message_id}")
+            self.bot.memory['roles.triggers'].remove(f'{ctx.guild.id}_{message.channel.id}_{payload.message_id}')
 
 def setup(bot):
     bot.add_cog(Roles(bot))
