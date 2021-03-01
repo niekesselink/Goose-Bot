@@ -118,7 +118,7 @@ class Roles(commands.Cog):
         """Uniform function to handle the reaction add/remove event."""
 
         # Ignore bot and check if the message where the reaction was done is a trigger.
-        if (payload.member and payload.member.bot) or f'{payload.guild_id}_{payload.channel_id}_{payload.message_id}' not in self.bot.memory['roles.triggers']:
+        if (payload.member and payload.member.bot) or payload.guild_id is None or f'{payload.guild_id}_{payload.channel_id}_{payload.message_id}' not in self.bot.memory['roles.triggers']:
             return
 
         # Now try and get a role that goes with the reaction from the database...
@@ -139,6 +139,10 @@ class Roles(commands.Cog):
     @commands.Cog.listener()
     async def on_raw_message_delete(self, payload):
         """Even that happens when a message gets deleted."""
+
+        # Guild only...
+        if payload.guild_id is None:
+            return
 
         # Check if the message where the reaction was done is a trigger.
         message_ids = []
