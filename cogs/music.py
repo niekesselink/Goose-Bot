@@ -133,8 +133,12 @@ class Music(commands.Cog):
     async def on_reaction_add(self, reaction, user):
         """Event that happens when emoji reactions are given, in this case to control the playlist view."""
 
+        # Check if guild is in music memory before checking further...
+        if user.bot or user.guild.id not in self.bot.memory['music']:
+            return
+
         # Ignore bot, check if the message is a queue message as well, and proper emoji are being used..
-        if user.bot or reaction.message.id not in self.bot.memory['music'][reaction.message.guild.id]['playlistMessages'] and reaction.emoji != '⬆' and reaction.emoji != '⬇':
+        if reaction.message.id not in self.bot.memory['music'][reaction.message.guild.id]['playlistMessages'] and reaction.emoji != '⬆' and reaction.emoji != '⬇':
             return
 
         # Let's awesome it's going a page down for now...

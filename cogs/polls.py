@@ -20,6 +20,10 @@ class Polls(commands.Cog):
     async def on_message(self, message):
         """Event that happens when user sends a message in a channel."""
 
+        # Ignore non-guild.
+        if message.guild is None:
+            return
+
         # Ignore the poll command, it's triggered first before this event so we have to do this.
         # Also ignore message by the bot, we don't want a loop, and ignore if private message.
         prefix = self.bot.config.prefix
