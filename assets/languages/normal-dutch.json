@@ -12,6 +12,7 @@
   "birthday.timezone_set": "{user_mention}, jouw tijdzone is nu {0}!",
   "birthday.timezone_unknown": "{user_mention}, die tijdzone ken ik niet. Kijk op http://www.timezoneconverter.com/cgi-bin/findzone om de tijdzone te vinden voor jouw locatie!",
   "birthday.wish": "Hoi @everyone, het is vandaag de verjaardag van {0}!\nWees een vriendelijk persoon en zeg even gefeliciteerd?",
+  "core.trigger_unknown": "Ik ken dat trigger woord niet, check de help!",
   "debug.avatar": "Avatar vervangen!",
   "debug.cog_load": "Cog {0} is geladen!",
   "debug.cog_unload": "Cog {0} is verwijderd!",

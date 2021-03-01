@@ -12,6 +12,7 @@
   "birthday.timezone_set": "**Honk!** {user_mention}, I have set your timezone to {0}!",
   "birthday.timezone_unknown": "**Honk!** {user_mention}, I don't know that timezone, go check http://www.timezoneconverter.com/cgi-bin/findzone to find the right one!",
   "birthday.wish": "**HONK HONK!** Hey @everyone, the human people, it's the birthday of {0} today!\nBe a friendly human and honk happy birthday would you?",
+  "core.trigger_unknown": "**Honk!** I don't know that trigger word, check the help!",
   "debug.avatar": "**Honk!** Avatar replaced!",
   "debug.cog_load": "**Honk!** Cog {0} has been loaded!",
   "debug.cog_unload": "**Honk!** Cog {0} has been unloaded!",

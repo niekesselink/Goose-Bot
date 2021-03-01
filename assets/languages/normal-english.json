@@ -12,6 +12,7 @@
   "birthday.timezone_set": "{user_mention}, I have set your timezone to {0}!",
   "birthday.timezone_unknown": "{user_mention}, I don't know that timezone, go check http://www.timezoneconverter.com/cgi-bin/findzone to find the right one!",
   "birthday.wish": "Hey @everyone, it's the birthday of {0} today!\nBe a friendly person and say happy birthday would you?",
+  "core.trigger_unknown": "I don't know that trigger word, check the help!",
   "debug.avatar": "Avatar replaced!",
   "debug.cog_load": "Cog {0} has been loaded!",
   "debug.cog_unload": "Cog {0} has been unloaded!",

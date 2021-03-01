@@ -279,6 +279,10 @@ class Music(commands.Cog):
                 self.bot.memory['music'][ctx.guild.id]['playing'] = True
                 self.play_song(ctx)
 
+        # Unknown trigger...
+        else: 
+            await ctx.send(await language.get(self, ctx, 'core.trigger_unknown'))
+                
     @commands.command()
     @commands.guild_only()
     async def shuffle(self, ctx):
