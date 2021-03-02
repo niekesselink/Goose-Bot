@@ -425,6 +425,7 @@ class Music(commands.Cog):
 
                 # We're going for the next in queue, so increment the playing.
                 index = self.bot.memory['music'][ctx.guild.id]['playingIndex'] + 1
+                self.bot.memory['music'][ctx.guild.id]['playingIndex'] = index
 
                 # Are we at the end of the queue?
                 if len(self.bot.memory['music'][ctx.guild.id]['playlist']) <= index:
@@ -436,9 +437,7 @@ class Music(commands.Cog):
 
                     # List is done, but we are looping. So, resetting the playing index.
                     index = 0
-
-                # Save the new index.
-                self.bot.memory['music'][ctx.guild.id]['playingIndex'] = index
+                    self.bot.memory['music'][ctx.guild.id]['playingIndex'] = index                
 
         # Let's get the entry of next song.
         entry = self.bot.memory['music'][ctx.guild.id]['playlist'][index]
