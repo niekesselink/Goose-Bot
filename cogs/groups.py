@@ -24,8 +24,8 @@ class Groups(commands.Cog):
         # Get the group result
         result = await self.bot.db.fetch("SELECT g.id, g.name, string_agg('<@' || gm.member_id::TEXT || '>', ', ') AS members, g.last_called "
                                          "FROM groups AS g LEFT OUTER JOIN group_members AS gm ON gm.group_id = g.id "
-                                         f"WHERE g.guild_id = {message.guild.id} AND LOWER(g.name) = LOWER('{group}') "
-                                         "GROUP BY g.id")
+                                         "WHERE g.guild_id = $1 AND LOWER(g.name) = LOWER($2) "
+                                         "GROUP BY g.id", message.guild.id, group)
 
         # Did we got a result event?
         if not result:
@@ -39,7 +39,7 @@ class Groups(commands.Cog):
 
         # Update last call.
         group_id = int(result[0]['id'])
-        await self.bot.db.execute(f"UPDATE groups SET last_called = NOW() WHERE id = {group_id}")
+        await self.bot.db.execute("UPDATE groups SET last_called = NOW() WHERE id = $1", group_id)
 
         # Now publish the results.
         await message.channel.send('**@' + result[0]['name'] + '!** ' + result[0]['members'])
@@ -53,7 +53,7 @@ class Groups(commands.Cog):
 
         # Remove member from all groups in the database for the guild he/she left.
         await self.bot.db.execute("DELETE FROM group_members AS gm USING groups AS g "
-                                  f"WHERE g.id = gm.group_id AND gm.member_id = {member.id} AND g.guild_id = {member.guild.id}")
+                                  "WHERE g.id = gm.group_id AND gm.member_id = $1 AND g.guild_id = $2", member.id, member.guild.id)
 
 
     @commands.group()
@@ -70,8 +70,8 @@ class Groups(commands.Cog):
         # Open database and get the results.
         groups = await self.bot.db.fetch("SELECT g.name, g.description, "
                                          "(SELECT COUNT(*) FROM group_members AS gm WHERE gm.group_id = g.id) AS membercount "
-                                         f"FROM groups AS g WHERE g.guild_id = {ctx.guild.id} "
-                                         "ORDER BY membercount")
+                                         "FROM groups AS g WHERE g.guild_id = $1 "
+                                         "ORDER BY membercount", ctx.guild.id)
 
         # Are there even any groups?
         if not groups:
@@ -99,8 +99,7 @@ class Groups(commands.Cog):
         """"Join an existing group."""
 
         # Get the group matching the name.
-        result = await self.bot.db.fetch("SELECT id, name FROM groups "
-                                         f"WHERE guild_id = {ctx.guild.id} AND LOWER(name) = LOWER('{group}')")
+        result = await self.bot.db.fetch("SELECT id, name FROM groups WHERE guild_id = $1 AND LOWER(name) = LOWER($2)", ctx.guild.id, group)
 
         # Tell the user if the group does not exist.
         if not result:
@@ -108,12 +107,12 @@ class Groups(commands.Cog):
 
         # Check if the user is not a member already.
         group_id = int(result[0]['id'])
-        member_check = await self.bot.db.fetch(f"SELECT group_id FROM group_members WHERE group_id = {group_id} AND member_id = {ctx.author.id}")
+        member_check = await self.bot.db.fetch("SELECT group_id FROM group_members WHERE group_id = $1 AND member_id = $2", group_id, ctx.author.id)
         if member_check:
             return await ctx.send(await language.get(self, ctx, 'groups.already_a_member'))
 
         # Join the group.
-        await self.bot.db.execute(f"INSERT INTO group_members (group_id, member_id) VALUES ({group_id}, {ctx.author.id})")
+        await self.bot.db.execute("INSERT INTO group_members (group_id, member_id) VALUES ($1, $2)", group_id, ctx.author.id)
 
         # And now inform.
         message = await language.get(self, ctx, 'groups.joined')
@@ -125,8 +124,7 @@ class Groups(commands.Cog):
         """"Leave a group you're currently in."""
 
         # Get the group matching the name.
-        result = await self.bot.db.fetch("SELECT id, name FROM groups "
-                                         f"WHERE guild_id = {ctx.guild.id} AND LOWER(name) = LOWER('{group}')")
+        result = await self.bot.db.fetch("SELECT id, name FROM groups WHERE guild_id = $1 AND LOWER(name) = LOWER($2)", ctx.guild.id, group)
 
         # Tell the user if the group does not exist.
         if not result:
@@ -134,12 +132,12 @@ class Groups(commands.Cog):
 
         # Check if the user is a member .
         group_id = int(result[0]['id'])
-        member_check = await self.bot.db.fetch(f"SELECT group_id FROM group_members WHERE group_id = {group_id} AND member_id = {ctx.author.id}")
+        member_check = await self.bot.db.fetch("SELECT group_id FROM group_members WHERE group_id = $1 AND member_id = $2", group_id, ctx.author.id)
         if not member_check:
             return await ctx.send(await language.get(self, ctx, 'groups.not_a_member'))
 
         # Leave the group.
-        await self.bot.db.execute(f"DELETE FROM group_members WHERE group_id = {group_id} AND member_id = {ctx.author.id}")
+        await self.bot.db.execute("DELETE FROM group_members WHERE group_id = $1 AND member_id = $2", group_id, ctx.author.id)
 
         # And now inform.
         message = await language.get(self, ctx, 'groups.left')
@@ -157,8 +155,7 @@ class Groups(commands.Cog):
         group_description = data[1].replace("'", "''")
 
         # Check if there's a group matching the name.
-        result = await self.bot.db.fetch("SELECT id, name FROM groups "
-                                         f"WHERE guild_id = {ctx.guild.id} AND LOWER(name) = LOWER('{group_name}')")
+        result = await self.bot.db.fetch("SELECT id, name FROM groups WHERE guild_id = $1 AND LOWER(name) = LOWER($2)", ctx.guild.id, group_name)
 
         # If there is, tell so and stop creating.
         if result:
@@ -169,7 +166,7 @@ class Groups(commands.Cog):
             ctx.send(await language.get(self, ctx, 'event.missing_argument'))
 
         # Now create the group.
-        await self.bot.db.execute(f"INSERT INTO groups (guild_id, name, description) VALUES ({ctx.guild.id}, '{group_name}', '{group_description}')")
+        await self.bot.db.execute("INSERT INTO groups (guild_id, name, description) VALUES ($1, $2, $3)", ctx.guild.id, group_name, group_description)
 
         # And inform.
         message = await language.get(self, ctx, 'groups.created')
@@ -182,8 +179,7 @@ class Groups(commands.Cog):
         """Delete an existing group."""
 
         # Get the group matching the name.
-        result = await self.bot.db.fetch("SELECT id, name FROM groups "
-                                         f"WHERE guild_id = {ctx.guild.id} AND LOWER(name) = LOWER('{group}')")
+        result = await self.bot.db.fetch("SELECT id, name FROM groups WHERE guild_id = $1 AND LOWER(name) = LOWER($2)", ctx.guild.id, group)
 
         # Tell the user if the group does not exist.
         if not result:
@@ -191,7 +187,7 @@ class Groups(commands.Cog):
 
         # Now delete the group.
         group_id = int(result[0]['id'])
-        await self.bot.db.execute(f"DELETE FROM groups WHERE id = {group_id}")
+        await self.bot.db.execute("DELETE FROM groups WHERE id = $1", group_id)
 
         # And inform.
         message = await language.get(self, ctx, 'groups.deleted')

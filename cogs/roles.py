@@ -74,7 +74,8 @@ class Roles(commands.Cog):
             # Store this in the database, but make sure to catch duplicates...
             # If any other exception we will throw it so it can be solved by the developer.
             try:
-                await self.bot.db.execute(f"INSERT INTO roles_reaction (guild_id, channel_id, message_id, role_id, reaction) VALUES ({ctx.guild.id}, {message.channel.id}, {message_id}, {role.id}, '{reaction}')")
+                await self.bot.db.execute("INSERT INTO roles_reaction (guild_id, channel_id, message_id, role_id, reaction) VALUES ($1, $2, $3, $4, $5)",
+                                          ctx.guild.id, message.channel.id, message_id, role.id, reaction)
             except asyncpg.exceptions.UniqueViolationError:
                 return await ctx.send(await language.get(self, ctx, 'roles.already_exist'), delete_after=10)
             except:
@@ -96,7 +97,8 @@ class Roles(commands.Cog):
             reaction = data[1]
 
             # Now let's remove the trigger...
-            await self.bot.db.execute(f"DELETE FROM roles_reaction WHERE guild_id = {ctx.guild.id} AND channel_id = {message.channel.id} AND message_id = {message_id} AND reaction = '{reaction}'")
+            await self.bot.db.execute("DELETE FROM roles_reaction WHERE guild_id = $1 AND channel_id = $2 AND message_id = $3 AND reaction = $4",
+                                      ctx.guild.id, message.channel.id, message_id, reaction)
 
             # Now let's remove the reaction to the post, also the trigger if no reactions are left.
             await message.clear_reaction(reaction)
@@ -122,7 +124,8 @@ class Roles(commands.Cog):
             return
 
         # Now try and get a role that goes with the reaction from the database...
-        role_id = await self.bot.db.fetch(f"SELECT role_id FROM roles_reaction WHERE guild_id = {payload.guild_id} AND channel_id = {payload.channel_id} AND message_id = {payload.message_id} AND reaction = '{str(payload.emoji)}'")
+        role_id = await self.bot.db.fetch("SELECT role_id FROM roles_reaction WHERE guild_id = $1 AND channel_id = $2 AND message_id = $3 AND reaction = $4",
+                                          payload.guild_id, payload.channel_id, payload.message_id, str(payload.emoji))
 
         # Get some more data if there is a role_id...
         if role_id:
@@ -146,7 +149,7 @@ class Roles(commands.Cog):
 
         # Check if the message where the reaction was done is a trigger, and if so, delete it.
         if f'{payload.guild_id}_{payload.channel_id}_{payload.message_id}' in self.bot.memory['roles.triggers']:
-            await self.bot.db.fetch(f"DELETE FROM roles_reaction WHERE guild_id = {payload.guild_id} AND channel_id = {payload.channel_id} AND message_id = {payload.message_id}")
+            await self.bot.db.fetch("DELETE FROM roles_reaction WHERE guild_id = $1 AND channel_id = $2 AND message_id = $3", payload.guild_id, payload.channel_id, payload.message_id)
             self.bot.memory['roles.triggers'].remove(f'{ctx.guild.id}_{message.channel.id}_{payload.message_id}')
 
 def setup(bot):

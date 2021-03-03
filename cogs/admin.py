@@ -45,7 +45,7 @@ class Admin(commands.Cog):
             self.bot.memory[ctx.guild.id][config_name] = config_value
 
         # Now add it to the database.
-        await self.bot.db.execute(f"UPDATE guild_settings SET value = '{config_value}' WHERE 'key' = '{config_name}' and 'guild_id' = {ctx.guild.id}")
+        await self.bot.db.execute("UPDATE guild_settings SET value = $1 WHERE 'key' = $2 and 'guild_id' = $3", config_value, config_name, guild_id)
 
         # Inform.
         message = await language.get(self, ctx, 'admin.config')

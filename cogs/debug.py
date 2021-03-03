@@ -3,6 +3,7 @@ import discord
 import importlib
 import json
 import os
+import psutil
 import subprocess
 
 from collections import namedtuple
@@ -17,6 +18,9 @@ class Debug(commands.Cog):
         """Initial function that runs when the class has been created."""
         self.bot = bot
 
+        # Get reference to the current running process.
+        self.process = psutil.Process(os.getpid())
+
     async def cog_check(self, ctx):
         """Validation check before every command within this class will be executed."""
         return await self.bot.is_owner(ctx.author)
@@ -25,6 +29,14 @@ class Debug(commands.Cog):
     async def debug(self, ctx):
         """Declaration of the debug category."""
         return
+
+    @debug.command()
+    async def ram(self, ctx):
+        """Shows RAM usage of the bot."""
+        
+        # Get RAM info and return it in a simple message.
+        ramUsage = self.process.memory_full_info().rss / 1024**2
+        await ctx.send(f'{ramUsage:.2f} MB')
 
     @debug.command()
     async def load(self, ctx, name):

@@ -42,15 +42,15 @@ class Birthday(commands.Cog):
             return await ctx.send(await language.get(self, ctx, 'birthday.incorrect'))
 
         # Get guild timezone and ensure we have something...
-        timezone = await self.bot.db.fetch(f"SELECT value FROM guild_settings WHERE guild_id = {ctx.guild.id} AND key = 'timezone'")
+        timezone = await self.bot.db.fetch("SELECT value FROM guild_settings WHERE guild_id = $1 AND key = 'timezone'", ctx.guild.id)
         if timezone[0]['value'] == '':
             timezone = 'CET'
         else:
             timezone = timezone[0]['value']
 
         # Now add it to the database.
-        await self.bot.db.execute(f"INSERT INTO birthdays (guild_id, member_id, birthday, timezone) VALUES ({ctx.guild.id}, {ctx.author.id}, '{date}', '{timezone}') "
-                                  f"ON CONFLICT (guild_id, member_id) DO UPDATE SET birthday = '{date}'")
+        await self.bot.db.execute("INSERT INTO birthdays (guild_id, member_id, birthday, timezone) VALUES ($1, $2, $3, $4) "
+                                  "ON CONFLICT (guild_id, member_id) DO UPDATE SET birthday = $3", ctx.guild.id, ctx.author.id, date, timezone)
 
         # Inform the user we've set the birthday.
         message = await language.get(self, ctx, 'birthday.succes')
@@ -67,7 +67,7 @@ class Birthday(commands.Cog):
             return await ctx.send(await language.get(self, ctx, 'birthday.timezone'))
 
         # Check if user has set a birthday.
-        birthday = await self.bot.db.fetch(f"SELECT birthday FROM birthdays WHERE guild_id = {ctx.guild.id} AND member_id = {ctx.author.id}")
+        birthday = await self.bot.db.fetch("SELECT birthday FROM birthdays WHERE guild_id = $1 AND member_id = $2", ctx.guild.id, ctx.author.id)
         if not birthday:
             return await ctx.send(await language.get(self, ctx, 'birthday.not_set'))
 
@@ -82,7 +82,7 @@ class Birthday(commands.Cog):
             return await ctx.send(await language.get(self, ctx, 'birthday.timezone_unknown'))
 
         # Now let's save it.
-        await self.bot.db.execute(f"UPDATE birthdays SET timezone = '{matching_timezones[0]}' WHERE guild_id = {ctx.guild.id} AND member_id = {ctx.author.id}")
+        await self.bot.db.execute("UPDATE birthdays SET timezone = $1 WHERE guild_id = $2 AND member_id = $3", matching_timezones[0], ctx.guild.id, ctx.author.id)
 
         # Inform.
         message = await language.get(self, ctx, 'birthday.timezone_set')
@@ -114,8 +114,8 @@ class Birthday(commands.Cog):
                 continue
 
             # Get some values required.
-            channel_id = await self.bot.db.fetch(f"SELECT value FROM guild_settings WHERE guild_id = {guild.id} AND key = 'birthday.channel'")
-            role_id = await self.bot.db.fetch(f"SELECT value FROM guild_settings WHERE guild_id = {guild.id} AND key = 'birthday.role'")
+            channel_id = await self.bot.db.fetch("SELECT value FROM guild_settings WHERE guild_id = $1 AND key = 'birthday.channel'", guild.id)
+            role_id = await self.bot.db.fetch("SELECT value FROM guild_settings WHERE guild_id = $1 AND key = 'birthday.role'", guild.id)
 
             # Now try to get the channel.
             if channel_id[0]['value'] != '':
@@ -137,7 +137,7 @@ class Birthday(commands.Cog):
                 role_id = ''
             
             # We have triggered this person's birthday...
-            await self.bot.db.execute(f"UPDATE birthdays SET triggered = TRUE, given_role = '{role_id}' WHERE guild_id = {guild.id} AND member_id = {member.id}")
+            await self.bot.db.execute("UPDATE birthdays SET triggered = TRUE, given_role = $1 WHERE guild_id = $2 AND member_id = $3", role_id, guild.id, member.id)
 
         # Now also look for people who had their birthday yesterday.
         old_birthdays = await self.bot.db.fetch("SELECT guild_id, member_id, given_role FROM birthdays "
@@ -165,7 +165,7 @@ class Birthday(commands.Cog):
                     pass
 
             # No role given, simple update.
-            await self.bot.db.execute(f"UPDATE birthdays SET triggered = FALSE, given_role = '' WHERE guild_id = {guild.id} AND member_id = {member.id}")
+            await self.bot.db.execute("UPDATE birthdays SET triggered = FALSE, given_role = '' WHERE guild_id = $1 AND member_id = $2", guild.id, member.id)
 
     @check_birthday.before_loop
     async def before_check_birthday(self):
