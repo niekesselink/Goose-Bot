@@ -36,7 +36,7 @@
   "groups.no_members": "**Honk!** {user_mention}, I would love to mention that group but it has no members, so it's useless...",
   "groups.non_existent": "**Honk!** That group doesn't exist, {user_mention}!",
   "groups.not_a_member": "**Honk!** You're not in this group, {user_mention}!",
-  "groups.list.description": "Below is a list of groups which you can join by using `.group join`. Once you've joined a group, you can mention everyone or be mentioned by doing `@group <name>`.",
+  "groups.list.description": "Below is a list of groups which you can join by using `.groups join`. Once you've joined a group, you can mention everyone or be mentioned by doing `@group <name>`.",
   "groups.list.members": "members",
   "groups.list.title": "**Honking groups.**",
   "info.created": "Created",

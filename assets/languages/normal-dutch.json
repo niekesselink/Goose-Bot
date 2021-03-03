@@ -36,7 +36,7 @@
   "groups.no_members": "{user_mention}, er zitten geen leden in die groep. Oproepen is daarom een beetje nutteloos...",
   "groups.non_existent": "Die groep bestaat niet {user_mention}!",
   "groups.not_a_member": "Je zit niet in die groep {user_mention}!",
-  "groups.list.description": "Onderstaand is een lijst van groepen waarvan je lid kan worden via `.group join`. Iedereen op de server kan de groep oproepen door `@group <name>` in te typen.",
+  "groups.list.description": "Onderstaand is een lijst van groepen waarvan je lid kan worden via `.groups join`. Iedereen op de server kan de groep oproepen door `@group <name>` in te typen.",
   "groups.list.members": "leden",
   "groups.list.title": "**Groepen.**",
   "info.created": "Aangemaakt",
