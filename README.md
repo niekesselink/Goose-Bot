@@ -10,16 +10,3 @@ Please note that this bot may not be perfect and may contain errors. If you enco
 * FFmpeg 
 * PostgreSQL
 
-### TODO ###
-* Website for adding/controlling the bot
-* Bot configuration per server
-	* Limit cogs to certain channels
-* Moderation features
-	* Mute an user guild wise or channel wise
-	* Block user from using the bot
-	* Prune messages of an user
-* Music feature
-	* Role check on skip to force, else voting.
-* Role management
-	* Auto-add roles to new users
-	* Click reaction to assign a role

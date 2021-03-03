@@ -65,7 +65,7 @@ CREATE TABLE "groups" (
 	id serial NOT NULL,
 	guild_id int8 NOT NULL,
 	"name" text NOT NULL,
-	description text NOT NULL,
+	"description" text NOT NULL,
 	last_called timestamp NULL,
 	CONSTRAINT groups_pkey PRIMARY KEY (id),
 	CONSTRAINT "FK_groups_guilds" FOREIGN KEY (guild_id) REFERENCES guilds(id) ON DELETE CASCADE
@@ -81,6 +81,7 @@ CREATE TABLE "groups" (
 CREATE TABLE guild_members (
 	guild_id int8 NOT NULL,
 	id int8 NOT NULL,
+	"about" text NULL,
 	CONSTRAINT guild_members_pkey PRIMARY KEY (guild_id, id),
 	CONSTRAINT "FK_guild_members_guilds" FOREIGN KEY (guild_id) REFERENCES guilds(id) ON DELETE CASCADE
 );
