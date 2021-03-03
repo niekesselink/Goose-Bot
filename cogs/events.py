@@ -1,8 +1,5 @@
 import discord
-import json
-import os
 
-from datetime import datetime
 from discord.ext import commands
 from utils import language
 
@@ -14,108 +11,13 @@ class Events(commands.Cog):
         self.bot = bot
 
     @commands.Cog.listener()
-    async def on_ready(self):
-        """Event that happens once the bot has started."""
-
-        # But is running.
-        print('Bot has started.')
-        self.bot.uptime = datetime.utcnow()
-
-        # Get the right activity type.
-        activityType = self.bot.config.activityType.lower()
-        if activityType == "playing":
-            activityType = discord.ActivityType.playing
-        elif activityType == "streaming":
-            activityType = discord.ActivityType.streaming
-        elif activityType == "listening":
-            activityType = discord.ActivityType.listening
-        elif activityType == "watching":
-            activityType = discord.ActivityType.watching
-        elif activityType == "custom":
-            activityType = discord.ActivityType.custom
-        elif activityType == "competing":
-            activityType = discord.ActivityType.competing
-
-        # Check-double-check to ensure the type is not a string, if correct, go and change...
-        if isinstance(activityType, str) is False:
-            await self.bot.change_presence(
-                activity=discord.Activity(type=activityType, name=self.bot.config.activityText),
-                status=discord.Status.online
-            )
-
-    @commands.Cog.listener()
-    async def on_command_error(self, ctx, error):
-        """Event that happens once a command runs into an error."""
-
-        # Don't give an error if the command is non existing.
-        if isinstance(error, commands.errors.CommandNotFound):
-            return
-
-        # Don't give an error either when the command check failed.
-        if isinstance(error, commands.errors.CheckFailure):
-            return
-
-        # Cooldown on hidden commands are probably an easter egg, it should stay silent.
-        if isinstance(error, commands.errors.CommandOnCooldown) and ctx.command.hidden:
-            return
-
-        # If the argument is missing, then let's say that...
-        if isinstance(error, commands.errors.MissingRequiredArgument):
-            return await ctx.send(await language.get(self, ctx, 'events.missing_argument'))
-
-        # Notice if private message is not allowed for the command.
-        if isinstance(error, commands.NoPrivateMessage):
-            return await ctx.author.send(await language.get(self, ctx, 'events.no_private_message'))
-
-        # We've hit an error. Inform that the owner is on it...
-        await ctx.send(await language.get(self, ctx, 'events.error'))
-
-        # Create a special error embed for this error and send it to the bot owner.
-        owner = self.bot.get_user(462311999980961793)
-        await owner.send(embed=discord.Embed(
-            title=f'Error using {ctx.message.content}',
-            description=f'`{str(error)}`',
-            colour=0xFF7E62,
-        ))
-            
-    @commands.Cog.listener()
-    async def on_guild_join(self, guild):
-        """Event that happens once the bot enters a guild."""
-
-        # Add the guild to the database.
-        await self.bot.db.execute(f"INSERT INTO guilds (id) VALUES ({guild.id})")
-
-        # Now add the configs and their default to the database.
-        with open('assets/json/settings.json') as content:
-            configs = json.load(content)
-            for config in configs:
-                await bot.db.execute(f"INSERT INTO guild_settings (guild_id, key, value) VALUES ({guild.id}, '{config}', '{configs[config]}')")
-
-        # Finally, add a list of all members to be used further into the bot's features.
-        for member in guild.members:
-            await self.bot.db.execute(f"INSERT INTO guild_members (guild_id, id) VALUES ({guild.id}, {member.id})")
-
-    @commands.Cog.listener()
-    async def on_guild_leave(self, guild):
-        """Event that happens once the bot leaves a guild."""
-
-        # Remove the guild from the database.
-        await self.bot.db.execute(f"DELETE FROM guilds WHERE id = {guild.id}")
-
-    @commands.Cog.listener()
     async def on_member_join(self, member):
         """Event that happens once a member joins the guild the bot is in."""
-
-        # Add the member to the database and send welcome message.
-        await self.bot.db.execute(f"INSERT INTO guild_members (guild_id, id) VALUES ({member.guild.id}, {member.id}) ON CONFLICT (guild_id, id) DO NOTHING")
         await self.send_event_message(member, 'welcome')
 
     @commands.Cog.listener()
     async def on_member_remove(self, member):
         """Event that happens once a member leaves the guild the bot is in."""
-
-        # Remove member from the database, send a goodbye message.
-        await self.bot.db.execute(f"DELETE FROM guild_members WHERE guild_id = {member.guild.id} AND id = {member.id}")
         await self.send_event_message(member, 'bye')
 
     @commands.Cog.listener()
@@ -130,12 +32,12 @@ class Events(commands.Cog):
         """Function to send the proper welcome or bye message."""
 
         # Get the channel ID and only continue if it's set.
-        channel_id = await self.bot.db.fetch(f"SELECT value FROM guild_settings WHERE guild_id = {member.guild.id} AND key = 'events.{event}_channel'")
+        channel_id = await self.bot.db.fetch("SELECT value FROM guild_settings WHERE guild_id = $1 AND key = $2", member.guild.id, f'events.{event}_channel')
         if channel_id[0]['value'] != '':
             channel = member.guild.get_channel(int(channel_id[0]['value']))
 
             # Getting a random message, again, only continue and send it if it is set.
-            message = await self.bot.db.fetch(f"SELECT text FROM event_{event}s WHERE guild_id = {member.guild.id} ORDER BY RANDOM() LIMIT 1")
+            message = await self.bot.db.fetch("SELECT text FROM $1 WHERE guild_id = $2 ORDER BY RANDOM() LIMIT 1", f'event_{event}s', member.guild.id)
             if message:
                 await channel.send(language.fill(message[0]['text'], member=member))
 
