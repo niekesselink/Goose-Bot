@@ -1,6 +1,5 @@
 import discord
 import os
-import psutil
 import subprocess
 
 from discord.ext import commands
@@ -12,9 +11,7 @@ class Info(commands.Cog):
     def __init__(self, bot):
         """Initial function that runs when the class has been created."""
         self.bot = bot
-
-        # Get reference to the current running process.
-        self.process = psutil.Process(os.getpid())
+        self.bot.remove_command('help')
 
     @commands.command()
     async def honk(self, ctx):
@@ -39,22 +36,71 @@ class Info(commands.Cog):
         await ctx.send(message.format(miliseconds))
 
     @commands.command()
-    async def info(self, ctx):
-        """Shows information about the Goose bot."""
+    @commands.guild_only()
+    async def info(self, ctx, *, data: str=None):
+        """Shows information about yours or someone elses their account."""
+
+        # Get the correct data from the message.
+        username = None
+        if data is not None:
+            data = data.split(' ', 1)
+            username = data[0]
+
+        # Get the user
+        user = ctx.author
+        if username is not None:
+
+            # Only set the about field if username is 'set'.
+            if username.lower() == 'set':
+                await self.bot.db.execute("UPDATE guild_members SET about = $1 WHERE guild_id = $2 AND id = $3", data[1] if len(data) > 1 else '', ctx.guild.id, ctx.author.id)
+                return await ctx.message.add_reaction('👌')
+
+            # We're not setting, now check if user is getable, other just refer to yourself.
+            user = ctx.guild.get_member(int(username[3:21]))
+            user = user if user is not None else ctx.author
+
+        # Author field.
+        author = {
+            'name': f'{user.name}#{user.discriminator}',
+            'icon': user.avatar_url
+        }
+
+        # Get about field.
+        about = await self.bot.db.fetch("SELECT about FROM guild_members WHERE guild_id = $1 AND id = $2", ctx.guild.id, user.id)
+        about = about[0]['about'] if about[0]['about'] is not None else await language.get(self, ctx, 'info.empty_about')
+
+        # Define embed fields data.
+        format = '%d/%m/%Y'
+        fields = {
+            await language.get(self, ctx, 'info.joined') + f' {ctx.guild.name}': user.joined_at.strftime(format),
+            await language.get(self, ctx, 'info.created'): user.created_at.strftime(format)
+        }
+
+        # Create and send the embed.
+        await ctx.send(embed=embed.create(
+            self,
+            description=about,
+            colour=0x303136,
+            fields=fields,
+            author=author
+        ))
+
+    @commands.command(alias='bot')
+    async def botinfo(self, ctx):
+        """Shows information about the bot."""
 
         # Get some data...
         guilds = await self.bot.db.fetch("SELECT COUNT(*) FROM guilds")
         guilds = int(guilds[0][0])
         members = await self.bot.db.fetch("SELECT COUNT(*) FROM guild_members")
         members = int(members[0][0])
-        ramUsage = self.process.memory_full_info().rss / 1024**2
 
         # Define embed fields data.
         fields = {
             'Creator': '<@462311999980961793>',
             'Servers active': f'{guilds} ({members} total members)',
             'Last update': f'{subprocess.check_output(["git", "log", "-1", "--format=%cd "]).strip().decode("utf-8")}',
-            'RAM usage': f'{ramUsage:.2f} MB'
+            'Source code': 'https://github.com/niekesselink/Goose-Bot'
         }
 
         # Create and send the embed.
@@ -62,15 +108,18 @@ class Info(commands.Cog):
             self,
             title=await language.get(self, ctx, 'info.title'),
             description=await language.get(self, ctx, 'info.description'),
+            colour=0x303136,
             thumbnail=ctx.bot.user.avatar_url,
             fields=fields
         ))
 
     @commands.command()
-    async def source(self, ctx):
-        """Check out the bot's source code."""
-        message = await language.get(self, ctx, 'info.source')
-        await ctx.send(message.format('https://github.com/niekesselink/Goose-Bot'))
+    async def help(self, ctx, *cog):
+        """Gets all cogs and commands of mine."""
+
+        embed=discord.Embed(colour=0x303136)
+        embed.add_field(name="Help?", value="This command is under construction...", inline=False)
+        await ctx.send(embed=embed)
 
 def setup(bot):
     bot.add_cog(Info(bot))

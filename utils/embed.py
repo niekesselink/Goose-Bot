@@ -1,13 +1,13 @@
 ﻿import discord
 
-def create(self, title, description, thumbnail=None, fields=None):
+def create(self, title=None, description=None, colour=None, thumbnail=None, fields=None, author=None):
     """Function to create a Discord embed the easy way."""
 
     # Create the base embed.
     embed = discord.Embed(
         title=title,
         description=description,
-        colour=discord.Color(value=int(self.bot.config.colour, 16)),
+        colour=discord.Color(value=int(self.bot.config.colour, 16)) if colour is None else colour,
     )
 
     # Add thumbnail if given.
@@ -18,6 +18,10 @@ def create(self, title, description, thumbnail=None, fields=None):
     if fields is not None:
         for field in fields:
             embed.add_field(name=field, value=fields[field], inline=False)
+
+    # Add author if that is also given, also check for url and add if present.
+    if author is not None:
+        embed.set_author(name=author['name'], icon_url=author['icon'])
 
     # Return the completed embed.
     return embed
