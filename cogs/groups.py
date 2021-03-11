@@ -152,7 +152,7 @@ class Groups(commands.Cog):
         # Get the correct data from the message.
         data = data.split(' ', 1)
         group_name = data[0]
-        group_description = data[1].replace("'", "''")
+        group_description = data[1]
 
         # Check if there's a group matching the name.
         result = await self.bot.db.fetch("SELECT id, name FROM groups WHERE guild_id = $1 AND LOWER(name) = LOWER($2)", ctx.guild.id, group_name)
