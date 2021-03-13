@@ -1,5 +1,4 @@
 import asyncio
-import discord
 import importlib
 import json
 import os
@@ -39,11 +38,25 @@ class Debug(commands.Cog):
         await ctx.send(f'{ramUsage:.2f} MB')
 
     @debug.command()
+    async def ping(self, ctx):
+        """Pong."""
+
+        # Send the first message.
+        msg = await ctx.send('...')
+
+        # Now let's get the difference from when we created the message and when it was created on server.
+        difference = msg.created_at - ctx.message.created_at
+        miliseconds = int(difference.total_seconds() * 1000)
+
+        # Update previous message 
+        await msg.edit(f'Pong! {miliseconds}')
+
+    @debug.command()
     async def load(self, ctx, name):
         """Load a cog."""
 
         self.bot.load_extension(f'cogs.{name}')
-        print(f'Cog {name} has been loaded!')
+        print(f'Cogs.{name} has been loaded!')
         message = await language.get(self, ctx, 'debug.cog_load')
         await ctx.send(content=message.format(name))
 
@@ -52,7 +65,7 @@ class Debug(commands.Cog):
         """Unload a specific cog."""
 
         self.bot.unload_extension(f'cogs.{name}')
-        print(f'Cog {name} has been unloaded!')
+        print(f'Cogs.{name} has been unloaded!')
         message = await language.get(self, ctx, 'debug.cog_unload')
         await ctx.send(content=message.format(name))
 
@@ -63,21 +76,17 @@ class Debug(commands.Cog):
         # Just reload one if not 'all'...
         if name != 'all':
             self.bot.reload_extension(f'cogs.{name}')
-            print(f'Cog {name} has been reloaded!')
+            print(f'Cogs.{name} has been reloaded!')
             message = await language.get(self, ctx, 'debug.cog_reload')
             return await ctx.send(content=message.format(name))
 
         # Reload all possible cogs which have been loaded...
         for file in os.listdir('cogs'):
             if file.endswith('.py'):
-                cog = file[:-3]
-                try:
-                    self.bot.reload_extension(f'cogs.{cog}')
-                    print(f'Cog {cog} has been reloaded!')
-                    message = await language.get(self, ctx, 'debug.cog_reload')
-                    await ctx.send(content=message.format(cog))
-                except:
-                    pass
+                self.bot.reload_extension(f'cogs.{file[:-3]}')
+                print(f'Cogs.{file[:-3]} has been reloaded!')
+                message = await language.get(self, ctx, 'debug.cog_reload')
+                await ctx.send(content=message.format(cog))
 
     @debug.command()
     async def reloadconfig(self, ctx):

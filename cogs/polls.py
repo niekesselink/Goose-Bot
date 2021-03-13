@@ -1,6 +1,4 @@
-﻿import discord
-
-from discord.ext import commands
+﻿from discord.ext import commands
 from utils import language
 
 class Polls(commands.Cog):

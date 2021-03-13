@@ -40,12 +40,9 @@ class Admin(commands.Cog):
             message = await language.get(self, ctx, 'admin.config_unknown')
             return await ctx.send(message.format(config_name))
 
-        # Check if the config is set in memory, if so, update that.
-        if ctx.guild.id in self.bot.memory and config_name in self.bot.memory[ctx.guild.id]:
-            self.bot.memory[ctx.guild.id][config_name] = config_value
-
-        # Now add it to the database.
-        await self.bot.db.execute("UPDATE guild_settings SET value = $1 WHERE 'key' = $2 and 'guild_id' = $3", config_value, config_name, guild_id)
+        # Now add it to the database and save in memory.
+        await self.bot.db.execute("UPDATE guild_settings SET value = $1 WHERE 'key' = $2 AND 'guild_id' = $3", config_value, config_name, guild_id)
+        self.bot.memory[ctx.guild.id][config_name] = config_value
 
         # Inform.
         message = await language.get(self, ctx, 'admin.config')

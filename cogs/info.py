@@ -14,29 +14,7 @@ class Info(commands.Cog):
         self.bot = bot
         self.bot.remove_command('help')
 
-    @commands.command()
-    async def honk(self, ctx):
-        """Honk honk."""
-
-        # Send the first message.
-        image1 = discord.Embed()
-        image1.set_image(url='https://i.imgur.com/Jj5Pg0i.jpg')
-        honk = await ctx.send(embed=image1)
-
-        # Now let's get the difference from when we created the message and when it was created on server.
-        difference = honk.created_at - ctx.message.created_at
-        miliseconds = int(difference.total_seconds() * 1000)
-
-        # Update previous message 
-        image2 = discord.Embed()
-        image2.set_image(url='https://i.imgur.com/OkcVNjy.jpeg')
-        await honk.edit(embed=image2)
-        
-        #Send a new one with how long that take.
-        message = await language.get(self, ctx, 'info.honk')
-        await ctx.send(message.format(miliseconds))
-
-    @commands.command()
+    @commands.command(alias=['profile'])
     @commands.guild_only()
     async def info(self, ctx, *, data: str=None):
         """Shows information about yours or someone elses their account."""
