@@ -448,14 +448,15 @@ class Music(commands.Cog):
 
         # Declare the options for youtube-dl.
         ydl_opts = {
-            'noplaylist': True,
             'format': 'bestaudio/best',
+            'noplaylist': True,
             'outtmpl': f'{ctx.guild.id}.mp3',
             'postprocessors': [{
                 'key': 'FFmpegExtractAudio',
                 'preferredcodec': 'mp3',
                 'preferredquality': '192',
-            }]
+            }],
+            'useragent': 'default'
         }
 
         # Declare the youtube-dl downloader and download the song.
@@ -473,8 +474,9 @@ class Music(commands.Cog):
         meta = None
         ydl_opts = {
             'noplaylist': True,
+            'quiet': True,
             'skip_download': True,
-            'quiet': True
+            'useragent': 'default'
         }
 
         # Download the metadata of the video.
