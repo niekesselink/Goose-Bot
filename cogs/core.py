@@ -59,14 +59,14 @@ class Core(commands.Cog):
 
         # If the argument is missing, then let's say that...
         if isinstance(error, commands.errors.MissingRequiredArgument):
-            return await ctx.send(await language.get(self, ctx, 'events.missing_argument'))
+            return await ctx.send(await language.get(self, ctx, 'core.incorrect_usage'))
 
         # Notice if private message is not allowed for the command.
         if isinstance(error, commands.NoPrivateMessage):
-            return await ctx.author.send(await language.get(self, ctx, 'events.no_private_message'))
+            return await ctx.author.send(await language.get(self, ctx, 'core.no_private_message'))
 
         # We've hit an error. Inform that the owner is on it...
-        await ctx.send(await language.get(self, ctx, 'events.error'))
+        await ctx.send(await language.get(self, ctx, 'core.error'))
 
         # Create a special error embed for this error and send it to the bot owner.
         owner = self.bot.get_user(462311999980961793)

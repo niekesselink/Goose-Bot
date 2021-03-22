@@ -79,21 +79,10 @@ class Music(commands.Cog):
         await ctx.message.add_reaction('👋')
 
         # Clean up since we're done...
-        del(self.bot.memory['music'][ctx.guild.id])
-
-    @commands.command(aliases=['playing', 'np'])
-    @commands.guild_only()
-    async def now(self, ctx):
-        """Shows the current playing song."""
-
-        # Do we have a queue or are we still in a channel? If not, no playlist.
-        if ctx.guild.id not in self.bot.memory['music'] or ctx.voice_client is None:
-            return await ctx.send(await language.get(self, ctx, 'music.not_playing'))
-        
-        # Send what we are playing now.
-        message = await language.get(self, ctx, 'music.now')
-        playing = self.bot.memory['music'][ctx.guild.id]['playingIndex']
-        await ctx.send(message.format(self.bot.memory['music'][ctx.guild.id]['playlist'][playing]['title']))
+        try:
+            del(self.bot.memory['music'][ctx.guild.id])
+        except: 
+            pass
 
     @commands.command(aliases=['queue', 'q'])
     @commands.guild_only()
@@ -128,8 +117,11 @@ class Music(commands.Cog):
             }
 
             # Add reactions..
+            await message.add_reaction('⏫')
             await message.add_reaction('⬆')
+            await message.add_reaction('▶️')
             await message.add_reaction('⬇')
+            await message.add_reaction('⏬')
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
@@ -140,17 +132,33 @@ class Music(commands.Cog):
             return
 
         # Check if the message is a queue message as well, and proper emoji are being used..
-        if reaction.message.id not in self.bot.memory['music'][reaction.message.guild.id]['playlistMessages'] and reaction.emoji != '⬆' and reaction.emoji != '⬇':
+        if reaction.message.id not in self.bot.memory['music'][reaction.message.guild.id]['playlistMessages'] and reaction.emoji not in ['⏫', '⬆', '▶️', '⬇', '⏬']:
             return
 
-        # Let's awesome it's going a page down for now...
-        lower = self.bot.memory['music'][reaction.message.guild.id]['playlistMessages'][reaction.message.id]['lower'] - 10
-        upper = self.bot.memory['music'][reaction.message.guild.id]['playlistMessages'][reaction.message.id]['upper'] - 10
+        # Let's asume it's going a page forward for now...
+        lower = self.bot.memory['music'][reaction.message.guild.id]['playlistMessages'][reaction.message.id]['lower'] + 10
+        upper = self.bot.memory['music'][reaction.message.guild.id]['playlistMessages'][reaction.message.id]['upper'] + 10
 
-        # Increase if not... but double due to assumption.
-        if reaction.emoji == '⬇':
-            lower = lower + 20
-            upper = upper + 20
+        # Are we going to top? Then do that.
+        if reaction.emoji == '⏫':
+            lower = 0
+            upper = 10
+
+        # Are we going back, then remove 20 since we assumed going forward first...
+        if reaction.emoji == '⬆':
+            lower = lower - 20
+            upper = upper - 20
+
+        # If going to now playing, then well, do that.
+        if reaction.emoji == '▶️':
+            lower = self.bot.memory['music'][reaction.message.guild.id]['playingIndex'] - 6
+            upper = self.bot.memory['music'][reaction.message.guild.id]['playingIndex'] + 4
+
+
+        # Or... are we going to bottom instead?
+        if reaction.emoji == '⏬':
+            lower = len(self.bot.memory['music'][reaction.message.guild.id]['playlist']) - 10
+            upper = len(self.bot.memory['music'][reaction.message.guild.id]['playlist'])
 
         # Validate and store the values...
         lower, upper = self.validate_paginging_numbers(reaction.message.guild.id, lower, upper)
@@ -231,6 +239,55 @@ class Music(commands.Cog):
         # Let's skip the song...
         ctx.voice_client.stop()
         await ctx.send(await language.get(self, ctx, 'music.skip'))
+
+    @commands.command(aliases=['remove'])
+    @commands.guild_only()
+    async def delete(self, ctx, index):
+        """Delete a song from the playlist at given index."""
+
+        # Can we run this command in the current context?
+        if not await self.allowed_to_run_command_check(ctx, True):
+            return
+
+        # Declare drop variable, for in case we need to adjust the current playing index.
+        indexPoints = index.split('-')
+        playingDrop = 0
+
+        # Validate input.
+        if not indexPoints[0].isdigit() or (len(indexPoints) > 1 and not indexPoints[1].isdigit()):
+            return await ctx.send(await language.get(self, ctx, 'core.incorrect_usage'))
+
+        # Can't remove current playing, use skip instead.
+        nowPlayingVisual = self.bot.memory['music'][ctx.guild.id]['playingIndex'] + 1
+        if int(indexPoints[0]) == nowPlayingVisual or (len(indexPoints) > 1 and int(indexPoints[0]) >= nowPlayingVisual and int(indexPoints[1]) <= nowPlayingVisual):
+            return await ctx.send(await language.get(self, ctx, 'music.removed_no_current'))
+
+        # Check if range is given, if so get a loop going corresponding to the range.
+        if '-' in index:
+            for i in list(range(int(indexPoints[0]) - 1, int(indexPoints[1]))):
+
+                # Let's remove the item, we keep removing the first index here as the playlist will automatically drop their items down...
+                # Afterwards, let's increase the drop rate what might be needed in case of 
+                del(self.bot.memory['music'][ctx.guild.id]['playlist'][int(indexPoints[0]) - 1])
+                playingDrop += 1
+
+            # Inform we removed the range...
+            message = await language.get(self, ctx, 'music.removed_range')
+            await ctx.send(message.format(index))
+
+        # Otherwise just remove one song, but get the name for the information beforehand...
+        else:
+            title = self.bot.memory['music'][ctx.guild.id]['playlist'][int(indexPoints[0]) - 1]['title']
+            del(self.bot.memory['music'][ctx.guild.id]['playlist'][int(indexPoints[0]) - 1])
+            playingDrop += 1
+
+            # Inform.
+            message = await language.get(self, ctx, 'music.removed')
+            await ctx.send(message.format(title))
+
+        # Adjust playing index accordingly.
+        if int(indexPoints[0]) < self.bot.memory['music'][ctx.guild.id]['playingIndex']:
+            self.bot.memory['music'][ctx.guild.id]['playingIndex'] = self.bot.memory['music'][ctx.guild.id]['playingIndex'] - playingDrop
 
     @commands.command()
     @commands.guild_only()
@@ -335,13 +392,23 @@ class Music(commands.Cog):
 
             # If it's a playlist, then use the Spotify API to get the playlist and queue it.
             if 'playlist' in query:
-                playlist = spotify.playlist(query)
-                for track in playlist['tracks']['items']:
-                    self.bot.memory['music'][ctx.guild.id]['playlist'].append(self.parse_spotify_track(track['track']))
 
+                # Get first part of playlist and define an array for complete result.
+                result = spotify.playlist_items(query)
+                playlist = []
+
+                # Now fill the array as long as we have results, this is due to Spotify returning only 100 items max.
+                while result:
+                    playlist.extend(result['items'])
+                    result = spotify.next(result)
+
+                # Now let's add them to the local playlist...
+                for track in playlist:
+                    self.bot.memory['music'][ctx.guild.id]['playlist'].append(self.parse_spotify_track(track['track']))
+                
                 # Inform we're done adding a playlist.
                 message = await language.get(self, ctx, 'music.queued_playlist')
-                await ctx.send(message.format(playlist['tracks']['total']))
+                await ctx.send(message.format(len(playlist)))
                 added_playlist = True
 
             # Get the track if it's a track and queue it.
