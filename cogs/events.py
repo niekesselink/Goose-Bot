@@ -35,7 +35,7 @@ class Events(commands.Cog):
             channel = member.guild.get_channel(int(channel_id[0]['value']))
 
             # Getting a random message, again, only continue and send it if it is set.
-            query = f"SELECT text FROM 'event_{event}s' WHERE guild_id = $1 ORDER BY RANDOM() LIMIT 1"
+            query = f"SELECT text FROM event_{event}s WHERE guild_id = $1 ORDER BY RANDOM() LIMIT 1"
             message = await self.bot.db.fetch(query, member.guild.id)
             if message:
                 await channel.send(language.fill(message[0]['text'], member=member))

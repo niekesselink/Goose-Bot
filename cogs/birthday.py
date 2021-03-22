@@ -137,7 +137,7 @@ class Birthday(commands.Cog):
                 role_id = ''
             
             # We have triggered this person's birthday...
-            await self.bot.db.execute("UPDATE birthdays SET triggered = TRUE, given_role = $1 WHERE guild_id = $2 AND member_id = $3", role_id, guild.id, member.id)
+            await self.bot.db.execute("UPDATE birthdays SET triggered = TRUE, given_role = $1 WHERE guild_id = $2 AND member_id = $3", str(role_id), guild.id, member.id)
 
         # Now also look for people who had their birthday yesterday.
         old_birthdays = await self.bot.db.fetch("SELECT guild_id, member_id, given_role FROM birthdays "
