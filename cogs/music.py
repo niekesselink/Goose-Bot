@@ -495,8 +495,8 @@ class Music(commands.Cog):
                 # Probably blocked or something, let's get the song title and do a search instead with lyrics on the end.
                 elif 'youtube.com' in query or 'youtu.be' in query:
                     result = requests.get(query)
-                    title = re.search('<\W*title\W*(.*)</title', result.text, re.IGNORECASE)
-                    meta = ydl.extract_info(f'{title.group(1)[:-10]} lyrics', download=False)
+                    query = re.search('<\W*title\W*(.*)</title', result.text, re.IGNORECASE).group(1)[:-10]
+                    meta = ydl.extract_info(f'ytsearch:{query} lyrics', download=False)
 
                 # Now we really don't know...
                 else:
