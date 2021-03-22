@@ -4,5 +4,6 @@ discord.py
 psutil
 PyNaCl
 python-dateutil
+requests
 spotipy
 youtube-dl

@@ -2,6 +2,8 @@ import asyncio
 import discord
 import os
 import random
+import re
+import requests
 import spotipy
 import youtube_dl
 
@@ -455,8 +457,7 @@ class Music(commands.Cog):
                 'key': 'FFmpegExtractAudio',
                 'preferredcodec': 'mp3',
                 'preferredquality': '192',
-            }],
-            'useragent': 'default'
+            }]
         }
 
         # Declare the youtube-dl downloader and download the song.
@@ -475,19 +476,29 @@ class Music(commands.Cog):
         ydl_opts = {
             'noplaylist': True,
             'quiet': True,
-            'skip_download': True,
-            'useragent': 'default'
+            'skip_download': True
         }
 
         # Download the metadata of the video.
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-
-            # Sometimes an error occurs here for unknown reasons due to youtube-dl. If it occurs, we will try again by appending lyrics as we would do further in the code.
             try:
                 meta = ydl.extract_info(query, download=False)
+
+            # Sometimes an error occurs here for unknown reasons due to youtube-dl.
+            # If it occurs, we will try to do the fixes below...
             except:
+
+                # Append lyrics as first resort in case it's not done.
                 if query.startswith('ytsearch:') and not query.endswith(' lyrics'):
                     meta = ydl.extract_info(f'{query} lyrics', download=False)
+
+                # Probably blocked or something, let's get the song title and do a search instead with lyrics on the end.
+                elif 'youtube.com' in query or 'youtu.be' in query:
+                    result = requests.get(query)
+                    title = re.search('<\W*title\W*(.*)</title', result.text, re.IGNORECASE)
+                    meta = ydl.extract_info(f'{title.group(1)[:-10]} lyrics', download=False)
+
+                # Now we really don't know...
                 else:
                     raise
 
