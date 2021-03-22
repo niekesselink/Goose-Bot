@@ -86,7 +86,7 @@ class Debug(commands.Cog):
                 self.bot.reload_extension(f'cogs.{file[:-3]}')
                 print(f'Cogs.{file[:-3]} has been reloaded!')
                 message = await language.get(self, ctx, 'debug.cog_reload')
-                await ctx.send(content=message.format(cog))
+                await ctx.send(content=message.format(file[:-3]))
 
     @debug.command()
     async def reloadconfig(self, ctx):
