@@ -1,6 +1,7 @@
 asyncio
 asyncpg
 discord.py
+pillow
 psutil
 PyNaCl
 python-dateutil
