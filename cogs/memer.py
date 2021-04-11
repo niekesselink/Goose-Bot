@@ -53,8 +53,8 @@ class Memer(commands.Cog):
         avatar1 = self.get_image(ctx.author.avatar_url).resize((220, 220)).convert('RGBA')
         avatar2 = self.get_avatar(ctx, mention).resize((200, 200)).convert('RGBA')
 
-        base.paste(avatar1, (580, 260), avatar1)
-        base.paste(avatar2, (350, 70), avatar2)
+        base.paste(avatar1, (350, 70), avatar1)
+        base.paste(avatar2, (580, 260), avatar2)
         base = base.convert('RGB')
         bytes = BytesIO()
         base.save(bytes, format='png')
