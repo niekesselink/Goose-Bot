@@ -58,21 +58,24 @@ def fill(string, ctx=None, member=None, message=None):
     if ctx:
         replace = {
             '{guild_name}': ctx.guild.name,
-            '{user_mention}': ctx.message.author.mention
+            '{user_mention}': ctx.message.author.mention,
+            '{user_id}': f'{ctx.message.author.name}#{ctx.message.author.discriminator}}'
         }
 
     # For member.
     if member:
         replace = {
             '{guild_name}': member.guild.name,
-            '{user_mention}': member.mention
+            '{user_mention}': member.mention,
+            '{user_id}': f'{member.name}#{member.discriminator}}'
         }
 
     # For message.
     if message:
         replace = {
             '{guild_name}': message.guild.name,
-            '{user_mention}': message.author.mention
+            '{user_mention}': message.author.mention,
+            '{user_id}': f'{message.author.name}#{message.author.discriminator}}'
         }
 
     # Now make it happen.
