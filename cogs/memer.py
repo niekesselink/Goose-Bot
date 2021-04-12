@@ -33,13 +33,14 @@ class Memer(commands.Cog):
         # Prepare image and get user avatar
         base = Image.open('assets/memer/fakenews.bmp').convert('RGBA')
         avatar = self.get_avatar(ctx, mention).resize((400, 400)).convert('RGBA')
+        final_image = Image.new('RGBA', base.size)
 
         # Put the base over the avatar, and save the image.
         final_image.paste(avatar, (390, 0), avatar)
         final_image.paste(base, (0, 0), base)
         final_image = final_image.convert('RGBA')
         bytes = BytesIO()
-        base.save(bytes, format='png')
+        final_image.save(bytes, format='png')
         bytes.seek(0)
 
         # Now, let's send it.
