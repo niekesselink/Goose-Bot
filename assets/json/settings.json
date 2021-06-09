@@ -5,6 +5,9 @@
   "events.bye_channel": "",
   "events.welcome_channel": "",
   "language": "english",
+  "levels.enabled": "False",
+  "levels.xp-rate": "1",
+  "levels.xp-range": "10-25",
   "polls.channel": "",
   "timezone": "CET"
 }

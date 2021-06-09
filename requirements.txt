@@ -1,5 +1,6 @@
 asyncio
 asyncpg
+cachetools
 discord.py
 pillow
 psutil
