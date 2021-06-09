@@ -27,7 +27,7 @@ class Admin(commands.Cog):
         # Get the correct data from the message.
         data = data.split(' ', 1)
         config_name = data[0].lower()
-        config_value = data[1].lower()
+        config_value = data[1]
 
         # Get the Json array of possible settings.
         settings = {}
@@ -41,7 +41,7 @@ class Admin(commands.Cog):
             return await ctx.send(message.format(config_name))
 
         # Now add it to the database and save in memory.
-        await self.bot.db.execute("UPDATE guild_settings SET value = $1 WHERE 'key' = $2 AND 'guild_id' = $3", config_value, config_name, str(ctx.guild.id))
+        await self.bot.db.execute("UPDATE guild_settings SET value = $1 WHERE key = $2 AND guild_id = $3", config_value, config_name, str(ctx.guild.id))
         self.bot.memory[ctx.guild.id][config_name] = config_value
 
         # Inform.
