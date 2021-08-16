@@ -13,14 +13,16 @@ class Levels(commands.Cog):
         """Initial function that runs when the class has been created."""
         self.bot = bot
 
-        # Create memory and run a task to fill it...
-        if 'levels' not in self.bot.memory:
-            self.bot.memory['levels'] = {}
-            self.bot.memory['levels.lock'] = TTLCache(maxsize=math.inf, ttl=60)
-            self.bot.loop.create_task(self.populate_memory())
+        # Run a task to create and fill memory...
+        self.bot.loop.create_task(self.populate_memory())
 
     async def populate_memory(self):
         """Task to populate the memory for the trigger reactions to get roles."""
+
+        # Create memory.
+        if 'levels' not in self.bot.memory:
+            self.bot.memory['levels'] = {}
+            self.bot.memory['levels.lock'] = TTLCache(maxsize=math.inf, ttl=60)
 
         # Get all the guild ID's where levels are enabled and add them to memory...
         guilds = await self.bot.db.fetch("SELECT guild_id FROM guild_settings WHERE key = 'levels.enabled' AND value = 'True'")
@@ -117,7 +119,8 @@ class Levels(commands.Cog):
         # Get the user if given, else resort to self.
         user = ctx.author
         if username is not None:
-            user = ctx.guild.get_member(int(re.findall("\d+", username)[0]))
+            user_id = re.findall("\d+", username)
+            user = ctx.guild.get_member(int(user_id[0]) if len(user_id) > 0 else username)
             user = user if user is not None else ctx.author
 
         # Get user info from the database.
@@ -208,6 +211,41 @@ class Levels(commands.Cog):
 
         # Now let's re-level and inform we're done!
         await self.re_level(ctx.guild, user, result[0]['xp'])
+        await ctx.message.add_reaction('👌')
+
+    @commands.group()
+    @commands.guild_only()
+    @commands.has_permissions(administrator=True)
+    async def levels(self, ctx):
+        """Admin commands for levels."""
+        return
+
+    @levels.command()
+    @commands.guild_only()
+    @commands.has_permissions(administrator=True)
+    async def enable(self, ctx):
+        """Enables the leveling system."""
+
+        # Enable it...
+        await self.bot.db.execute("UPDATE guild_settings SET value = 'True' WHERE key = 'levels.enabled' AND guild_id = $1", ctx.guild.id)
+        self.bot.memory[ctx.guild.id][config_name] = 'True'
+        await self.add_guild(ctx.guild.id)
+
+        # Inform...
+        await ctx.message.add_reaction('👌')
+
+    @levels.command()
+    @commands.guild_only()
+    @commands.has_permissions(administrator=True)
+    async def disable(self, ctx):
+        """Disables the leveling system."""
+
+        # Disable it...
+        await self.bot.db.execute("UPDATE guild_settings SET value = 'False' WHERE key = 'levels.enabled' AND guild_id = $1", ctx.guild.id)
+        self.bot.memory[ctx.guild.id][config_name] = 'False'
+        del(self.bot.memory['levels'][guild_id])
+
+        # Inform...
         await ctx.message.add_reaction('👌')
 
     async def re_level(self, guild, member, xp):

@@ -35,7 +35,8 @@ class Info(commands.Cog):
                 return await ctx.message.add_reaction('👌')
 
             # We're not setting, now check if user is getable, other just refer to yourself.
-            user = ctx.guild.get_member(int(re.findall("\d+", username)[0]))
+            user_id = re.findall("\d+", username)
+            user = ctx.guild.get_member(int(user_id[0]) if len(user_id) > 0 else username)
             user = user if user is not None else ctx.author
 
         # Author field.
