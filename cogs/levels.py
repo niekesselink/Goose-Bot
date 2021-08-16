@@ -137,6 +137,26 @@ class Levels(commands.Cog):
 
     @commands.command()
     @commands.guild_only()
+    async def leaderboard(self, ctx):
+        """Get's the top 10 people of the server."""
+        
+        # Get the top ten members.
+        result = await self.bot.db.fetch("SELECT member_id, xp, level FROM levels WHERE guild_id = $1 "
+                                         "ORDER BY xp DESC LIMIT 10", ctx.guild.id)
+
+        # Generate a proper list now...
+        count = 1
+        message = ''
+        for member in result:
+            user = ctx.guild.get_member(member['member_id'])
+            message += f"{count}) {user.name} (Level {member['level']}, {member['xp']} XP)\n"
+            count = count + 1
+
+        # Send the message..
+        await ctx.send(message)
+
+    @commands.command()
+    @commands.guild_only()
     @commands.has_permissions(manage_roles=True)
     async def setxp(self, ctx, *, data: str):
         """Give an user a specific amount of XP."""
