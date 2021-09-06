@@ -1,7 +1,5 @@
 ﻿import asyncio
-import asyncpg
 import datetime
-import discord
 import json
 
 from dateutil import parser
@@ -28,16 +26,12 @@ class Birthday(commands.Cog):
 
     @birthday.command()
     @commands.guild_only()
-    async def set(self, ctx, *, birthday: str=None):
+    async def set(self, ctx, *, date: str):
         """Set your birthday date, the format day/month is used."""
-
-        # Check for value, if none then tell how to use this command.
-        if birthday is None:
-            return await ctx.send(await language.get(self, ctx, 'birthday.how_to'))
 
         # Parse the given date and get guild timezone, return error if something is not working.
         try:
-            date = parser.parse(birthday)
+            date = parser.parse(date)
         except:
             return await ctx.send(await language.get(self, ctx, 'birthday.incorrect'))
 
@@ -53,18 +47,14 @@ class Birthday(commands.Cog):
                                   "ON CONFLICT (guild_id, member_id) DO UPDATE SET birthday = $3", ctx.guild.id, ctx.author.id, date, timezone)
 
         # Inform the user we've set the birthday.
-        message = await language.get(self, ctx, 'birthday.succes')
+        message = await language.get(self, ctx, 'birthday.success')
         date_formatted = date.strftime(await language.get(self, ctx, 'birthday.format')).lower()
         await ctx.send(message.format(date_formatted, timezone))
 
     @birthday.command()
     @commands.guild_only()
-    async def timezone(self, ctx, *, timezone: str=None):
+    async def timezone(self, ctx, *, timezone: str):
         """Change the timezone of your current location."""
-
-        # Check for input, if none explain the possible timezones.
-        if timezone is None:
-            return await ctx.send(await language.get(self, ctx, 'birthday.timezone'))
 
         # Check if user has set a birthday.
         birthday = await self.bot.db.fetch("SELECT birthday FROM birthdays WHERE guild_id = $1 AND member_id = $2", ctx.guild.id, ctx.author.id)
@@ -173,8 +163,6 @@ class Birthday(commands.Cog):
 
         # Get the current time.
         now = datetime.datetime.now()
-
-        # Get the nearest upcoming hourly 15 minute timemark.
         target = (now.minute // 15 + 1) * 15
         target = now + datetime.timedelta(minutes=target - now.minute)
         target = target.replace(second=0, microsecond=0)

@@ -1,7 +1,7 @@
 asyncio
 asyncpg
 cachetools
-discord.py
+novus
 pillow
 psutil
 PyNaCl

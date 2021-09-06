@@ -53,7 +53,6 @@ class Groups(commands.Cog):
         await self.bot.db.execute("DELETE FROM group_members AS gm USING groups AS g "
                                   "WHERE g.id = gm.group_id AND gm.member_id = $1 AND g.guild_id = $2", member.id, member.guild.id)
 
-
     @commands.group()
     @commands.guild_only()
     async def groups(self, ctx):

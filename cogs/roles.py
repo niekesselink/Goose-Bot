@@ -43,14 +43,18 @@ class Roles(commands.Cog):
         message_id = int(data[1])
 
         # Now let's remove the message that initiated the command...
-        await ctx.message.delete(delay=10)
+        if ctx.prefix is self.bot.config.prefix:
+            await ctx.message.delete(delay=10)
 
         # Get the message we need to add the reaction to, inform when not found.
         # We will throw the normal error in case of another error... makes sense?
         try:
             message = await ctx.fetch_message(message_id)
         except discord.NotFound:
-            return await ctx.send(await language.get(self, ctx, 'roles.message_not_found'), delete_after=10)
+            if ctx.prefix is self.bot.config.prefix:
+                return await ctx.send(await language.get(self, ctx, 'roles.message_not_found'), delete_after=10)
+            else:
+                return await ctx.send(await language.get(self, ctx, 'roles.message_not_found'))
         except:
             throw
 
@@ -77,7 +81,10 @@ class Roles(commands.Cog):
                 await self.bot.db.execute("INSERT INTO roles_reaction (guild_id, channel_id, message_id, role_id, reaction) VALUES ($1, $2, $3, $4, $5)",
                                           ctx.guild.id, message.channel.id, message_id, role.id, reaction)
             except asyncpg.exceptions.UniqueViolationError:
-                return await ctx.send(await language.get(self, ctx, 'roles.already_exist'), delete_after=10)
+                if ctx.prefix is self.bot.config.prefix:
+                    return await ctx.send(await language.get(self, ctx, 'roles.already_exist'), delete_after=10)
+                else:
+                    return await ctx.send(await language.get(self, ctx, 'roles.already_exist'))
             except:
                 throw
 
@@ -88,7 +95,10 @@ class Roles(commands.Cog):
 
             # Now let's add the reaction to the post and inform the success.
             await message.add_reaction(reaction)
-            await ctx.send(await language.get(self, ctx, 'roles.added'), delete_after=10)
+            if ctx.prefix is self.bot.config.prefix:
+                await ctx.send(await language.get(self, ctx, 'roles.added'), delete_after=10)
+            else:
+                await ctx.send(await language.get(self, ctx, 'roles.added'))
 
         # If the action is remove, then do the following...
         if action == 'remove':
@@ -104,7 +114,10 @@ class Roles(commands.Cog):
             await message.clear_reaction(reaction)
 
             # Inform success..
-            await ctx.send(await language.get(self, ctx, 'roles.deleted'), delete_after=10)
+            if ctx.prefix is self.bot.config.prefix:
+                await ctx.send(await language.get(self, ctx, 'roles.deleted'), delete_after=10)
+            else:
+                await ctx.send(await language.get(self, ctx, 'roles.deleted'))
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):

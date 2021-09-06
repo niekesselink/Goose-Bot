@@ -22,17 +22,17 @@ class Memer(commands.Cog):
             user = user if user is not None else ctx.author
 
         # Now, let's return the avatar...
-        return self.get_image(user.avatar_url)
+        return self.get_image(user.avatar.url)
 
     def get_image(self, url):
         return Image.open(BytesIO(requests.get(url, stream=True).content))
 
     @commands.command()
-    async def fakenews(self, ctx, mention=None):
+    async def fakenews(self, ctx, user=None):
 
         # Prepare image and get user avatar
         base = Image.open('assets/memer/fakenews.bmp').convert('RGBA')
-        avatar = self.get_avatar(ctx, mention).resize((400, 400)).convert('RGBA')
+        avatar = self.get_avatar(ctx, user).resize((400, 400)).convert('RGBA')
         final_image = Image.new('RGBA', base.size)
 
         # Put the base over the avatar, and save the image.
@@ -47,12 +47,12 @@ class Memer(commands.Cog):
         await ctx.send(file=discord.File(fp=bytes, filename='image.png'))
 
     @commands.command()
-    async def slap(self, ctx, mention):
+    async def slap(self, ctx, user):
 
         # Prepare image.
         base = Image.open('assets/memer/slap.bmp').resize((1000, 500)).convert('RGBA')
-        avatar1 = self.get_image(ctx.author.avatar_url).resize((220, 220)).convert('RGBA')
-        avatar2 = self.get_avatar(ctx, mention).resize((200, 200)).convert('RGBA')
+        avatar1 = self.get_image(ctx.author.avatar.url).resize((220, 220)).convert('RGBA')
+        avatar2 = self.get_avatar(ctx, user).resize((200, 200)).convert('RGBA')
 
         base.paste(avatar1, (350, 70), avatar1)
         base.paste(avatar2, (580, 260), avatar2)
@@ -65,12 +65,12 @@ class Memer(commands.Cog):
         await ctx.send(file=discord.File(fp=bytes, filename='image.png'))
 
     @commands.command()
-    async def spank(self, ctx, mention):
+    async def spank(self, ctx, user):
 
         # Prepare image and get avatars.
         base = Image.open('assets/memer/spank.bmp').resize((500, 500))
-        avatar1 = self.get_image(ctx.author.avatar_url).resize((140, 140)).convert('RGBA')
-        avatar2 = self.get_avatar(ctx, mention).resize((120, 120)).convert('RGBA')
+        avatar1 = self.get_image(ctx.author.avatar.url).resize((140, 140)).convert('RGBA')
+        avatar2 = self.get_avatar(ctx, user).resize((120, 120)).convert('RGBA')
 
         # Create image now.
         base.paste(avatar1, (225, 5), avatar1)

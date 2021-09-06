@@ -155,7 +155,14 @@ class Levels(commands.Cog):
         # Send the message..
         await ctx.send(message)
 
-    @commands.command()
+    @commands.group()
+    @commands.guild_only()
+    @commands.has_permissions(administrator=True)
+    async def levels(self, ctx):
+        """Admin commands for levels."""
+        return
+
+    @levels.command()
     @commands.guild_only()
     @commands.has_permissions(manage_roles=True)
     async def setxp(self, ctx, *, data: str):
@@ -179,9 +186,9 @@ class Levels(commands.Cog):
 
         # Now let's re-level and inform we're done!
         await self.re_level(ctx.guild, user, int(data[1]))
-        await ctx.message.add_reaction('👌')
+        await ctx.send('👌')
 
-    @commands.command()
+    @levels.command()
     @commands.guild_only()
     @commands.has_permissions(manage_roles=True)
     async def addxp(self, ctx, *, data: str):
@@ -205,9 +212,9 @@ class Levels(commands.Cog):
 
         # Now let's re-level and inform we're done!
         await self.re_level(ctx.guild, user, result[0]['xp'])
-        await ctx.message.add_reaction('👌')
+        await ctx.send('👌')
 
-    @commands.command()
+    @levels.command()
     @commands.guild_only()
     @commands.has_permissions(manage_roles=True)
     async def removexp(self, ctx, *, data: str):
@@ -231,14 +238,7 @@ class Levels(commands.Cog):
 
         # Now let's re-level and inform we're done!
         await self.re_level(ctx.guild, user, result[0]['xp'])
-        await ctx.message.add_reaction('👌')
-
-    @commands.group()
-    @commands.guild_only()
-    @commands.has_permissions(administrator=True)
-    async def levels(self, ctx):
-        """Admin commands for levels."""
-        return
+        await ctx.send('👌')
 
     @levels.command()
     @commands.guild_only()
@@ -252,7 +252,7 @@ class Levels(commands.Cog):
         await self.add_guild(ctx.guild.id)
 
         # Inform...
-        await ctx.message.add_reaction('👌')
+        await ctx.send('👌')
 
     @levels.command()
     @commands.guild_only()
@@ -266,7 +266,7 @@ class Levels(commands.Cog):
         del(self.bot.memory['levels'][guild_id])
 
         # Inform...
-        await ctx.message.add_reaction('👌')
+        await ctx.send('👌')
 
     async def re_level(self, guild, member, xp):
         """Function that re-levels a member to the correct level according to the XP, as well as giving the ranks."""

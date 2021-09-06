@@ -89,6 +89,13 @@ class Debug(commands.Cog):
                 await ctx.send(content=message.format(file[:-3]))
 
     @debug.command()
+    async def reloadslash(self, ctx):
+        """Reloads the slash commands."""
+        await ctx.channel.trigger_typing()
+        await self.bot.register_application_commands()
+        await ctx.send(await language.get(self, ctx, 'debug.reload_slash'))
+
+    @debug.command()
     async def reloadconfig(self, ctx):
         """Reloads the config.json file."""
 

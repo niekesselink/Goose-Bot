@@ -1,5 +1,3 @@
-import discord
-import os
 import re
 import subprocess
 
@@ -12,7 +10,6 @@ class Info(commands.Cog):
     def __init__(self, bot):
         """Initial function that runs when the class has been created."""
         self.bot = bot
-        self.bot.remove_command('help')
 
     @commands.command(alias=['profile'])
     @commands.guild_only()
@@ -42,7 +39,7 @@ class Info(commands.Cog):
         # Author field.
         author = {
             'name': f'{user.name}#{user.discriminator}',
-            'icon': user.avatar_url
+            'icon': user.avatar.url
         }
 
         # Get about field.
@@ -89,17 +86,9 @@ class Info(commands.Cog):
             title=await language.get(self, ctx, 'info.title'),
             description=await language.get(self, ctx, 'info.description'),
             colour=0x303136,
-            thumbnail=ctx.bot.user.avatar_url,
+            thumbnail=ctx.bot.user.avatar.url,
             fields=fields
         ))
-
-    @commands.command()
-    async def help(self, ctx, *cog):
-        """Gets all cogs and commands of mine."""
-
-        embed=discord.Embed(colour=0x303136)
-        embed.add_field(name="Help?", value="This command is under construction...", inline=False)
-        await ctx.send(embed=embed)
 
 def setup(bot):
     bot.add_cog(Info(bot))

@@ -7,8 +7,6 @@ import requests
 import spotipy
 import youtube_dl
 
-from datetime import datetime
-from discord import FFmpegPCMAudio
 from discord.ext import commands
 from spotipy.oauth2 import SpotifyClientCredentials
 from utils import language
@@ -27,28 +25,22 @@ class Music(commands.Cog):
     @commands.command()
     @commands.guild_only()
     async def join(self, ctx):
-        """Brings the bot to to the music channel."""
+        """Brings the bot to to the channel."""
 
         # Make sure the person using the command is in a voice channel.
         if ctx.author.voice is None:
             return await ctx.send(await language.get(self, ctx, 'music.user_not_in_channel'))
 
-        # Are we in a voice client?
+        # Are we in a voice client? If so, inform properly; we're somewhere else or already in your channel...
         if ctx.voice_client is not None:
-
-            # Just a message in case it's the same channel...
             if ctx.author.voice.channel is ctx.voice_client.channel:
                 return await ctx.send(await language.get(self, ctx, 'music.already_there'))
-
-            # Inform that we are already in a channel.
             return await ctx.send(await language.get(self, ctx, 'music.already_in_channel'))
 
-        # We're not in a channel but are going to now...
-        else:
-            await ctx.author.voice.channel.connect()
-
-        # Let's deafen ourselves...
+        # We're not in a channel but are going to now, also we do it deafened...
+        await ctx.author.voice.channel.connect()
         await ctx.guild.change_voice_state(channel=ctx.author.voice.channel, self_deaf=True)
+        await ctx.send(await language.get(self, ctx, 'music.join'))
 
         # Create a memory object.
         if ctx.guild.id not in self.bot.memory['music']:
@@ -68,26 +60,21 @@ class Music(commands.Cog):
     @commands.command()
     @commands.guild_only()
     async def leave(self, ctx):
-        """Makes the bot leave the music channel."""
+        """Makes the bot leave the channel."""
 
-        # This command only works when the bot is in a voice channel...
-        if ctx.voice_client is None:
-            return await ctx.send(await language.get(self, ctx, 'music.not_in_channel'))
+        # Can we run this command in the current context?
+        if not await self.allowed_to_run_command_check(ctx, False):
+            return
 
-        # Now leave and react.
+        # We're leaving...
         await ctx.voice_client.disconnect()
-        await ctx.message.add_reaction('👋')
-
-        # Clean up since we're done...
-        try:
-            del(self.bot.memory['music'][ctx.guild.id])
-        except: 
-            pass
+        await ctx.send(await language.get(self, ctx, 'music.leave'))
+        del(self.bot.memory['music'][ctx.guild.id])
 
     @commands.command(aliases=['queue', 'q'])
     @commands.guild_only()
     async def playlist(self, ctx):
-        """Shows the playlist of the bot if present."""
+        """Shows the current playlist of the bot."""
 
         # Are we in a channel?
         if ctx.voice_client is None:
@@ -212,20 +199,17 @@ class Music(commands.Cog):
 
     @commands.command()
     @commands.guild_only()
-    async def volume(self, ctx, volume: int):
-        """Changes the volume."""
+    async def volume(self, ctx, level: int):
+        """Changes the volume of the music."""
 
         # Can we run this command in the current context?
         if not await self.allowed_to_run_command_check(ctx, True):
             return
 
-        # Now let's change the volume...
-        ctx.voice_client.source.volume = volume / 100
-        self.bot.memory['music'][ctx.guild.id]['volume'] = volume / 100
-
-        # Inform as well.
-        message = await language.get(self, ctx, 'music.volume')
-        await ctx.send(message.format(volume))
+        # Now let's change the volume and inform...
+        ctx.voice_client.source.volume = level / 100
+        self.bot.memory['music'][ctx.guild.id]['volume'] = level / 100
+        await ctx.send((await language.get(self, ctx, 'music.volume')).format(level))
 
     @commands.command()
     @commands.guild_only()
@@ -242,15 +226,15 @@ class Music(commands.Cog):
 
     @commands.command(aliases=['remove'])
     @commands.guild_only()
-    async def delete(self, ctx, index):
-        """Delete a song from the playlist at given index."""
+    async def delete(self, ctx, position):
+        """Removes a song from the playlist at the given position."""
 
         # Can we run this command in the current context?
         if not await self.allowed_to_run_command_check(ctx, True):
             return
 
         # Declare drop variable, for in case we need to adjust the current playing index.
-        indexPoints = index.split('-')
+        indexPoints = position.split('-')
         playingDrop = 0
 
         # Validate input.
@@ -263,7 +247,7 @@ class Music(commands.Cog):
             return await ctx.send(await language.get(self, ctx, 'music.removed_no_current'))
 
         # Check if range is given, if so get a loop going corresponding to the range.
-        if '-' in index:
+        if '-' in position:
             for i in list(range(int(indexPoints[0]) - 1, int(indexPoints[1]))):
 
                 # Let's remove the item, we keep removing the first index here as the playlist will automatically drop their items down...
@@ -273,7 +257,7 @@ class Music(commands.Cog):
 
             # Inform we removed the range...
             message = await language.get(self, ctx, 'music.removed_range')
-            await ctx.send(message.format(index))
+            await ctx.send(message.format(position))
 
         # Otherwise just remove one song, but get the name for the information beforehand...
         else:
@@ -292,7 +276,7 @@ class Music(commands.Cog):
     @commands.command()
     @commands.guild_only()
     async def clear(self, ctx):
-        """Clears the playlist."""
+        """Clears the current playlist."""
 
         # Can we run this command in the current context?
         if not await self.allowed_to_run_command_check(ctx, False):
@@ -310,7 +294,7 @@ class Music(commands.Cog):
     @commands.command()
     @commands.guild_only()
     async def loop(self, ctx, trigger):
-        """Loop the playlist or the track."""
+        """Loop the song, playlist or turn it off again."""
 
         # Can we run this command in the current context?
         if not await self.allowed_to_run_command_check(ctx, False):
@@ -349,7 +333,7 @@ class Music(commands.Cog):
     @commands.command()
     @commands.guild_only()
     async def shuffle(self, ctx):
-        """Enables or disable shuffeling mode."""
+        """Shuffles the playlist."""
 
         # Can we run this command in the current context?
         if not await self.allowed_to_run_command_check(ctx, False):
@@ -372,7 +356,7 @@ class Music(commands.Cog):
     @commands.command(aliases=['p'])
     @commands.guild_only()
     async def play(self, ctx, *, query: str):
-        """Plays or queues a song from YouTube, pass video id or url."""
+        """Play a song or playlist by providing the name/artist or through an URL."""
 
         # Can we run this command in the current context?
         if not await self.allowed_to_run_command_check(ctx, False):
@@ -393,11 +377,9 @@ class Music(commands.Cog):
             # If it's a playlist, then use the Spotify API to get the playlist and queue it.
             if 'playlist' in query:
 
-                # Get first part of playlist and define an array for complete result.
-                result = spotify.playlist_items(query)
+                # Now, let's get all the results from Spotify properly into an array...
                 playlist = []
-
-                # Now fill the array as long as we have results, this is due to Spotify returning only 100 items max.
+                result = spotify.playlist_items(query)
                 while result:
                     playlist.extend(result['items'])
                     result = spotify.next(result)
@@ -419,16 +401,9 @@ class Music(commands.Cog):
         # Check for a YouTube link, if so, handle that...
         elif 'youtube.com' in query or 'youtu.be' in query:
 
-            # Check for a playlist first, it shouldn't contain a song...
+            # Check for a playlist first, if so, cancel, not supported (yet)...
             if 'playlist?list=' in query:
-
-                # TODO, for now inform not supported...
                 return await ctx.send(await language.get(self, ctx, 'music.not_supported'))
-
-                # Inform we're done adding a playlist.
-                #message = await language.get(self, ctx, 'music.queued_playlist')
-                #await ctx.send(message.format('0'))
-                #added_playlist = True
 
             # Else it's just a song from YouTube, let's add that to the queue.
             else:
@@ -439,35 +414,22 @@ class Music(commands.Cog):
         elif query.startswith('http://') or query.startswith('https://'):
             return await ctx.send(await language.get(self, ctx, 'music.not_supported'))
 
-        # Else it's just a name of a song, so let's handle that.
+        # Else it's just a name of a song, let's search for it on YouTube and add it..
         else:
-
-            # We'll do a YouTube search for this, preparing...
-            query = f'ytsearch:{query}'
-            entry = self.get_from_youtube(query)
-
-            # Now add the song the queue.
+            entry = self.get_from_youtube(f'ytsearch:{query}')
             self.bot.memory['music'][ctx.guild.id]['playlist'].append(entry)
-
-        # Now let's see if we need to start playing directly, as in, nothing is playing...
-        if not self.bot.memory['music'][ctx.guild.id]['playing']:
-
-            # Start playing...
-            self.bot.memory['music'][ctx.guild.id]['playing'] = True
-            playingIndex = self.bot.memory['music'][ctx.guild.id]['playingIndex']
-            self.play_song(ctx, playingIndex)
-
-            # Inform we're starting to play
-            message = await language.get(self, ctx, 'music.start')
-            return await ctx.send(message.format(self.bot.memory['music'][ctx.guild.id]['playlist'][playingIndex]['title']))
              
-        # Inform we've queued the song instead, ignore if playlist.
+        # Inform we've queued the song instead, ignore if it's a playlist.
         if not added_playlist:
             message = await language.get(self, ctx, 'music.queued')
             await ctx.send(message.format(
-                entry['title'],
-                len(self.bot.memory['music'][ctx.guild.id]['playlist'])
+                entry['title']
             ))
+
+        # Now let's see if we need to start playing directly, as in, nothing is playing...
+        if not self.bot.memory['music'][ctx.guild.id]['playing']:
+            self.bot.memory['music'][ctx.guild.id]['playing'] = True
+            self.play_song(ctx, self.bot.memory['music'][ctx.guild.id]['playingIndex'])
 
     def play_song(self, ctx, index=None):
         """Function to actually play a song."""
@@ -487,26 +449,26 @@ class Music(commands.Cog):
         # We need to fill the index if none is given, or maybe even stop in that case...
         if index is None:
 
-            # Are we looping the track? Then do that, otherwise fall into the else clause...
+            # Are we looping the track? Then we stick to the current playing index...
             if self.bot.memory['music'][ctx.guild.id]['playingLoop'] == 'track':
                 index = self.bot.memory['music'][ctx.guild.id]['playingIndex']
-            else:
 
-                # We're going for the next in queue, so increment the playing.
+            else:
+                # We're going for the next in queue, so increment the playing index.
                 index = self.bot.memory['music'][ctx.guild.id]['playingIndex'] + 1
                 self.bot.memory['music'][ctx.guild.id]['playingIndex'] = index
 
                 # Are we at the end of the queue?
                 if len(self.bot.memory['music'][ctx.guild.id]['playlist']) <= index:
 
-                    # If we're not looping the playlist, then end playing.
+                    # End playing if we're not looping the queue.
                     if self.bot.memory['music'][ctx.guild.id]['playingLoop'] != 'queue':
                         self.bot.memory['music'][ctx.guild.id]['playing'] = False
                         return
 
                     # List is done, but we are looping. So, resetting the playing index.
+                    self.bot.memory['music'][ctx.guild.id]['playingIndex'] = 0                
                     index = 0
-                    self.bot.memory['music'][ctx.guild.id]['playingIndex'] = index                
 
         # Let's get the entry of next song.
         entry = self.bot.memory['music'][ctx.guild.id]['playlist'][index]

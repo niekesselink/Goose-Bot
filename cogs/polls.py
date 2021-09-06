@@ -97,8 +97,11 @@ class Polls(commands.Cog):
         self.bot.memory['polls.pending'].append(key)
 
         # Send the message that removes itself after 10 seconds to confirm the action, and the delete one of the user.
-        await ctx.send(await language.get(self, ctx, 'polls.next_post'), delete_after=10)
-        await ctx.message.delete()
+        if ctx.prefix is self.bot.config.prefix:
+            await ctx.send(await language.get(self, ctx, 'polls.next_post'), delete_after=10)
+            await ctx.message.delete()
+        else:
+            await ctx.send(await language.get(self, ctx, 'polls.next_post'))
 
 def setup(bot):
     bot.add_cog(Polls(bot))

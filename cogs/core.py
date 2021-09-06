@@ -72,7 +72,7 @@ class Core(commands.Cog):
         # Create a special error embed for this error and send it to the bot owner.
         owner = self.bot.get_user(462311999980961793)
         await owner.send(embed=discord.Embed(
-            title=f'Error using {ctx.message.content}',
+            title=f'Error using {ctx.command.module}.{ctx.command.name}',
             description=f'`{str(error)}`',
             colour=0xFF7E62,
         ))
