@@ -69,7 +69,17 @@ class Music(commands.Cog):
         # We're leaving...
         await ctx.voice_client.disconnect()
         await ctx.send(await language.get(self, ctx, 'music.leave'))
-        del(self.bot.memory['music'][ctx.guild.id])
+        if ctx.guild.id in self.bot.memory['music']:
+            del(self.bot.memory['music'][ctx.guild.id])
+
+    @commands.command(hidden=True)
+    @commands.guild_only()
+    @commands.has_permissions(administrator=True)
+    async def forceleave(self, ctx):
+        """Forces the bot to leave the channel."""
+        await ctx.voice_client.disconnect(True)
+        if ctx.guild.id in self.bot.memory['music']:
+            del(self.bot.memory['music'][ctx.guild.id])
 
     @commands.command(aliases=['queue', 'q'])
     @commands.guild_only()

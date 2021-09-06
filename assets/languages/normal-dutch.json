@@ -49,7 +49,7 @@
   "music.already_in_channel": "{user_mention}, ik zit al in een kanaal!",
   "music.already_there": "Ik ben er al {user_mention}!",
   "music.cleared": "De afspeellijst is nu leeg!",
-  "music.join": "{user_mention}, ik zit nu in jouw kaneel!",
+  "music.join": "{user_mention}, ik zit nu in jouw kanaal!",
   "music.leave": "Ik zit niet meer in een kanaal!",
   "music.loop.off": "Ik herhaal niks meer!",
   "music.loop.queue": "Ik zal de afspeellijst herhalen!",

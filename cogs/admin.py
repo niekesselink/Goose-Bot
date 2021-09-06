@@ -11,8 +11,7 @@ class Admin(commands.Cog):
         """Initial function that runs when the class has been created."""
         self.bot = bot
 
-    @commands.group()
-    @commands.guild_only()
+    @commands.group(hidden=True)
     @commands.has_permissions(administrator=True)
     async def admin(self, ctx):
         """Admin commands for the guild."""
