@@ -25,7 +25,7 @@ class Bot(commands.Bot):
 
         # Call the initialize of the bot itself.
         super().__init__(
-            command_prefix=self.config.prefix,
+            command_prefix=commands.when_mentioned_or(self.config.prefix),
             intents=intents,
             *args,
             **kwargs
@@ -45,5 +45,13 @@ for file in os.listdir('cogs'):
         name = file[:-3]
         bot.load_extension(f'cogs.{name}')
 
-# Now let's start it.
-bot.run(bot.config.token)
+# Define function for running the bot...
+async def main():
+    await bot.login(bot.config.token)
+    await bot.register_application_commands()
+    await bot.connect()
+    bot.loop.run_forever()
+
+# Now we start.
+loop = bot.loop
+loop.run_until_complete(main())
