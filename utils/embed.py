@@ -5,8 +5,8 @@ def create(self, title=None, description=None, colour=None, thumbnail=None, fiel
 
     # Create the base embed.
     embed = discord.Embed(
-        title=title,
-        description=description,
+        title='' if title is None else title,
+        description='' if description is None else description,
         colour=discord.Color(value=int(self.bot.config.colour, 16)) if colour is None else colour,
     )
 
