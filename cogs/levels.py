@@ -95,7 +95,7 @@ class Levels(commands.Cog):
         """Event that happens once some joins join the guild."""
 
         # Check if the user has XP and levels stored in the database.
-        result = await self.bot.db.fetch("SELECT level FROM levels_ranks WHERE guild_id = $1 AND member_id = $2", member.guild.id, member.id)
+        result = await self.bot.db.fetch("SELECT level FROM levels WHERE guild_id = $1 AND member_id = $2", member.guild.id, member.id)
         if result:
 
             # The person has a level! Probably rejoined, let's get the ranks that goes with the level.
