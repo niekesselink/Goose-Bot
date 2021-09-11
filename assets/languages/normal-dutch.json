@@ -45,7 +45,7 @@
   "info.title": "**Informatie.**",
   "levels.levelup": "Je gaat een level omhoog {0}, je bent nu level {1}!",
   "levels.norank": "*{user_mention}, die persoon heeft geen rank!",
-  "levels.rank": "{0} staat op positie **#{1}** met een level van {2} en {3} XP!",
+  "levels.rank": "Positie **#{0}** met een level van {1} en {2}/{3} XP!",
   "music.already_in_channel": "{user_mention}, ik zit al in een kanaal!",
   "music.already_there": "Ik ben er al {user_mention}!",
   "music.cleared": "De afspeellijst is nu leeg!",

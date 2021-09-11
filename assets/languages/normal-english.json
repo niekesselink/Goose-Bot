@@ -45,7 +45,7 @@
   "info.title": "**Information.**",
   "levels.levelup": "You just leveled up {0}, you're now level {1}!",
   "levels.norank": "{user_mention}, that person is not ranked!",
-  "levels.rank": "{0} is ranked on position **#{1}** with level {2} and a total of {3} XP!",
+  "levels.rank": "Position **#{0}** with level {1} and a total of {2}/{3} XP!",
   "music.already_in_channel": "{user_mention}, I'm already in a channel!",
   "music.already_there": "{user_mention}, I'm already there!",
   "music.cleared": "I've cleared the playlist!",

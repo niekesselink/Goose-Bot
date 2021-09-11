@@ -4,7 +4,7 @@ import re
 
 from cachetools import TTLCache
 from discord.ext import commands
-from utils import language
+from utils import embed, language
 
 class Levels(commands.Cog):
     """Leveling functionality for users on a Discord server."""
@@ -131,9 +131,20 @@ class Levels(commands.Cog):
         if not result:
             return await ctx.send(await language.get(self, ctx, 'levels.norank'))
 
-        # Send the message.
+        # Author field.
+        author = {
+            'name': f'{user.name}#{user.discriminator}',
+            'icon': user.avatar.url
+        }
+        
+        # Create and send the embed.
         message = await language.get(self, ctx, 'levels.rank')
-        await ctx.send(message.format(user.mention, result[0]['rank'], result[0]['level'], result[0]['xp']))
+        await ctx.send(embed=embed.create(
+            self,
+            description=message.format(result[0]['rank'], result[0]['level'], result[0]['xp'], int(self.get_xp_treshold(result[0]['level'] + 1))),
+            colour=0x303136,
+            author=author
+        ))
 
     @commands.command()
     @commands.guild_only()
@@ -145,15 +156,27 @@ class Levels(commands.Cog):
                                          "ORDER BY xp DESC LIMIT 10", ctx.guild.id)
 
         # Generate a proper list now...
-        count = 1
         message = ''
-        for member in result:
+        for i, member in enumerate(result):
             user = ctx.guild.get_member(member['member_id'])
-            message += f"{count}) {user.name} (Level {member['level']}, {member['xp']} XP)\n"
-            count = count + 1
 
-        # Send the message..
-        await ctx.send(message)
+            # Get the correct notation...
+            if i + 1 == 1:
+                message += f":first_place:) **{user.name}** (Level {member['level']}, {member['xp']} XP)\n"
+            elif i + 1 == 2:
+                message += f":second_place:) **{user.name}** (Level {member['level']}, {member['xp']} XP)\n"
+            elif i + 1 == 3:
+                message += f":third_place:) **{user.name}** (Level {member['level']}, {member['xp']} XP)\n"
+            else:
+                message += f"{i + 1}) **{user.name}** (Level {member['level']}, {member['xp']} XP)\n"
+
+        # Create and send the embed.
+        await ctx.send(embed=embed.create(
+            self,
+            title='Leaderboard',
+            description=message,
+            colour=0x303136
+        ))
 
     @commands.group()
     @commands.guild_only()
