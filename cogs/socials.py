@@ -31,7 +31,7 @@ class Socials(commands.Cog):
                 # Add or remove the role...
                 if live:
                     await after.add_roles(after.guild.get_role(int(role_id[0]['value'])))
-                elif:
+                else:
                     await after.remove_roles(after.guild.get_role(int(role_id[0]['value'])))
 
 def setup(bot):
