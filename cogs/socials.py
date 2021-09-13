@@ -10,7 +10,7 @@ class Socials(commands.Cog):
         self.bot = bot
 
     @commands.Cog.listener()
-    def on_presence_update(self, before, after):
+    async def on_presence_update(self, before, after):
         """Checks if user starts streaming and awards a role if set in a guild."""
 
         # Check if user started streaming...
