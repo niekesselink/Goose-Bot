@@ -374,8 +374,16 @@ class Music(commands.Cog):
         
         # Start typing incidicator and declare variables.
         await ctx.channel.trigger_typing()
-        added_playlist = False
+        message = await language.get(self, ctx, 'music.queued')
+        playlist = []
         entry = None
+
+        # Do we have an equalizer string? If so, get it, cut it, save it.
+        equalizer = None
+        if query.endswith(']') and '[' in query:
+            result = re.search(r'\[.*?\]', query)[0]
+            query = query.replace(result, '')
+            equalizer = result[1:-1]
 
         # Extract the right data in case it's a Spotify link, we want to make it a search string.
         if 'spotify.com' in query and ('playlist' in query or 'track' in query):
@@ -388,7 +396,6 @@ class Music(commands.Cog):
             if 'playlist' in query:
 
                 # Now, let's get all the results from Spotify properly into an array...
-                playlist = []
                 result = spotify.playlist_items(query)
                 while result:
                     playlist.extend(result['items'])
@@ -396,17 +403,18 @@ class Music(commands.Cog):
 
                 # Now let's add them to the local playlist...
                 for track in playlist:
-                    self.bot.memory['music'][ctx.guild.id]['playlist'].append(self.parse_spotify_track(track['track']))
+                    entry = self.parse_spotify_track(track['track'], equalizer)
+                    self.bot.memory['music'][ctx.guild.id]['playlist'].append(entry)
                 
                 # Inform we're done adding a playlist.
                 message = await language.get(self, ctx, 'music.queued_playlist')
                 await ctx.send(message.format(len(playlist)))
-                added_playlist = True
 
             # Get the track if it's a track and queue it.
             elif 'track' in query:
-                entry = self.parse_spotify_track(spotify.track(query))
+                entry = self.parse_spotify_track(spotify.track(query), equalizer)
                 self.bot.memory['music'][ctx.guild.id]['playlist'].append(entry)
+                await ctx.send(message.format(entry['title']))
 
         # Check for a YouTube link, if so, handle that...
         elif 'youtube.com' in query or 'youtu.be' in query:
@@ -417,8 +425,9 @@ class Music(commands.Cog):
 
             # Else it's just a song from YouTube, let's add that to the queue.
             else:
-                entry = self.get_from_youtube(query)
+                entry = self.get_from_youtube(query, equalizer)
                 self.bot.memory['music'][ctx.guild.id]['playlist'].append(entry)
+                await ctx.send(message.format(entry['title']))
             
         # If the query is still a hyperlink after previous catches, then cancel it, not supported.
         elif query.startswith('http://') or query.startswith('https://'):
@@ -426,15 +435,9 @@ class Music(commands.Cog):
 
         # Else it's just a name of a song, let's search for it on YouTube and add it..
         else:
-            entry = self.get_from_youtube(f'ytsearch:{query}')
+            entry = self.get_from_youtube(f'ytsearch:{query}', equalizer)
             self.bot.memory['music'][ctx.guild.id]['playlist'].append(entry)
-             
-        # Inform we've queued the song instead, ignore if it's a playlist.
-        if not added_playlist:
-            message = await language.get(self, ctx, 'music.queued')
-            await ctx.send(message.format(
-                entry['title']
-            ))
+            await ctx.send(message.format(entry['title']))
 
         # Now let's see if we need to start playing directly, as in, nothing is playing...
         if not self.bot.memory['music'][ctx.guild.id]['playing']:
@@ -485,7 +488,7 @@ class Music(commands.Cog):
 
         # If the query is still a YouTube search, then let's do that first...
         if 'ytsearch:' in entry['query']:
-            entry = self.get_from_youtube(entry['query'])
+            entry = self.get_from_youtube(entry['query'], entry['equalizer'])
 
         # Declare the options for youtube-dl.
         ydl_opts = {
@@ -504,10 +507,11 @@ class Music(commands.Cog):
             ydl.download([entry['query']])
 
         # Now let's actually start playing..
-        source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(f'{ctx.guild.id}.mp3'), self.bot.memory['music'][ctx.guild.id]['volume'])
+        ffmpegOptions = f"-af \"{entry['equalizer']}\"" if entry['equalizer'] else None
+        source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(f'{ctx.guild.id}.mp3', options=ffmpegOptions), self.bot.memory['music'][ctx.guild.id]['volume'])
         ctx.voice_client.play(source, after=lambda e: self.play_song(ctx))
 
-    def get_from_youtube(self, query):
+    def get_from_youtube(self, query, equalizer):
         """Gets a track from YouTube, either by URL or search."""
             
         # Declare variables used in the function.
@@ -553,10 +557,11 @@ class Music(commands.Cog):
         return {
             'query': meta['webpage_url'],
             'title': meta['title'],
-            'duration': meta['duration']
+            'duration': meta['duration'],
+            'equalizer': equalizer
         }
 
-    def parse_spotify_track(self, track):
+    def parse_spotify_track(self, track, equalizer):
         """Parse a track from Spotify to something useful for the bot."""
 
         # Get a proper query variable going.
@@ -569,7 +574,8 @@ class Music(commands.Cog):
         return {
             'query': query,
             'title': f"{track['name']} - {track['artists'][0]['name']}",
-            'duration': track['duration_ms']
+            'duration': track['duration_ms'],
+            'equalizer': equalizer
         }
 
     @commands.Cog.listener()
