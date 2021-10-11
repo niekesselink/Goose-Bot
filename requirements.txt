@@ -8,4 +8,4 @@ PyNaCl
 python-dateutil
 requests
 spotipy
-youtube-dl
+yt-dlp

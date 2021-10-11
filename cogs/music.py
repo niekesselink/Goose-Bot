@@ -5,7 +5,7 @@ import random
 import re
 import requests
 import spotipy
-import youtube_dl
+import yt_dlp
 
 from discord.ext import commands
 from spotipy.oauth2 import SpotifyClientCredentials
@@ -503,7 +503,7 @@ class Music(commands.Cog):
         }
 
         # Declare the youtube-dl downloader and download the song.
-        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([entry['query']])
 
         # Now let's actually start playing..
@@ -523,7 +523,7 @@ class Music(commands.Cog):
         }
 
         # Download the metadata of the video.
-        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             try:
                 meta = ydl.extract_info(query, download=False)
 
