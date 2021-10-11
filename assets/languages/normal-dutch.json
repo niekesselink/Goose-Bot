@@ -14,7 +14,7 @@
   "core.incorrect_usage": "Je gebruikt dit command niet correct {user_mention}!",
   "core.no_permission": "Je hebt geen toegang tot deze command {user_mention}!",
   "core.no_private_message": "Dit kan niet in een prive bericht.",
-  "core.trigger_unknown": "Ik ken dat trigger woord niet, check de help!",
+  "core.trigger_unknown": "Ik ken dat trigger woord niet! Je kan gebruiken; **{0}**",
   "debug.avatar": "Avatar vervangen!",
   "debug.cog_load": "Cog {0} is geladen!",
   "debug.cog_unload": "Cog {0} is verwijderd!",
