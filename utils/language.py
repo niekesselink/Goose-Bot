@@ -22,7 +22,7 @@ async def get(self, ctx, key, guild_id=None):
 
     # Still no guild? Then normal English with only username format...
     if guild_id is None:
-        replace = { 'user_mention': ctx.message.author.mention }
+        replace = { '{user_mention}': ctx.message.author.mention }
 
         # Format and return!
         string = Languages.array['normal-english'][key]

@@ -67,14 +67,16 @@ class Core(commands.Cog):
             return await ctx.author.send(await language.get(self, ctx, 'core.no_private_message'))
 
         # We've hit an error. Inform that the owner is on it...
-        await ctx.send(await language.get(self, ctx, 'core.error'))
+        await ctx.send(embed=discord.Embed(
+            description=await language.get(self, ctx, 'core.error'),
+            colour=0xFF0000
+        ))
 
         # Create a special error embed for this error and send it to the bot owner.
         owner = self.bot.get_user(462311999980961793)
         await owner.send(embed=discord.Embed(
-            title=f'Error using {ctx.command.module}.{ctx.command.name}',
-            description=f'`{str(error)}`',
-            colour=0xFF7E62,
+            description=f'**{ctx.message.content}**\n`{str(error)}`',
+            colour=0xFF0000
         ))
             
     @commands.Cog.listener()
