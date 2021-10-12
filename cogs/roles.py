@@ -20,9 +20,9 @@ class Roles(commands.Cog):
             self.bot.memory['roles.triggers'] = []
 
             # Store values.
-            for trigger in await self.bot.db.fetch("SELECT guild_id, channel_id, message_id FROM roles_reaction"):
-                if trigger['guild_id'] in self.bot.guilds:
-                    self.bot.memory['roles.triggers'].append(f"{trigger['guild_id']}_{trigger['channel_id']}_{trigger['message_id']}")
+            for guild in await self.bot.db.fetch("SELECT guild_id, channel_id, message_id FROM roles_reaction"):
+                if guild['guild_id'] in [guild.id for guild in self.bot.guilds]:
+                    self.bot.memory['roles.triggers'].append(f"{guild['guild_id']}_{guild['channel_id']}_{guild['message_id']}")
 
     @commands.group()
     @commands.guild_only()
