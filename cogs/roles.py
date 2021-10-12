@@ -11,18 +11,18 @@ class Roles(commands.Cog):
         """Initial function that runs when the class has been created."""
         self.bot = bot
 
-        # Create memory and run a task to fill it...
+    @commands.Cog.listener()
+    async def on_ready(self):
+        """Event that happens once the bot has started."""
+
+        # Create memory.
         if 'roles.triggers' not in self.bot.memory:
             self.bot.memory['roles.triggers'] = []
-            self.bot.loop.create_task(self.populate_memory())
 
-    async def populate_memory(self):
-        """Task to populate the memory for the trigger reactions to get roles."""
-
-        # For performance, we want to load the known trigger messages into memory...
-        triggers = await self.bot.db.fetch("SELECT guild_id, channel_id, message_id FROM roles_reaction")
-        for trigger in triggers:
-            self.bot.memory['roles.triggers'].append(f"{trigger['guild_id']}_{trigger['channel_id']}_{trigger['message_id']}")
+            # Store values.
+            for trigger in await self.bot.db.fetch("SELECT guild_id, channel_id, message_id FROM roles_reaction"):
+                if trigger['guild_id'] in self.bot.guilds:
+                    self.bot.memory['roles.triggers'].append(f"{trigger['guild_id']}_{trigger['channel_id']}_{trigger['message_id']}")
 
     @commands.group()
     @commands.guild_only()

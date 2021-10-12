@@ -13,21 +13,19 @@ class Levels(commands.Cog):
         """Initial function that runs when the class has been created."""
         self.bot = bot
 
-        # Run a task to create and fill memory...
-        self.bot.loop.create_task(self.populate_memory())
-
-    async def populate_memory(self):
-        """Task to populate the memory for the trigger reactions to get roles."""
+    @commands.Cog.listener()
+    async def on_ready(self):
+        """Event that happens once the bot has started."""
 
         # Create memory.
         if 'levels' not in self.bot.memory:
             self.bot.memory['levels'] = {}
             self.bot.memory['levels.lock'] = TTLCache(maxsize=math.inf, ttl=60)
 
-        # Get all the guild ID's where levels are enabled and add them to memory...
-        guilds = await self.bot.db.fetch("SELECT guild_id FROM guild_settings WHERE key = 'levels.enabled' AND value = 'True'")
-        for guild in guilds:
-            await self.add_guild(guild['guild_id'])
+            # Store values in memory.
+            for guild in await self.bot.db.fetch("SELECT guild_id FROM guild_settings WHERE key = 'levels.enabled' AND value = 'True'"):
+                if guild['guild_id'] in [guild.id for guild in self.bot.guilds]:
+                    await self.add_guild(guild['guild_id'])
 
     async def add_guild(self, guild_id):
         """Setup a guild in the level memory."""

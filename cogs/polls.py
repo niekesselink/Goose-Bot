@@ -8,11 +8,19 @@ class Polls(commands.Cog):
         """Initial function that runs when the class has been created."""
         self.bot = bot
 
-        # Define memory variables...
+    @commands.Cog.listener()
+    async def on_ready(self):
+        """Event that happens once the bot has started."""
+
+        # Define memory variables.
         if 'polls' not in self.bot.memory:
             self.bot.memory['polls'] = {}
-        if 'polls.pending' not in self.bot.memory:
             self.bot.memory['polls.pending'] = []
+
+            # Store values in memory.
+            for guild in await self.bot.db.fetch("SELECT guild_id, value FROM guild_settings WHERE key = 'polls.channel' AND value != ''"):
+                if guild['guild_id'] in [guild.id for guild in self.bot.guilds]:
+                    self.bot.memory['polls'][guild['guild_id']] = guild['value']
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -30,22 +38,17 @@ class Polls(commands.Cog):
 
         # Declare some variables.
         key = f'{message.guild.id}_{message.channel.id}_{message.author.id}'
-        is_poll_channel = False
+        isPollChannel = False
 
         # Check if the user used the !poll command before.
         if key not in self.bot.memory['polls.pending']:
 
-            # Is the polls channel set in the memory? If not, get it from the database.
-            if message.guild.id not in self.bot.memory['polls']:
-                channel_id = await self.bot.db.fetch("SELECT value FROM guild_settings WHERE guild_id = $1 AND key = 'polls.channel'", message.guild.id)
-                self.bot.memory['polls'][message.guild.id] = int(channel_id[0]['value']) if channel_id[0]['value'] != '' else 0
-
             # Check if the message is posted in the polls channel, if not, return.
-            if self.bot.memory['polls'][message.guild.id] != message.channel.id:
+            if message.guild.id in self.bot.memory['polls'] and self.bot.memory['polls'][message.guild.id] != message.channel.id:
                 return
 
             # It's the poll channel, set the boolean.
-            is_poll_channel = True
+            isPollChannel = True
 
         # It's a poll, if we got through by using !poll command then let's first remove the key.
         else:
@@ -82,7 +85,7 @@ class Polls(commands.Cog):
                     message = await message.channel.send(await language.get(self, None, 'polls.continuation', message.guild.id))
 
         # Now if it's in the poll channel, let's make sure we have at least two options, if not inform and remove it...
-        if is_poll_channel and reactions < 2:
+        if isPollChannel and reactions < 2:
             msg = await language.get(self, None, 'polls.not_a_poll', message.guild.id)
             await message.channel.send(msg.format(message.author.mention), delete_after=10)
             await message.delete()

@@ -18,7 +18,11 @@ class Music(commands.Cog):
         """Initial function that runs when the class has been created."""
         self.bot = bot
 
-        # Define memory variable...
+    @commands.Cog.listener()
+    async def on_ready(self):
+        """Event that happens once the bot has started."""
+
+        # Define memory.
         if 'music' not in self.bot.memory:
             self.bot.memory['music'] = {}
 
