@@ -1,3 +1,4 @@
+import asyncio
 import math
 import random
 import re
@@ -269,7 +270,7 @@ class Levels(commands.Cog):
 
         # Enable it...
         await self.bot.db.execute("UPDATE guild_settings SET value = 'True' WHERE key = 'levels.enabled' AND guild_id = $1", ctx.guild.id)
-        self.bot.memory[ctx.guild.id][config_name] = 'True'
+        self.bot.memory[ctx.guild.id]['levels.enabled'] = 'True'
         await self.add_guild(ctx.guild.id)
 
         # Inform...
@@ -283,11 +284,30 @@ class Levels(commands.Cog):
 
         # Disable it...
         await self.bot.db.execute("UPDATE guild_settings SET value = 'False' WHERE key = 'levels.enabled' AND guild_id = $1", ctx.guild.id)
-        self.bot.memory[ctx.guild.id][config_name] = 'False'
-        del(self.bot.memory['levels'][guild_id])
+        self.bot.memory[ctx.guild.id]['levels.enabled'] = 'False'
+        del(self.bot.memory['levels'][ctx.guild.id])
 
         # Inform...
         await ctx.send('👌')
+
+    @levels.command()
+    @commands.guild_only()
+    @commands.has_permissions(administrator=True)
+    async def recalculate(self, ctx):
+        """Recalculates the level of everyone. It's dangerous, and might take long."""
+
+        # Inform the progress is starting.
+        await ctx.send(f'Starting to re-calculate level standings...')
+
+        # Let's loop through all the members to re-level.
+        for member in ctx.guild.members:
+            result = await self.bot.db.fetch("SELECT xp FROM levels WHERE guild_id = $1 and member_id = $2", ctx.guild.id, member.id)
+            if len(result) > 0:
+                await self.re_level(ctx.guild, member, result[0]['xp'])
+                await asyncio.sleep(0.5)
+
+        # Done!
+        await ctx.send('Done!')
 
     async def re_level(self, guild, member, xp):
         """Function that re-levels a member to the correct level according to the XP, as well as giving the ranks."""
