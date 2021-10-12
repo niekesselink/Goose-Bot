@@ -1,4 +1,5 @@
 import asyncio
+import discord
 import importlib
 import json
 import os
@@ -8,7 +9,7 @@ import subprocess
 from collections import namedtuple
 from discord.ext import commands
 from urllib.request import urlopen
-from utils import embed, language, migrate
+from utils import embed, language
 
 class Debug(commands.Cog):
     """Debug commands mainly for development/update purposes."""
@@ -32,10 +33,14 @@ class Debug(commands.Cog):
     @debug.command()
     async def ram(self, ctx):
         """Shows RAM usage of the bot."""
-        
-        # Get RAM info and return it in a simple message.
         ramUsage = self.process.memory_full_info().rss / 1024**2
         await ctx.send(f'{ramUsage:.2f} MB')
+
+    @debug.command()
+    async def avatar(self, ctx, url):
+        """Update profile image of the bot."""
+        await self.bot.user.edit(avatar=urlopen(url).read())
+        await ctx.send(await language.get(self, ctx, 'debug.avatar'))
 
     @debug.command()
     async def ping(self, ctx):
@@ -54,20 +59,16 @@ class Debug(commands.Cog):
     @debug.command()
     async def load(self, ctx, name):
         """Load a cog."""
-
         self.bot.load_extension(f'cogs.{name}')
         print(f'Cogs.{name} has been loaded!')
-        message = await language.get(self, ctx, 'debug.cog_load')
-        await ctx.send(content=message.format(name))
+        await ctx.send((await language.get(self, ctx, 'debug.cog_load')).format(name))
 
     @debug.command()
     async def unload(self, ctx, name):
         """Unload a specific cog."""
-
         self.bot.unload_extension(f'cogs.{name}')
         print(f'Cogs.{name} has been unloaded!')
-        message = await language.get(self, ctx, 'debug.cog_unload')
-        await ctx.send(content=message.format(name))
+        await ctx.send((await language.get(self, ctx, 'debug.cog_unload')).format(name))
 
     @debug.command()
     async def reload(self, ctx, name):
@@ -77,16 +78,14 @@ class Debug(commands.Cog):
         if name != 'all':
             self.bot.reload_extension(f'cogs.{name}')
             print(f'Cogs.{name} has been reloaded!')
-            message = await language.get(self, ctx, 'debug.cog_reload')
-            return await ctx.send(content=message.format(name))
+            return await ctx.send((await language.get(self, ctx, 'debug.cog_reload')).format(name))
 
         # Reload all possible cogs which have been loaded...
         for file in os.listdir('cogs'):
             if file.endswith('.py'):
                 self.bot.reload_extension(f'cogs.{file[:-3]}')
                 print(f'Cogs.{file[:-3]} has been reloaded!')
-                message = await language.get(self, ctx, 'debug.cog_reload')
-                await ctx.send(content=message.format(file[:-3]))
+                await ctx.send((await language.get(self, ctx, 'debug.cog_reload')).format(file[:-3]))
 
     @debug.command()
     async def reloadslash(self, ctx):
@@ -103,78 +102,72 @@ class Debug(commands.Cog):
         with open('config.json', encoding='utf8') as data:
             self.bot.config = json.load(data, object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
 
-        # Inform.
+        # Inform completion.
         await ctx.send(await language.get(self, ctx, 'debug.reload_config'))
 
     @debug.command()
     async def reloadutil(self, ctx, name):
         """(Re)Load an util."""
 
-        # Import it...
+        # Import it and inform...
         util = importlib.import_module(f'utils.{name}')
         importlib.reload(util)
 
-        # Inform...
+        # Inform completion.
         print(f'Util {name} has been (re)loaded!')
-        message = await language.get(self, ctx, 'debug.reload_util')
-        await ctx.send(content=message.format(name))
+        await ctx.send((await language.get(self, ctx, 'debug.reload_util')).format(name))
 
     @debug.command()
-    async def avatar(self, ctx, url):
-        """Update profile image of the bot."""
+    async def eval(self, ctx, *args):
+        """Execute Python code."""
 
-        await self.bot.user.edit(avatar=urlopen(url).read())
-        await ctx.send(await language.get(self, ctx, 'debug.avatar'))
+        # Prepare and run the code...
+        eval_string = " ".join(args)
+        eval_result = eval(eval_string)
 
-    @debug.command()
-    async def migrate(self, ctx):
-        """Migrate the database to ensure it's up to date."""
+        # Save to a file.
+        with open("eval.txt", "w") as file:
+            file.write(str(eval_result))
 
-        # Migration code.
-        await migrate.go(self.bot)
-        await ctx.send(await language.get(self, ctx, 'debug.migrate'))
+        # Now, send it.
+        with open("eval.txt", "rb") as file:
+            await ctx.send(file=discord.File(file, "eval.txt"))
 
     @debug.command()
     async def pull(self, ctx):
         """Pulls the most recent version from the repository."""
 
-        # Start typing indicator.
+        # Start typing indicator...
         await ctx.channel.trigger_typing()
 
-        # Execture "git pull" command in shell...
+        # Execture "git pull" command in shell.
         stdout, stderr = await self.run_process('git pull')
 
         # Inform the report.
         await ctx.send(embed=embed.create(
             self,
             title=await language.get(self, ctx, 'debug.git_pull'),
-            description=f'```diff\n{stdout}\n{stderr}\n```'
+            description=f'```diff\n{stdout}\n{stderr}\n```',
+            colour=0x303136
         ))
 
     @debug.command()
-    async def update(self, ctx, name):
+    async def pip(self, ctx, name):
         """Updates a pip package."""
 
-        # Start typing indicator.
+        # Start typing indicator...
         await ctx.channel.trigger_typing()
 
-        # Execture command in shell...
+        # Run the pip command.
         stdout, stderr = await self.run_process(f'pip3 install --upgrade {name}')
 
         # Inform the report.
         await ctx.send(embed=embed.create(
             self,
             title=await language.get(self, ctx, 'debug.update'),
-            description=f'```diff\n{stdout}\n{stderr}\n```'
+            description=f'```diff\n{stdout}\n{stderr}\n```',
+            colour=0x303136
         ))
-
-    @debug.command()
-    async def eval(self, ctx, *args):
-        """Execute Python code. Could be dangerous."""
-
-        eval_string = " ".join(args)
-        eval_result = eval(eval_string)
-        await ctx.send(f"```py\n{eval_result}\n```")
 
     async def run_process(self, command):
         """Function for running progams on the VPS."""
@@ -188,6 +181,32 @@ class Debug(commands.Cog):
 
         # Return the output.
         return [output.decode() for output in result]
-        
+
+    @debug.command()
+    async def migrate(self, ctx):
+        """Migrate the database to ensure it's up to date."""
+
+        # Start typing indicator...
+        await ctx.channel.trigger_typing()
+
+        # Loop through the guilds.
+        for guild in self.bot.guilds:
+
+            # Add the guild itself to the database.
+            await self.bot.db.execute("INSERT INTO guilds (id) VALUES ($1) ON CONFLICT (id) DO NOTHING", guild.id)
+
+            # Get config variables and add the default of it to the database if none present.
+            with open('assets/json/settings.json') as content:
+                configs = json.load(content)
+                for config in configs:
+                    await self.bot.db.execute("INSERT INTO guild_settings (guild_id, key, value) VALUES ($1, $2, $3) ON CONFLICT (guild_id, key) DO NOTHING", guild.id, config, configs[config])
+
+            # Now loop through members and add them to the database.
+            for member in guild.members:
+                await self.bot.db.execute("INSERT INTO guild_members (guild_id, id) VALUES ($1, $2) ON CONFLICT (guild_id, id) DO NOTHING", guild.id, member.id)
+
+        # Inform completion.
+        await ctx.send(await language.get(self, ctx, 'debug.migrate'))
+     
 def setup(bot):
     bot.add_cog(Debug(bot))
