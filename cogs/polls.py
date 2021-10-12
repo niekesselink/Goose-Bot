@@ -44,7 +44,7 @@ class Polls(commands.Cog):
         if key not in self.bot.memory['polls.pending']:
 
             # Check if the message is posted in the polls channel, if not, return.
-            if message.guild.id in self.bot.memory['polls'] and self.bot.memory['polls'][message.guild.id] != message.channel.id:
+            if message.guild.id not in self.bot.memory['polls'] or int(self.bot.memory['polls'][message.guild.id]) != message.channel.id:
                 return
 
             # It's the poll channel, set the boolean.
