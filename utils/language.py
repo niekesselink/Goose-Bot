@@ -1,6 +1,5 @@
 import os
 import json
-import traceback
 
 class Languages:
     """Class for loading the languages."""
