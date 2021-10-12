@@ -44,6 +44,7 @@
   "info.joined": "Joined",
   "info.title": "**Information.**",
   "levels.levelup": "**Honk!** You just leveled up {0}, you're now level {1}!",
+  "levels.newrole": "With that, you're now part of the {0} rank!",
   "levels.norank": "**Honk!** {user_mention}, that person is not ranked!",
   "levels.rank": "Position **#{0}** with level {1} and a total of {2}/{3} XP!",
   "music.already_in_channel": "**Honk!** {user_mention}, don't be a dick. I'm already in a channel!",

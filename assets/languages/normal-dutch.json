@@ -44,6 +44,7 @@
   "info.joined": "Joined",
   "info.title": "**Informatie.**",
   "levels.levelup": "Je gaat een level omhoog {0}, je bent nu level {1}!",
+  "levels.newrole": "Je bent daardoor nu onderdeel van de {0} rol!",
   "levels.norank": "*{user_mention}, die persoon heeft geen rank!",
   "levels.rank": "Positie **#{0}** met een level van {1} en {2}/{3} XP!",
   "music.already_in_channel": "{user_mention}, ik zit al in een kanaal!",

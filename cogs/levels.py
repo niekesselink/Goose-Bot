@@ -84,10 +84,17 @@ class Levels(commands.Cog):
             # Let's update it in the database...
             await self.bot.db.execute("UPDATE levels SET level = $1 WHERE guild_id = $2 AND member_id = $3", next_level, message.guild.id, message.author.id)
 
-            # Let's check if that means we're getting a new rank, if so, give the rank.
+            # Let's check if that means we're getting a new rank...
             role_id = await self.bot.db.fetch("SELECT role_id FROM levels_ranks WHERE guild_id = $1 AND level = $2", message.guild.id, next_level)
             if role_id:
-                await message.author.add_roles(message.guild.get_role(role_id[0]['role_id']))
+
+                # We do, award it.
+                role = message.guild.get_role(role_id[0]['role_id'])
+                await message.author.add_roles(role)
+
+                # Now inform about it.
+                msg = await language.get(self, None, 'levels.newrole', message.guild.id)
+                await message.channel.send(msg.format(role.name))
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
