@@ -78,6 +78,18 @@ class Birthday(commands.Cog):
         message = await language.get(self, ctx, 'birthday.timezone_set')
         await ctx.send(message.format(matching_timezones[0]))
 
+    async def member_info_field(self, ctx, member):
+        """Function to add a field to member info command."""
+
+        # Get birthday, return if not set.
+        result = await self.bot.db.fetch("SELECT birthday FROM birthdays WHERE guild_id = $1 AND member_id = $2", ctx.guild.id, member.id)
+        if not result:
+            return None
+        
+        # Format the birthday and create the field.
+        format = (await language.get(self, ctx, 'birthday.format')).replace('%Y', '')
+        return { await language.get(self, ctx, 'birthday'): result[0]['birthday'].strftime(format) }
+
     @tasks.loop(minutes=15.0)
     async def check_birthday(self):
         """

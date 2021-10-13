@@ -190,5 +190,16 @@ class Groups(commands.Cog):
         message = await language.get(self, ctx, 'groups.deleted')
         await ctx.send(message.format(result[0]['name']))
 
+    async def member_info_field(self, ctx, member):
+        """Function to add a field to member info command."""
+
+        # Get list of groups the member is part of.
+        result = await self.bot.db.fetch("SELECT string_agg(g.name::TEXT, ', ') AS groups FROM group_members AS gm "
+                                         "LEFT OUTER JOIN groups AS g ON g.id = gm.group_id "
+                                         "WHERE g.guild_id = $1 AND gm.member_id = $2", ctx.guild.id, member.id)
+
+        # Return the field now if there is something.
+        return { await language.get(self, ctx, 'groups'): result[0]['groups'] } if result[0]['groups'] else None
+
 def setup(bot):
     bot.add_cog(Groups(bot))

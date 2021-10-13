@@ -53,6 +53,14 @@ class Info(commands.Cog):
             await language.get(self, ctx, 'info.created'): user.created_at.strftime(format)
         }
 
+        # Get additional fields from cogs.
+        for cog in self.bot.cogs:
+            cog = self.bot.get_cog(cog)
+            if 'member_info_field' in dir(cog):
+                value = await cog.member_info_field(ctx, user)
+                if value is not None:
+                    fields.update(value)
+
         # Create and send the embed.
         await ctx.send(embed=embed.create(
             self,
