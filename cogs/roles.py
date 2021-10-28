@@ -55,8 +55,6 @@ class Roles(commands.Cog):
                 return await ctx.send(await language.get(self, ctx, 'roles.message_not_found'), delete_after=10)
             else:
                 return await ctx.send(await language.get(self, ctx, 'roles.message_not_found'))
-        except:
-            throw
 
         # Now, if the action is adding a reaction, then do the following code.
         if action == 'add':
@@ -85,8 +83,6 @@ class Roles(commands.Cog):
                     return await ctx.send(await language.get(self, ctx, 'roles.already_exist'), delete_after=10)
                 else:
                     return await ctx.send(await language.get(self, ctx, 'roles.already_exist'))
-            except:
-                throw
 
             # Also add the trigger to the memory list in case it's not there yet..
             key = f'{ctx.guild.id}_{message.channel.id}_{message.id}'
@@ -163,7 +159,7 @@ class Roles(commands.Cog):
         # Check if the message where the reaction was done is a trigger, and if so, delete it.
         if f'{payload.guild_id}_{payload.channel_id}_{payload.message_id}' in self.bot.memory['roles.triggers']:
             await self.bot.db.fetch("DELETE FROM roles_reaction WHERE guild_id = $1 AND channel_id = $2 AND message_id = $3", payload.guild_id, payload.channel_id, payload.message_id)
-            self.bot.memory['roles.triggers'].remove(f'{ctx.guild.id}_{message.channel.id}_{payload.message_id}')
+            self.bot.memory['roles.triggers'].remove(f'{payload.guild_id}_{payload.channel_id}_{payload.message_id}')
 
 def setup(bot):
     bot.add_cog(Roles(bot))
