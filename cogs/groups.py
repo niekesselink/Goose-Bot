@@ -1,5 +1,5 @@
 from discord.ext import commands
-from utils import embed, language
+from utils import embed, language, paginator
 
 class Groups(commands.Cog):
     """Commands for forming and using mention groups."""
@@ -40,7 +40,7 @@ class Groups(commands.Cog):
         await self.bot.db.execute("UPDATE groups SET last_called = NOW() WHERE id = $1", group_id)
 
         # Now publish the results.
-        await message.channel.send('**@' + result[0]['name'] + '!** ' + result[0]['members'])
+        await message.channel.send(f"**@{result[0]['name']}!** {result[0]['members']}")
 
     @commands.Cog.listener()
     async def on_member_remove(self, member):
@@ -53,7 +53,7 @@ class Groups(commands.Cog):
         await self.bot.db.execute("DELETE FROM group_members AS gm USING groups AS g "
                                   "WHERE g.id = gm.group_id AND gm.member_id = $1 AND g.guild_id = $2", member.id, member.guild.id)
 
-    @commands.group()
+    @commands.group(aliases=['group'])
     @commands.guild_only()
     async def groups(self, ctx):
         """Commands for groups on the server, purposed to ping those interested in an event."""
