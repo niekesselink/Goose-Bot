@@ -10,7 +10,7 @@ import yt_dlp
 
 from discord.ext import commands
 from spotipy.oauth2 import SpotifyClientCredentials
-from utils import language, paginator
+from utils import language
 
 class Music(commands.Cog):
     """Commands for playing music in a voice channel."""
