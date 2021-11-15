@@ -4,8 +4,8 @@ cachetools
 novus
 pillow
 psutil
-PyNaCl
 python-dateutil
+python-youtube
 requests
 spotipy
 yt-dlp

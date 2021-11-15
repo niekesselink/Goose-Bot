@@ -1,6 +1,7 @@
 import asyncio
 import discord
 import os
+import pyyoutube
 import random
 import re
 import requests
@@ -9,7 +10,7 @@ import yt_dlp
 
 from discord.ext import commands
 from spotipy.oauth2 import SpotifyClientCredentials
-from utils import language
+from utils import language, paginator
 
 class Music(commands.Cog):
     """Commands for playing music in a voice channel."""
@@ -115,7 +116,7 @@ class Music(commands.Cog):
         self.bot.memory['music'][ctx.guild.id]['volume'] = level / 100
         ctx.voice_client.source.volume = level / 100
 
-    @commands.command()
+    @commands.command(aliases=['next'])
     @commands.guild_only()
     @commands.check(is_allowed_to_use)
     async def skip(self, ctx):
@@ -419,9 +420,33 @@ class Music(commands.Cog):
         # Secondly, let's handle YouTube links.
         elif 'youtube.com' in query or 'youtu.be' in query:
 
-            # It's a playlist link... (Not supported yet)
+            # It's a playlist link...
             if 'playlist?list=' in query:
-                return await ctx.send(await language.get(self, ctx, 'music.not_supported'))
+
+                # Extract the ID from the url.
+                url = requests.utils.urlparse(query).query
+                params = dict(x.split('=') for x in url.split('&'))
+
+                # Now get the videos information through YouTube API.
+                api = pyyoutube.Api(api_key=self.bot.config.youtube_api_key)
+                result = api.get_playlist_items(
+                    playlist_id=params['list'],
+                    parts="id,snippet",
+                    count=None,
+                )
+
+                # Loop to add the songs.
+                for item in result.items:
+                    self.bot.memory['music'][ctx.guild.id]['playlist'].append({
+                        'query': f'ytsearch:{item.snippet.title}',
+                        'title': item.snippet.title,
+                        'duration': 0,
+                        'audiofilter': audioFilter
+                    })
+
+                # Inform succes...
+                message = await language.get(self, ctx, 'music.queued_playlist')
+                await ctx.send(message.format(len(result.items)))
 
             # It's a track link...
             else:

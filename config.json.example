@@ -1,11 +1,12 @@
 {
+  "token": "insert token here",
+  "postgre": "insert url here",
   "activityType": "listening",
   "activityText": "humans.",
-  "token": "insert token here",
   "colour": "73BBFF",
   "prefix": ".",
 
-  "postgre": "insert url here",
   "spotify_client_id": "insert client id here",
-  "spotify_client_secret": "insert client secret here"
+  "spotify_client_secret": "insert client secret here",
+  "youtube_api_key": "insert api key here"
 }
