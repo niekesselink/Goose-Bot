@@ -1,5 +1,5 @@
 from discord.ext import commands
-from utils import embed, language, paginator
+from utils import embed, language
 
 class Groups(commands.Cog):
     """Commands for forming and using mention groups."""
