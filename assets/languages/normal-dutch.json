@@ -10,6 +10,7 @@
   "birthday.success": "{user_mention}, ik heb jouw verjaardag op {0} gezet in de tijdzone {1}!",
   "birthday.timezone_set": "{user_mention}, jouw tijdzone is nu {0}!",
   "birthday.timezone_unknown": "{user_mention}, die tijdzone ken ik niet. Kijk op http://www.timezoneconverter.com/cgi-bin/findzone om de tijdzone te vinden voor jouw locatie!",
+  "birthday.upcoming": "Deze verjaardagen zijn aankomend...\n\n",
   "birthday.wish": "Hoi @everyone, het is vandaag de verjaardag van {0}!\nWees een vriendelijk persoon en zeg even gefeliciteerd?",
   "core.error": "**Oh oh!** Er heeft zich een fout voorgedaan. De ontwikkelaar van de bot is op de hoogste gebracht en zal snel met een oplossing komen {user_mention}!",
   "core.incorrect_usage": "Je gebruikt dit command niet correct {user_mention}!",

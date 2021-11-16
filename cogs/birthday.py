@@ -78,6 +78,32 @@ class Birthday(commands.Cog):
         message = await language.get(self, ctx, 'birthday.timezone_set')
         await ctx.send(message.format(matching_timezones[0]))
 
+    @commands.command()
+    @commands.guild_only()
+    async def birthdays(self, ctx):
+        """Shows the first eight upcoming birthdays."""
+
+        # Let's get them from the database.
+        birthdays = await self.bot.db.fetch("SELECT member_id, case WHEN bday < current_date THEN bday + interval '1 year' ELSE bday END, text "
+                                            "FROM birthdays, to_char(birthday, 'Mon-DD') as text, "
+                                            "make_date(extract(year from current_date)::int, extract(month from birthday)::int, extract(day from birthday)::int) as bday "
+                                            "WHERE guild_id = $1 ORDER BY bday LIMIT 8", ctx.guild.id)
+
+        # Time to format all the results...
+        lines = []
+        for birthday in birthdays:
+
+            # Ensure we got the member...
+            member = ctx.guild.get_member(birthday['member_id'])
+            if member is None:
+                continue
+
+            # Add to the array.
+            lines.append(f"● `{birthday['text']}` **{member.name}**#{member.discriminator}")
+
+        # Now, we'll send it.
+        await ctx.send(await language.get(self, ctx, 'birthday.upcoming') + '\n'.join(lines))
+
     async def member_info_field(self, ctx, member):
         """Function to add a field to member info command."""
 

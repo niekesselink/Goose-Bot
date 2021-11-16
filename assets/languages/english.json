@@ -10,6 +10,7 @@
   "birthday.success": "**Honk!** {user_mention}, I have set your birthday to {0} in the timezone {1}.",
   "birthday.timezone_set": "**Honk!** {user_mention}, I have set your timezone to {0}!",
   "birthday.timezone_unknown": "**Honk!** {user_mention}, I don't know that timezone, go check http://www.timezoneconverter.com/cgi-bin/findzone to find the right one!",
+  "birthday.upcoming": "**Honk!** These are the upcoming birthdays...\n\n",
   "birthday.wish": "**HONK HONK!** Hey @everyone, the human people, it's the birthday of {0} today!\nBe a friendly human and honk happy birthday would you?",
   "core.error": "**Honk!** An error has occured. My caretaker been notified and will feed me some fixing code soon, thanks for being a crash-dummy {user_mention}!",
   "core.incorrect_usage": "**Honk!** You're using this command incorrect {user_mention}!",

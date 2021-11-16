@@ -10,6 +10,7 @@
   "birthday.success": "{user_mention}, I have set your birthday to {0} in the timezone {1}.",
   "birthday.timezone_set": "{user_mention}, I have set your timezone to {0}!",
   "birthday.timezone_unknown": "{user_mention}, I don't know that timezone, go check http://www.timezoneconverter.com/cgi-bin/findzone to find the right one!",
+  "birthday.upcoming": "**Honk!** These are the upcoming birthdays...\n\n",
   "birthday.wish": "Hey @everyone, it's the birthday of {0} today!\nBe a friendly person and say happy birthday would you?",
   "core.error": "**Oh no!** An error has occured. The error message has been sent to the bot owner, thanks for being a crash-dummy {user_mention}!",
   "core.incorrect_usage": "You're using this command incorrect {user_mention}!",
