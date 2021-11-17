@@ -62,10 +62,10 @@ CREATE TABLE event_welcomes (
 -- DROP TABLE "groups";
 
 CREATE TABLE "groups" (
-	id serial NOT NULL,
+	id serial4 NOT NULL,
 	guild_id int8 NOT NULL,
 	"name" text NOT NULL,
-	"description" text NOT NULL,
+	description text NOT NULL,
 	last_called timestamp NULL,
 	CONSTRAINT groups_pkey PRIMARY KEY (id),
 	CONSTRAINT "FK_groups_guilds" FOREIGN KEY (guild_id) REFERENCES guilds(id) ON DELETE CASCADE
@@ -81,7 +81,7 @@ CREATE TABLE "groups" (
 CREATE TABLE guild_members (
 	guild_id int8 NOT NULL,
 	id int8 NOT NULL,
-	"about" text NULL,
+	about text NULL,
 	CONSTRAINT guild_members_pkey PRIMARY KEY (guild_id, id),
 	CONSTRAINT "FK_guild_members_guilds" FOREIGN KEY (guild_id) REFERENCES guilds(id) ON DELETE CASCADE
 );
@@ -99,7 +99,40 @@ CREATE TABLE guild_settings (
 	"key" text NOT NULL DEFAULT ''::text,
 	value text NOT NULL DEFAULT ''::text,
 	CONSTRAINT guild_settings_guild_id_key_key UNIQUE (guild_id, key),
-	CONSTRAINT "FK_guild_settings_guilds" FOREIGN KEY (guild_id) REFERENCES guilds(id) ON UPDATE RESTRICT ON DELETE CASCADE
+	CONSTRAINT "FK_guild_settings_guilds" FOREIGN KEY (guild_id) REFERENCES guilds(id) ON DELETE CASCADE ON UPDATE RESTRICT
+);
+
+
+-- public.levels definition
+
+-- Drop table
+
+-- DROP TABLE levels;
+
+CREATE TABLE levels (
+	guild_id int8 NOT NULL,
+	member_id int8 NOT NULL,
+	xp int8 NOT NULL,
+	"level" int8 NOT NULL DEFAULT 0,
+	CONSTRAINT levels_fk FOREIGN KEY (guild_id) REFERENCES guilds(id),
+	CONSTRAINT levels_fk_1 FOREIGN KEY (guild_id,member_id) REFERENCES guild_members(guild_id,id)
+);
+CREATE UNIQUE INDEX levels_guild_id_idx ON public.levels USING btree (guild_id, member_id);
+
+
+-- public.levels_ranks definition
+
+-- Drop table
+
+-- DROP TABLE levels_ranks;
+
+CREATE TABLE levels_ranks (
+	id serial4 NOT NULL,
+	guild_id int8 NOT NULL,
+	"level" int8 NOT NULL,
+	role_id int8 NOT NULL,
+	CONSTRAINT levels_ranks_pk PRIMARY KEY (id),
+	CONSTRAINT levels_ranks_fk FOREIGN KEY (guild_id) REFERENCES guilds(id) ON DELETE CASCADE
 );
 
 
@@ -121,6 +154,21 @@ CREATE TABLE roles_reaction (
 );
 
 
+-- public.autodelete definition
+
+-- Drop table
+
+-- DROP TABLE autodelete;
+
+CREATE TABLE autodelete (
+	guild_id int8 NOT NULL,
+	channel_id int8 NOT NULL,
+	delay int4 NOT NULL,
+	CONSTRAINT autodelete_pk PRIMARY KEY (guild_id, channel_id),
+	CONSTRAINT autodelete_fk FOREIGN KEY (guild_id) REFERENCES guilds(id)
+);
+
+
 -- public.birthdays definition
 
 -- Drop table
@@ -134,7 +182,7 @@ CREATE TABLE birthdays (
 	timezone text NOT NULL DEFAULT 'CEST'::text,
 	triggered bool NOT NULL DEFAULT false,
 	given_role text NOT NULL DEFAULT ''::text,
-	CONSTRAINT "FK_birthdays_guild_members" FOREIGN KEY (guild_id, member_id) REFERENCES guild_members(guild_id, id) ON DELETE CASCADE,
+	CONSTRAINT "FK_birthdays_guild_members" FOREIGN KEY (guild_id,member_id) REFERENCES guild_members(guild_id,id) ON DELETE CASCADE,
 	CONSTRAINT "FK_birthdays_guilds" FOREIGN KEY (guild_id) REFERENCES guilds(id) ON DELETE CASCADE
 );
 CREATE UNIQUE INDEX birthdays_guild_id_member_id_key ON public.birthdays USING btree (guild_id, member_id);
@@ -150,5 +198,5 @@ CREATE TABLE group_members (
 	group_id int4 NOT NULL DEFAULT 0,
 	member_id int8 NOT NULL,
 	CONSTRAINT group_members_group_id_member_id_key UNIQUE (group_id, member_id),
-	CONSTRAINT "FK_group_members_groups" FOREIGN KEY (group_id) REFERENCES groups(id) ON DELETE CASCADE
+	CONSTRAINT "FK_group_members_groups" FOREIGN KEY (group_id) REFERENCES "groups"(id) ON DELETE CASCADE
 );
