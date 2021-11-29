@@ -43,7 +43,7 @@ class Music(commands.Cog):
             return await ctx.send(await language.get(self, ctx, 'music.already_in_channel'))
 
         # Let's join the channel...
-        await ctx.send(await language.get(self, ctx, 'music.leave')) if ctx.message is None else await ctx.message.add_reaction('👍')
+        await ctx.send(await language.get(self, ctx, 'music.join')) if ctx.message is None else await ctx.message.add_reaction('👍')
         await self.join_channel(ctx)
 
     async def join_channel(self, ctx):
