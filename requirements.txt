@@ -1,5 +1,6 @@
 asyncio
 asyncpg
+emoji
 cachetools
 novus
 pillow
