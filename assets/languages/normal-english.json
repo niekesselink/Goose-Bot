@@ -10,7 +10,7 @@
   "birthday.format": "%d %B %Y",
   "birthday.incorrect": "{user_mention}, is that a date? I don't think so. Typing `.birthday set 18 june 1993` is an example on how to do properly!",
   "birthday.not_set": "You need to set a birthday first using the `.birthday set` command, {user_mention}!",
-  "birthday.success": "{user_mention}, I have set your birthday to {0} in the timezone {1}.",
+  "birthday.success": "{user_mention}, I have set your birthday to {0} in the timezone {1}. Incorrect? Try again but phrase it differently. For example, switch the numbers around or type the month by name.",
   "birthday.timezone_set": "{user_mention}, I have set your timezone to {0}!",
   "birthday.timezone_unknown": "{user_mention}, I don't know that timezone, go check http://www.timezoneconverter.com/cgi-bin/findzone to find the right one!",
   "birthday.upcoming": "These are the upcoming birthdays...\n\n",

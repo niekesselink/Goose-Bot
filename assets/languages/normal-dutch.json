@@ -10,7 +10,7 @@
   "birthday.format": "%d %B %Y",
   "birthday.incorrect": "{user_mention}, is dat een datum? Volgens mij niet. `.birthday set 18 june 1993` is een voorbeeld van hoe het moet!",
   "birthday.not_set": "Je moet eerst jouw verjaardag vaststellen via de `.birthday set` command {user_mention}!",
-  "birthday.success": "{user_mention}, ik heb jouw verjaardag op {0} gezet in de tijdzone {1}!",
+  "birthday.success": "{user_mention}, ik heb jouw verjaardag op {0} gezet in de tijdzone {1}! Niet goed? Probeer het dan opnieuw in andere format! Bijvoorbeeld, draai de nummers om of typ de naam van de maand in het Engels.",
   "birthday.timezone_set": "{user_mention}, jouw tijdzone is nu {0}!",
   "birthday.timezone_unknown": "{user_mention}, die tijdzone ken ik niet. Kijk op http://www.timezoneconverter.com/cgi-bin/findzone om de tijdzone te vinden voor jouw locatie!",
   "birthday.upcoming": "Deze verjaardagen zijn aankomend...\n\n",
