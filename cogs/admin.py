@@ -11,7 +11,7 @@ class Admin(commands.Cog):
         """Initial function that runs when the class has been created."""
         self.bot = bot
 
-    @commands.group(hidden=True)
+    @commands.hybrid_group(hidden=True)
     @commands.has_permissions(administrator=True)
     async def admin(self, ctx):
         """Admin commands for the guild."""
@@ -20,7 +20,7 @@ class Admin(commands.Cog):
     @admin.command()
     @commands.guild_only()
     @commands.has_permissions(administrator=True)
-    async def config(self, ctx, *, data: str):
+    async def config(self, ctx: commands.Context, *, data: str):
         """"Set a config variable for the current guild."""
 
         # Get the correct data from the message.
@@ -50,7 +50,7 @@ class Admin(commands.Cog):
     @admin.command()
     @commands.guild_only()
     @commands.has_permissions(administrator=True)
-    async def status(self, ctx, *, data: str):
+    async def status(self, ctx: commands.Context, *, data: str):
         """Change the status of the bot."""
 
         # For a non-fork, so Goose bot, only the real owner can do this..
@@ -89,5 +89,5 @@ class Admin(commands.Cog):
         # Add reaction to confirm it's done.
         await ctx.message.add_reaction('👍')
 
-def setup(bot):
-    bot.add_cog(Admin(bot))
+async def setup(bot):
+    await bot.add_cog(Admin(bot))

@@ -10,9 +10,8 @@ class Polls(commands.Cog):
         """Initial function that runs when the class has been created."""
         self.bot = bot
 
-    @commands.Cog.listener()
-    async def on_ready(self):
-        """Event that happens once the bot has started."""
+    async def cog_load(self):
+        """Event that happens once this cog gets loaded."""
 
         # Define memory variables.
         if 'polls' not in self.bot.memory:
@@ -20,8 +19,9 @@ class Polls(commands.Cog):
             self.bot.memory['polls.pending'] = []
 
             # Store values in memory.
+            guilds = [guild async for guild in self.bot.fetch_guilds()]
             for guild in await self.bot.db.fetch("SELECT guild_id, value FROM guild_settings WHERE key = 'polls.channel' AND value != ''"):
-                if guild['guild_id'] in [guild.id for guild in self.bot.guilds]:
+                if guild['guild_id'] in [guild.id for guild in guilds]:
                     self.bot.memory['polls'][guild['guild_id']] = guild['value']
 
     @commands.Cog.listener()
@@ -75,9 +75,9 @@ class Polls(commands.Cog):
             await message.channel.send(msg.format(message.author.mention), delete_after=10)
             await message.delete()
 
-    @commands.command()
+    @commands.hybrid_command()
     @commands.guild_only()
-    async def poll(self, ctx):
+    async def poll(self, ctx: commands.Context):
         """Start a poll in any channel if allowed."""
 
         # Create an unique key and set it in the memory.
@@ -91,5 +91,5 @@ class Polls(commands.Cog):
         else:
             await ctx.send(await language.get(self, ctx, 'polls.next_post'))
 
-def setup(bot):
-    bot.add_cog(Polls(bot))
+async def setup(bot):
+    await bot.add_cog(Polls(bot))

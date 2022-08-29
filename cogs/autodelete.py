@@ -8,29 +8,29 @@ class AutoDelete(commands.Cog):
         """Initial function that runs when the class has been created."""
         self.bot = bot
 
-    @commands.Cog.listener()
-    async def on_ready(self):
-        """Event that happens once the bot has started."""
+    async def cog_load(self):
+        """Event that happens once this cog gets loaded."""
 
         # Define memory variables.
         if 'autodelete' not in self.bot.memory:
             self.bot.memory['autodelete'] = {}
 
             # Store values in memory.
+            guilds = [guild async for guild in self.bot.fetch_guilds()]
             for values in await self.bot.db.fetch("SELECT guild_id, channel_id, delay FROM autodelete"):
-                if values['guild_id'] in [guild.id for guild in self.bot.guilds]:
+                if values['guild_id'] in [guild.id for guild in guilds]:
 
                     # First add guild if not present yet...
                     if values['guild_id'] not in self.bot.memory['autodelete']:
                         self.bot.memory['autodelete'][values['guild_id']] = {}
 
-                    # Now add the config.
+                    # Now add to the config.
                     self.bot.memory['autodelete'][values['guild_id']].update({ values['channel_id']: values['delay'] })
 
-    @commands.command()
+    @commands.hybrid_command()
     @commands.guild_only()
     @commands.has_permissions(administrator=True)
-    async def autodelete(self, ctx, delay):
+    async def autodelete(self, ctx: commands.Context, delay: str):
         """Add or remove a channel from the autodelete."""
 
         # In case the keyword is none, then remove the channel from autodelete.
@@ -78,5 +78,5 @@ class AutoDelete(commands.Cog):
         if message.guild.id in self.bot.memory['autodelete'] and message.channel.id in self.bot.memory['autodelete'][message.guild.id]:
             await message.delete(delay=self.bot.memory['autodelete'][message.guild.id][message.channel.id])
 
-def setup(bot):
-    bot.add_cog(AutoDelete(bot))
+async def setup(bot):
+    await bot.add_cog(AutoDelete(bot))

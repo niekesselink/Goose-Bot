@@ -53,15 +53,15 @@ class Groups(commands.Cog):
         await self.bot.db.execute("DELETE FROM group_members AS gm USING groups AS g "
                                   "WHERE g.id = gm.group_id AND gm.member_id = $1 AND g.guild_id = $2", member.id, member.guild.id)
 
-    @commands.group(aliases=['group'])
+    @commands.hybrid_group(aliases=['group'])
     @commands.guild_only()
-    async def groups(self, ctx):
+    async def groups(self, ctx: commands.Context):
         """Commands for groups on the server, purposed to ping those interested in an event."""
         return
 
     @groups.command()
     @commands.guild_only()
-    async def list(self, ctx):
+    async def list(self, ctx: commands.Context):
         """"Gives a list of groups."""
 
         # Open database and get the results.
@@ -92,7 +92,7 @@ class Groups(commands.Cog):
 
     @groups.command()
     @commands.guild_only()
-    async def join(self, ctx, group: str):
+    async def join(self, ctx: commands.Context, group: str):
         """"Join an existing group."""
 
         # Get the group matching the name.
@@ -117,7 +117,7 @@ class Groups(commands.Cog):
 
     @groups.command()
     @commands.guild_only()
-    async def leave(self, ctx, group: str):
+    async def leave(self, ctx: commands.Context, group: str):
         """"Leave a group you're currently in."""
 
         # Get the group matching the name.
@@ -143,7 +143,7 @@ class Groups(commands.Cog):
     @groups.command()
     @commands.guild_only()
     @commands.has_permissions(administrator=True)
-    async def create(self, ctx, *, data: str):
+    async def create(self, ctx: commands.Context, *, data: str):
         """Create a new public group for people to join."""
 
         # Get the correct data from the message.
@@ -172,7 +172,7 @@ class Groups(commands.Cog):
     @groups.command()
     @commands.guild_only()
     @commands.has_permissions(administrator=True)
-    async def delete(self, ctx, group: str):
+    async def delete(self, ctx: commands.Context, group: str):
         """Delete an existing group."""
 
         # Get the group matching the name.
@@ -201,5 +201,5 @@ class Groups(commands.Cog):
         # Return the field now if there is something.
         return { await language.get(self, ctx, 'groups'): result[0]['groups'] } if result[0]['groups'] else None
 
-def setup(bot):
-    bot.add_cog(Groups(bot))
+async def setup(bot):
+    await bot.add_cog(Groups(bot))

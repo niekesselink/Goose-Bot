@@ -14,9 +14,8 @@ class Levels(commands.Cog):
         """Initial function that runs when the class has been created."""
         self.bot = bot
 
-    @commands.Cog.listener()
-    async def on_ready(self):
-        """Event that happens once the bot has started."""
+    async def cog_load(self):
+        """Event that happens once this cog gets loaded."""
 
         # Create memory.
         if 'levels' not in self.bot.memory:
@@ -24,8 +23,9 @@ class Levels(commands.Cog):
             self.bot.memory['levels.lock'] = TTLCache(maxsize=math.inf, ttl=60)
 
             # Store values in memory.
+            guilds = [guild async for guild in self.bot.fetch_guilds()]
             for guild in await self.bot.db.fetch("SELECT guild_id FROM guild_settings WHERE key = 'levels.enabled' AND value = 'True'"):
-                if guild['guild_id'] in [guild.id for guild in self.bot.guilds]:
+                if guild['guild_id'] in [guild.id for guild in guilds]:
                     await self.add_guild(guild['guild_id'])
 
     async def add_guild(self, guild_id):
@@ -113,9 +113,9 @@ class Levels(commands.Cog):
             # Let's add the ranks...
             await member.add_roles(*achieved_ranks)
 
-    @commands.command()
+    @commands.hybrid_command()
     @commands.guild_only()
-    async def rank(self, ctx, username: str=None):
+    async def rank(self, ctx: commands.Context, username: str=None):
         """Get information about your current level."""
 
         # Command only works when levels are activated.
@@ -152,9 +152,9 @@ class Levels(commands.Cog):
             author=author
         ))
 
-    @commands.command()
+    @commands.hybrid_command()
     @commands.guild_only()
-    async def leaderboard(self, ctx):
+    async def leaderboard(self, ctx: commands.Context):
         """Get's the top 10 people of the server."""
         
         # Get the top ten members.
@@ -184,17 +184,17 @@ class Levels(commands.Cog):
             colour=0x303136
         ))
 
-    @commands.group()
+    @commands.hybrid_group()
     @commands.guild_only()
-    @commands.has_permissions(administrator=True)
-    async def levels(self, ctx):
+    @commands.has_permissions(manage_roles=True)
+    async def levels(self, ctx: commands.Context):
         """Admin commands for levels."""
         return
 
     @levels.command()
     @commands.guild_only()
     @commands.has_permissions(manage_roles=True)
-    async def setxp(self, ctx, *, data: str):
+    async def setxp(self, ctx: commands.Context, *, data: str):
         """Give an user a specific amount of XP."""
 
         # Command only works when levels are activated.
@@ -220,7 +220,7 @@ class Levels(commands.Cog):
     @levels.command()
     @commands.guild_only()
     @commands.has_permissions(manage_roles=True)
-    async def addxp(self, ctx, *, data: str):
+    async def addxp(self, ctx: commands.Context, *, data: str):
         """Give an user a specific amount of XP."""
 
         # Command only works when levels are activated.
@@ -246,7 +246,7 @@ class Levels(commands.Cog):
     @levels.command()
     @commands.guild_only()
     @commands.has_permissions(manage_roles=True)
-    async def removexp(self, ctx, *, data: str):
+    async def removexp(self, ctx: commands.Context, *, data: str):
         """Remove XP from an user, use 'all' to remove all the earned XP."""
 
         # Command only works when levels are activated.
@@ -272,7 +272,7 @@ class Levels(commands.Cog):
     @levels.command()
     @commands.guild_only()
     @commands.has_permissions(administrator=True)
-    async def enable(self, ctx):
+    async def enable(self, ctx: commands.Context):
         """Enables the leveling system."""
 
         # Enable it...
@@ -286,7 +286,7 @@ class Levels(commands.Cog):
     @levels.command()
     @commands.guild_only()
     @commands.has_permissions(administrator=True)
-    async def disable(self, ctx):
+    async def disable(self, ctx: commands.Context):
         """Disables the leveling system."""
 
         # Disable it...
@@ -300,7 +300,7 @@ class Levels(commands.Cog):
     @levels.command()
     @commands.guild_only()
     @commands.has_permissions(administrator=True)
-    async def recalculate(self, ctx):
+    async def recalculate(self, ctx: commands.Context):
         """Recalculates the level of everyone. It's dangerous, and might take long."""
 
         # Inform the progress is starting.
@@ -352,5 +352,5 @@ class Levels(commands.Cog):
         # It's stolen from MEE6, but who cares right? Don't ask me the reasoning behind this calculation.
         return 5/6 * next_level * (2 * next_level * next_level + 27 * next_level + 91)
 
-def setup(bot):
-    bot.add_cog(Levels(bot))
+async def setup(bot):
+    await bot.add_cog(Levels(bot))

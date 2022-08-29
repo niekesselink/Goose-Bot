@@ -1,7 +1,7 @@
 asyncio
 asyncpg
 cachetools
-novus
+discord.py
 pillow
 psutil
 python-dateutil

@@ -19,9 +19,15 @@ class Core(commands.Cog):
     async def on_ready(self):
         """Event that happens once the bot has started."""
 
+        # Wait untill ready. Wait what?
+        await self.bot.wait_until_ready()
+
         # But is running.
         print('Bot has started.')
         self.bot.uptime = datetime.utcnow()
+
+        # Sync commands to enable or disable new/old slash commands.
+        await self.bot.tree.sync()
 
         # Get the right activity type.
         activityType = self.bot.config.activityType.lower()
@@ -114,5 +120,5 @@ class Core(commands.Cog):
         """Event that happens once a member leaves the guild the bot is in."""
         await self.bot.db.execute("DELETE FROM guild_members WHERE guild_id = $1 AND id = $2", member.guild.id, member.id)
 
-def setup(bot):
-    bot.add_cog(Core(bot))
+async def setup(bot):
+    await bot.add_cog(Core(bot))

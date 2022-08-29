@@ -48,5 +48,5 @@ class Events(commands.Cog):
         if message.content.strip() == 'F':
             return await message.add_reaction('🇫')
 
-def setup(bot):
-    bot.add_cog(Events(bot))
+async def setup(bot):
+    await bot.add_cog(Events(bot))

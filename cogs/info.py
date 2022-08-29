@@ -7,13 +7,12 @@ from utils import embed, language
 class Info(commands.Cog):
     """Information commands about the bot."""
 
-    def __init__(self, bot):
-        """Initial function that runs when the class has been created."""
-        self.bot = bot
+    def __init__(self, bot: commands.Bot) -> None:
+        self.bot: commands.Bot = bot
 
-    @commands.command(alias=['profile'])
+    @commands.hybrid_command(alias=['profile'])
     @commands.guild_only()
-    async def info(self, ctx, *, data: str=None):
+    async def info(self, ctx: commands.Context, *, data: str=None):
         """Shows information about yours or someone elses their account."""
 
         # Get the correct data from the message.
@@ -70,8 +69,8 @@ class Info(commands.Cog):
             author=author
         ))
 
-    @commands.command(alias='bot')
-    async def botinfo(self, ctx):
+    @commands.hybrid_command(alias='bot')
+    async def botinfo(self, ctx: commands.Context):
         """Shows information about the bot."""
 
         # Get some data...
@@ -98,5 +97,5 @@ class Info(commands.Cog):
             fields=fields
         ))
 
-def setup(bot):
-    bot.add_cog(Info(bot))
+async def setup(bot):
+    await bot.add_cog(Info(bot))

@@ -31,5 +31,5 @@ class Socials(commands.Cog):
             elif was_live:
                 await after.remove_roles(after.guild.get_role(int(role_id[0]['value'])))
 
-def setup(bot):
-    bot.add_cog(Socials(bot))
+async def setup(bot):
+    await bot.add_cog(Socials(bot))

@@ -18,15 +18,15 @@ class Birthday(commands.Cog):
         """Function that happens the when the cog unloads."""
         self.check_birthday.cancel()
 
-    @commands.group()
+    @commands.hybrid_group()
     @commands.guild_only()
-    async def birthday(self, ctx):
+    async def birthday(self, ctx: commands.Context):
         """Commands for setting and changing your birthday."""
         return
 
     @birthday.command()
     @commands.guild_only()
-    async def set(self, ctx, *, date: str):
+    async def set(self, ctx: commands.Context, *, date: str):
         """Set your birthday date, the format day/month is used."""
 
         # Parse the given date and get guild timezone, return error if something is not working.
@@ -53,7 +53,7 @@ class Birthday(commands.Cog):
 
     @birthday.command()
     @commands.guild_only()
-    async def timezone(self, ctx, *, timezone: str):
+    async def timezone(self, ctx: commands.Context, *, timezone: str):
         """Change the timezone of your current location."""
 
         # Check if user has set a birthday.
@@ -78,9 +78,9 @@ class Birthday(commands.Cog):
         message = await language.get(self, ctx, 'birthday.timezone_set')
         await ctx.send(message.format(matching_timezones[0]))
 
-    @commands.command()
+    @commands.hybrid_command()
     @commands.guild_only()
-    async def birthdays(self, ctx):
+    async def birthdays(self, ctx: commands.Context):
         """Shows the first eight upcoming birthdays."""
 
         # Let's get them from the database.
@@ -104,7 +104,7 @@ class Birthday(commands.Cog):
         # Now, we'll send it.
         await ctx.send(await language.get(self, ctx, 'birthday.upcoming') + '\n'.join(lines))
 
-    async def member_info_field(self, ctx, member):
+    async def member_info_field(self, ctx: commands.Context, member):
         """Function to add a field to member info command."""
 
         # Get birthday, return if not set.
@@ -209,5 +209,5 @@ class Birthday(commands.Cog):
         difference = (target - now).total_seconds()
         await asyncio.sleep(difference)
 
-def setup(bot):
-    bot.add_cog(Birthday(bot))
+async def setup(bot):
+    await bot.add_cog(Birthday(bot))

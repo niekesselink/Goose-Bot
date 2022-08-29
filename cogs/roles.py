@@ -11,30 +11,30 @@ class Roles(commands.Cog):
         """Initial function that runs when the class has been created."""
         self.bot = bot
 
-    @commands.Cog.listener()
-    async def on_ready(self):
-        """Event that happens once the bot has started."""
+    async def cog_load(self):
+        """Event that happens once this cog gets loaded."""
 
         # Create memory.
         if 'roles.triggers' not in self.bot.memory:
             self.bot.memory['roles.triggers'] = []
 
             # Store values.
+            guilds = [guild async for guild in self.bot.fetch_guilds()]
             for guild in await self.bot.db.fetch("SELECT guild_id, channel_id, message_id FROM roles_reaction"):
-                if guild['guild_id'] in [guild.id for guild in self.bot.guilds]:
+                if guild['guild_id'] in [guild.id for guild in guilds]:
                     self.bot.memory['roles.triggers'].append(f"{guild['guild_id']}_{guild['channel_id']}_{guild['message_id']}")
 
-    @commands.group()
+    @commands.hybrid_group()
     @commands.guild_only()
     @commands.has_permissions(manage_roles=True)
-    async def roles(self, ctx):
+    async def roles(self, ctx: commands.Context):
         """Commands for adding role reactions."""
         return
 
     @roles.command()
     @commands.guild_only()
     @commands.has_permissions(manage_roles=True)
-    async def reaction(self, ctx, *, data: str):
+    async def reaction(self, ctx: commands.Context, *, data: str):
         """Add a role trigger on a specific reaction."""
 
         # Split the data in an array and get the type of action as well as message_id.
@@ -161,5 +161,5 @@ class Roles(commands.Cog):
             await self.bot.db.fetch("DELETE FROM roles_reaction WHERE guild_id = $1 AND channel_id = $2 AND message_id = $3", payload.guild_id, payload.channel_id, payload.message_id)
             self.bot.memory['roles.triggers'].remove(f'{payload.guild_id}_{payload.channel_id}_{payload.message_id}')
 
-def setup(bot):
-    bot.add_cog(Roles(bot))
+async def setup(bot):
+    await bot.add_cog(Roles(bot))

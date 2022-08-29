@@ -19,17 +19,14 @@ class Music(commands.Cog):
         """Initial function that runs when the class has been created."""
         self.bot = bot
 
-    @commands.Cog.listener()
-    async def on_ready(self):
-        """Event that happens once the bot has started."""
-
-        # Define memory.
+    async def cog_load(self):
+        """Event that happens once this cog gets loaded."""
         if 'music' not in self.bot.memory:
             self.bot.memory['music'] = {}
 
-    @commands.command()
+    @commands.hybrid_command()
     @commands.guild_only()
-    async def join(self, ctx):
+    async def join(self, ctx: commands.Context):
         """Brings the bot to your voice channel."""
 
         # Make sure the user is in a voice channel.
@@ -46,12 +43,11 @@ class Music(commands.Cog):
         await ctx.send(await language.get(self, ctx, 'music.join')) if ctx.message is None else await ctx.message.add_reaction('👍')
         await self.join_channel(ctx)
 
-    async def join_channel(self, ctx):
+    async def join_channel(self, ctx: commands.Context):
         """Function to join a voice channel and create bot memory."""
 
         # Let's join the channel...
-        await ctx.author.voice.channel.connect()
-        await ctx.guild.change_voice_state(channel=ctx.author.voice.channel, self_deaf=True)
+        await ctx.author.voice.channel.connect(self_deaf=True)
 
         # Create a memory object.
         if ctx.guild.id not in self.bot.memory['music']:
@@ -64,7 +60,7 @@ class Music(commands.Cog):
                 'volume': 1   
             }
 
-    async def is_allowed_to_use(ctx):
+    async def is_allowed_to_use(ctx: commands.Context):
         """Function to check if user is in the channel with the bot."""
 
         # Make sure the user is in a voice channel.
@@ -89,10 +85,10 @@ class Music(commands.Cog):
         # All good...
         return True
 
-    @commands.command()
+    @commands.hybrid_command()
     @commands.guild_only()
     @commands.check(is_allowed_to_use)
-    async def leave(self, ctx):
+    async def leave(self, ctx: commands.Context):
         """Makes the bot leave the channel."""
 
         # We're leaving...
@@ -101,10 +97,10 @@ class Music(commands.Cog):
         if ctx.guild.id in self.bot.memory['music']:
             del(self.bot.memory['music'][ctx.guild.id])
 
-    @commands.command()
+    @commands.hybrid_command()
     @commands.guild_only()
     @commands.check(is_allowed_to_use)
-    async def volume(self, ctx, level: int):
+    async def volume(self, ctx: commands.Context, level: int):
         """Changes the volume of the music."""
 
         # Ensure we have a source...
@@ -116,10 +112,10 @@ class Music(commands.Cog):
         self.bot.memory['music'][ctx.guild.id]['volume'] = level / 100
         ctx.voice_client.source.volume = level / 100
 
-    @commands.command(aliases=['next'])
+    @commands.hybrid_command(aliases=['next'])
     @commands.guild_only()
     @commands.check(is_allowed_to_use)
-    async def skip(self, ctx):
+    async def skip(self, ctx: commands.Context):
         """Skips the current playing song."""
 
         # Ensure we have a source...
@@ -130,10 +126,10 @@ class Music(commands.Cog):
         await ctx.send(await language.get(self, ctx, 'music.skip'))
         ctx.voice_client.stop()
 
-    @commands.command()
+    @commands.hybrid_command()
     @commands.guild_only()
     @commands.check(is_allowed_to_use)
-    async def clear(self, ctx):
+    async def clear(self, ctx: commands.Context):
         """Clears the current playlist."""
             
         # Clear the playlist.
@@ -145,10 +141,10 @@ class Music(commands.Cog):
         self.bot.memory['music'][ctx.guild.id]['playing'] = False
         ctx.voice_client.stop()
 
-    @commands.command(aliases=['remove'])
+    @commands.hybrid_command(aliases=['remove'])
     @commands.guild_only()
     @commands.check(is_allowed_to_use)
-    async def delete(self, ctx, position):
+    async def delete(self, ctx: commands.Context, position: str):
         """Removes a song from the playlist at the given position."""
 
         # Declare drop variable, for in case we need to adjust the current playing index.
@@ -191,10 +187,10 @@ class Music(commands.Cog):
         if int(indexPoints[0]) < self.bot.memory['music'][ctx.guild.id]['playingIndex']:
             self.bot.memory['music'][ctx.guild.id]['playingIndex'] = self.bot.memory['music'][ctx.guild.id]['playingIndex'] - playingDrop
 
-    @commands.command(aliases=['repeat'])
+    @commands.hybrid_command(aliases=['repeat'])
     @commands.guild_only()
     @commands.check(is_allowed_to_use)
-    async def loop(self, ctx, trigger):
+    async def loop(self, ctx: commands.Context, trigger: str):
         """Loop the song, playlist or turn it off again."""
             
         # Stop looping in case that keyword is given.
@@ -226,10 +222,10 @@ class Music(commands.Cog):
             message = await language.get(self, ctx, 'core.trigger_unknown')
             await ctx.send(message.format('track, queue, off'))
                 
-    @commands.command()
+    @commands.hybrid_command()
     @commands.guild_only()
     @commands.check(is_allowed_to_use)
-    async def shuffle(self, ctx):
+    async def shuffle(self, ctx: commands.Context):
         """Shuffles the playlist."""
 
         # Let's get current entry object first, and remove it.
@@ -246,9 +242,9 @@ class Music(commands.Cog):
         # And finally, inform..
         await ctx.send(await language.get(self, ctx, 'music.shuffle'))
 
-    @commands.command(aliases=['queue', 'q'])
+    @commands.hybrid_command(aliases=['queue', 'q'])
     @commands.guild_only()
-    async def playlist(self, ctx):
+    async def playlist(self, ctx: commands.Context):
         """Shows the current playlist of the bot."""
 
         # Are we in a channel?
@@ -372,10 +368,10 @@ class Music(commands.Cog):
         # Return the values...
         return lower, upper
 
-    @commands.command(aliases=['p'])
+    @commands.hybrid_command(aliases=['p'])
     @commands.guild_only()
     @commands.check(is_allowed_to_use)
-    async def play(self, ctx, *, query: str):
+    async def play(self, ctx: commands.Context, *, query: str):
         """Play a song or playlist by providing the name/artist or through an URL."""
 
         # If given, cut the audio filter away from the query into it's own.
@@ -384,91 +380,91 @@ class Music(commands.Cog):
             audioFilter = re.search(r'\[.*?\]', query)[0][1:-1]
             query = query.replace(f' [{audioFilter}]', '')
 
-        # Start typing incidicator.
-        await ctx.channel.trigger_typing()
+        # Start typing...
+        async with ctx.channel.typing():
 
-        # First, let's handle Spotify links.
-        if 'spotify.com' in query and ('playlist' in query or 'track' in query):
-            spotifyCredentials = SpotifyClientCredentials(client_id=self.bot.config.spotify_client_id, client_secret=self.bot.config.spotify_client_secret)
-            spotify = spotipy.Spotify(client_credentials_manager=spotifyCredentials)
+            # First, let's handle Spotify links.
+            if 'spotify.com' in query and ('playlist' in query or 'track' in query):
+                spotifyCredentials = SpotifyClientCredentials(client_id=self.bot.config.spotify_client_id, client_secret=self.bot.config.spotify_client_secret)
+                spotify = spotipy.Spotify(client_credentials_manager=spotifyCredentials)
 
-            # It's a playlist link...
-            if 'playlist' in query:
+                # It's a playlist link...
+                if 'playlist' in query:
 
-                # Now, let's get all the results from Spotify properly into an array...
-                playlist = []
-                result = spotify.playlist_items(query)
-                while result:
-                    playlist.extend(result['items'])
-                    result = spotify.next(result)
+                    # Now, let's get all the results from Spotify properly into an array...
+                    playlist = []
+                    result = spotify.playlist_items(query)
+                    while result:
+                        playlist.extend(result['items'])
+                        result = spotify.next(result)
 
-                # Now let's add them to the local playlist...
-                for track in playlist:
-                    entry = self.spotify_to_entry(track['track'], audioFilter)
-                    self.bot.memory['music'][ctx.guild.id]['playlist'].append(entry)
+                    # Now let's add them to the local playlist...
+                    for track in playlist:
+                        entry = self.spotify_to_entry(track['track'], audioFilter)
+                        self.bot.memory['music'][ctx.guild.id]['playlist'].append(entry)
                 
-                # Inform we're done adding a playlist.
-                message = await language.get(self, ctx, 'music.queued_playlist')
-                await ctx.send(message.format(len(playlist)))
+                    # Inform we're done adding a playlist.
+                    message = await language.get(self, ctx, 'music.queued_playlist')
+                    await ctx.send(message.format(len(playlist)))
 
-            # It's a track link...
-            elif 'track' in query:
-                entry = self.spotify_to_entry(spotify.track(query), audioFilter)
-                self.bot.memory['music'][ctx.guild.id]['playlist'].append(entry)
-                await ctx.send((await language.get(self, ctx, 'music.queued')).format(entry['title']))
+                # It's a track link...
+                elif 'track' in query:
+                    entry = self.spotify_to_entry(spotify.track(query), audioFilter)
+                    self.bot.memory['music'][ctx.guild.id]['playlist'].append(entry)
+                    await ctx.send((await language.get(self, ctx, 'music.queued')).format(entry['title']))
 
-        # Secondly, let's handle YouTube links.
-        elif 'youtube.com' in query or 'youtu.be' in query:
+            # Secondly, let's handle YouTube links.
+            elif 'youtube.com' in query or 'youtu.be' in query:
 
-            # It's a playlist link...
-            if 'playlist?list=' in query:
+                # It's a playlist link...
+                if 'playlist?list=' in query:
 
-                # Extract the ID from the url.
-                url = requests.utils.urlparse(query).query
-                params = dict(x.split('=') for x in url.split('&'))
+                    # Extract the ID from the url.
+                    url = requests.utils.urlparse(query).query
+                    params = dict(x.split('=') for x in url.split('&'))
 
-                # Now get the videos information through YouTube API.
-                api = pyyoutube.Api(api_key=self.bot.config.youtube_api_key)
-                result = api.get_playlist_items(
-                    playlist_id=params['list'],
-                    parts="id,snippet",
-                    count=None,
-                )
+                    # Now get the videos information through YouTube API.
+                    api = pyyoutube.Api(api_key=self.bot.config.youtube_api_key)
+                    result = api.get_playlist_items(
+                        playlist_id=params['list'],
+                        parts="id,snippet",
+                        count=None,
+                    )
 
-                # Loop to add the songs.
-                for item in result.items:
-                    self.bot.memory['music'][ctx.guild.id]['playlist'].append({
-                        'query': f'ytsearch:{item.snippet.title}',
-                        'title': item.snippet.title,
-                        'duration': 0,
-                        'audiofilter': audioFilter
-                    })
+                    # Loop to add the songs.
+                    for item in result.items:
+                        self.bot.memory['music'][ctx.guild.id]['playlist'].append({
+                            'query': f'ytsearch:{item.snippet.title}',
+                            'title': item.snippet.title,
+                            'duration': 0,
+                            'audiofilter': audioFilter
+                        })
 
-                # Inform succes...
-                message = await language.get(self, ctx, 'music.queued_playlist')
-                await ctx.send(message.format(len(result.items)))
+                    # Inform succes...
+                    message = await language.get(self, ctx, 'music.queued_playlist')
+                    await ctx.send(message.format(len(result.items)))
 
-            # It's a track link...
-            else:
-                entry = self.get_from_youtube(query, audioFilter)
-                self.bot.memory['music'][ctx.guild.id]['playlist'].append(entry)
-                await ctx.send((await language.get(self, ctx, 'music.queued')).format(entry['title']))
+                # It's a track link...
+                else:
+                    entry = self.get_from_youtube(query, audioFilter)
+                    self.bot.memory['music'][ctx.guild.id]['playlist'].append(entry)
+                    await ctx.send((await language.get(self, ctx, 'music.queued')).format(entry['title']))
             
-        # If still a hyperlink, then it's not supported.
-        elif query.startswith('http://') or query.startswith('https://'):
-            return await ctx.send(await language.get(self, ctx, 'music.not_supported'))
+            # If still a hyperlink, then it's not supported.
+            elif query.startswith('http://') or query.startswith('https://'):
+                return await ctx.send(await language.get(self, ctx, 'music.not_supported'))
 
-        # Finally, search for the song on YouTube...
-        else:
-            entry = self.get_from_youtube(f'ytsearch:{query}', audioFilter)
-            self.bot.memory['music'][ctx.guild.id]['playlist'].append(entry)
-            await ctx.send((await language.get(self, ctx, 'music.queued')).format(entry['title']))
+            # Finally, search for the song on YouTube...
+            else:
+                entry = self.get_from_youtube(f'ytsearch:{query}', audioFilter)
+                self.bot.memory['music'][ctx.guild.id]['playlist'].append(entry)
+                await ctx.send((await language.get(self, ctx, 'music.queued')).format(entry['title']))
 
         # Now let's see if we need to start playing directly, as in, nothing is playing...
         if not self.bot.memory['music'][ctx.guild.id]['playing']:
             self.start_play(ctx, self.bot.memory['music'][ctx.guild.id]['playingIndex'])
 
-    def spotify_to_entry(self, track, audioFilter=None):
+    def spotify_to_entry(self, track: str, audioFilter: str=None):
         """Parse a track from Spotify to an in-house entry."""
 
         # Get a proper query variable including the name of all the artists.
@@ -485,7 +481,7 @@ class Music(commands.Cog):
             'audiofilter': audioFilter
         }
 
-    def get_from_youtube(self, query, audioFilter=None):
+    def get_from_youtube(self, query: str, audioFilter: str=None):
         """Function to find and get information of a video on YouTube."""
             
         # Declare yt-dlp options.
@@ -532,12 +528,12 @@ class Music(commands.Cog):
             'audiofilter': audioFilter
         }
 
-    def start_play(self, ctx, index=None):
+    def start_play(self, ctx: commands.Context, index: int=None):
         """Function to start playing."""
         self.bot.memory['music'][ctx.guild.id]['playing'] = True
         self.play_handler(ctx, index)
 
-    def play_handler(self, ctx, index=None):
+    def play_handler(self, ctx: commands.Context, index: int=None):
         """Function that serves as the play handler."""
 
         # Remove previous downloaded file.
@@ -606,5 +602,5 @@ class Music(commands.Cog):
         voice_client = discord.utils.get(self.bot.voice_clients, guild=before.channel.guild)
         await voice_client.disconnect()
 
-def setup(bot):
-    bot.add_cog(Music(bot))
+async def setup(bot):
+    await bot.add_cog(Music(bot))

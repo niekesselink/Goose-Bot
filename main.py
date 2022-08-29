@@ -19,39 +19,43 @@ class Bot(commands.Bot):
             self.config = json.load(data, object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
             
         # Declare intents.
-        intents = discord.Intents.default()
-        intents.members = True
-        intents.presences = True
+        intents = discord.Intents(
+            guilds=True,
+            members=True,
+            bans=True,
+            emojis=True,
+            voice_states=True,
+            messages=True,
+            reactions=True,
+            message_content=True,
+        )
 
         # Call the initialize of the bot itself.
         super().__init__(
-            command_prefix=commands.when_mentioned_or(self.config.prefix),
+            command_prefix=self.config.prefix,
             intents=intents,
             *args,
             **kwargs
         )
 
+    async def setup_hook(self) -> None:
+        """Setup function that's async."""
+
         # Configure database.
-        self.db = asyncio.get_event_loop().run_until_complete(
-            asyncpg.create_pool(self.config.postgre)
-        )
+        self.db = await asyncpg.create_pool(self.config.postgre)
 
-# Define the bot.
-bot = Bot()
+        # Add each cog there is in the cogs directory...
+        for file in os.listdir('cogs'):
+            if file.endswith('.py'):
+                name = file[:-3]
+                await self.load_extension(f'cogs.{name}')
 
-# Add each cog there is in the cogs directory...
-for file in os.listdir('cogs'):
-    if file.endswith('.py'):
-        name = file[:-3]
-        bot.load_extension(f'cogs.{name}')
-
-# Define function for running the bot...
 async def main():
-    await bot.login(bot.config.token)
-    await bot.register_application_commands()
-    await bot.connect()
-    bot.loop.run_forever()
+    """Main method. What else?"""
 
-# Now we start.
-loop = bot.loop
-loop.run_until_complete(main())
+    # Start database and efine the bot.
+    async with Bot() as bot:
+        await bot.start(bot.config.token)
+
+# Run the main method.
+asyncio.run(main())
