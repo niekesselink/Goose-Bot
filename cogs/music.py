@@ -40,7 +40,7 @@ class Music(commands.Cog):
             return await ctx.send(await language.get(self, ctx, 'music.already_in_channel'))
 
         # Let's join the channel...
-        await ctx.send(await language.get(self, ctx, 'music.join')) if ctx.message is None else await ctx.message.add_reaction('👍')
+        await ctx.send(await language.get(self, ctx, 'music.join')) if ctx.clean_prefix == '/' else await ctx.message.add_reaction('👍')
         await self.join_channel(ctx)
 
     async def join_channel(self, ctx: commands.Context):
@@ -92,7 +92,7 @@ class Music(commands.Cog):
         """Makes the bot leave the channel."""
 
         # We're leaving...
-        await ctx.send(await language.get(self, ctx, 'music.leave')) if ctx.message is None else await ctx.message.add_reaction('👋')
+        await ctx.send(await language.get(self, ctx, 'music.leave')) if ctx.clean_prefix == '/' else await ctx.message.add_reaction('👋')
         await ctx.voice_client.disconnect()
         if ctx.guild.id in self.bot.memory['music']:
             del(self.bot.memory['music'][ctx.guild.id])
@@ -520,9 +520,13 @@ class Music(commands.Cog):
                     meta = ydl.extract_info(f'{query} lyrics', download=False)
                 meta = meta['entries'][0]
 
+        # Get from the meta formats only those with audio channels, and get then the one with the best quality...
+        audioFormats = list(filter(lambda x: x.get('audio_channels') is not None and x.get('audio_channels') > 0, meta['formats']))
+        bestFormat = max(audioFormats, key=lambda x: x.get('quality'))
+
         # Send back the entry.
         return {
-            'query': meta['formats'][0]['url'],
+            'query': bestFormat['url'],
             'title': meta['title'],
             'duration': meta['duration'],
             'audiofilter': audioFilter
@@ -580,8 +584,8 @@ class Music(commands.Cog):
             entry = self.get_from_youtube(entry['query'], entry['audiofilter'])
 
         # Now let's actually start playing..
-        ffmpegOptions = f"-af \"{entry['audiofilter']}\"" if entry['audiofilter'] else None
-        ffmpegOptionsBefore = '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5'
+        ffmpegOptions = "-vn" + (f" -af \"{entry['audiofilter']}\"" if entry['audiofilter'] else '')
+        ffmpegOptionsBefore = '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -re'
         source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(entry['query'], options=ffmpegOptions, before_options=ffmpegOptionsBefore), self.bot.memory['music'][ctx.guild.id]['volume'])
         ctx.voice_client.play(source, after=lambda e: self.play_handler(ctx))
 
