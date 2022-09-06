@@ -54,15 +54,29 @@ class Birthday(commands.Cog):
         date_formatted = date.strftime(await language.get(self, ctx, 'birthday.format')).lower()
         await ctx.send(message.format(date_formatted, timezone))
 
+    async def has_birthday(ctx: commands.Context):
+        """Function to check if user has a birthday set."""
+        birthday = await ctx.bot.db.fetch("SELECT birthday FROM birthdays WHERE guild_id = $1 AND member_id = $2", ctx.guild.id, ctx.author.id)
+        if not birthday:
+            await ctx.send(await language.get(ctx, ctx, 'birthday.not_set'))
+            return False
+        return True
+
+    @birthday.command(aliases=['delete', 'remove'])
+    @commands.guild_only()
+    @commands.check(has_birthday)
+    async def clear(self, ctx: commands.Context):
+        """Remove your set birthday and don't get announced anymore when it's your day."""
+
+        # Remove the birthday entry of the user and inform.
+        await self.bot.db.execute("DELETE FROM birthdays WHERE guild_id = $1 AND member_id = $2", ctx.guild.id, ctx.author.id)
+        await ctx.send(await language.get(self, ctx, 'birthday.cleared'))
+
     @birthday.command()
     @commands.guild_only()
+    @commands.check(has_birthday)
     async def timezone(self, ctx: commands.Context, *, timezone: str):
         """Change the timezone of your current location."""
-
-        # Check if user has set a birthday.
-        birthday = await self.bot.db.fetch("SELECT birthday FROM birthdays WHERE guild_id = $1 AND member_id = $2", ctx.guild.id, ctx.author.id)
-        if not birthday:
-            return await ctx.send(await language.get(self, ctx, 'birthday.not_set'))
 
         # Get the Json array of possible timezones.
         timezones = {}

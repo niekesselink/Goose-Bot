@@ -7,6 +7,7 @@
   "autodelete.enabled": "Autodelete is voor dit kanaal! Berichten zullen automatisch verwijderd worden na de aangegeven tijd.",
   "autodelete.incorrect": "{user_mention}, die delay ken ik niet. Probeer iets zoals `1d` of het aantal seconden...",
   "birthday": "Verjaardag",
+  "birthday.cleared": "Jouw verjaardag is niet meer opgeslagen en er zal dus geen aankondiging meer komen!",
   "birthday.format": "%d %B %Y",
   "birthday.incorrect": "{user_mention}, is dat een datum? Volgens mij niet. `.birthday set 18 june 1993` is een voorbeeld van hoe het moet!",
   "birthday.not_set": "Je moet eerst jouw verjaardag vaststellen via de `.birthday set` command {user_mention}!",

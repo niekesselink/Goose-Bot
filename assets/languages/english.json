@@ -7,6 +7,7 @@
   "autodelete.enabled": "**Honk!** Autodelete has been enabled! I'll chase the messages away after the delay has passed...",
   "autodelete.incorrect": "**Honk!** {user_mention}, I don't know that delay. Try something like `1d` or just the amount of seconds...",
   "birthday": "Birthday",
+  "birthday.cleared": "**Honk!** From now on my small brain doesn't know your birthday anymore!",
   "birthday.format": "%d %B %Y",
   "birthday.incorrect": "**Honk!** {user_mention}, is that a date? I don't think so. Typing `.birthday set 18 june 1993` is an example on how to do properly!",
   "birthday.not_set": "**Honk!** You need to set a birthday first using the `.birthday set` command, {user_mention}!",
