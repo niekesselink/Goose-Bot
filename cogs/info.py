@@ -46,19 +46,17 @@ class Info(commands.Cog):
         about = about[0]['about'] if about[0]['about'] is not None else await language.get(self, ctx, 'info.empty_about')
 
         # Define embed fields data.
-        format = '%d/%m/%Y'
-        fields = {
-            await language.get(self, ctx, 'info.joined') + f' {ctx.guild.name}': user.joined_at.strftime(format),
-            await language.get(self, ctx, 'info.created'): user.created_at.strftime(format)
-        }
+        fields = []
+        fields.append({ 'name': await language.get(self, ctx, 'info.joined') + f' {ctx.guild.name}', 'value': user.joined_at.strftime('%d/%m/%Y'), 'inline': False })
+        fields.append({ 'name': await language.get(self, ctx, 'info.created'), 'value': user.created_at.strftime('%d/%m/%Y'), 'inline': False })
 
         # Get additional fields from cogs.
         for cog in self.bot.cogs:
             cog = self.bot.get_cog(cog)
             if 'member_info_field' in dir(cog):
-                value = await cog.member_info_field(ctx, user)
-                if value is not None:
-                    fields.update(value)
+                field = await cog.member_info_field(ctx, user)
+                if field is not None:
+                    fields.append(field)
 
         # Create and send the embed.
         await ctx.send(embed=embed.create(
@@ -80,12 +78,11 @@ class Info(commands.Cog):
         members = int(members[0][0])
 
         # Define embed fields data.
-        fields = {
-            'Creator': '<@462311999980961793>',
-            'Servers active': f'{guilds} ({members} total members)',
-            'Last update': f'{subprocess.check_output(["git", "log", "-1", "--format=%cd "]).strip().decode("utf-8")}',
-            'Source code': 'https://github.com/niekesselink/Goose-Bot'
-        }
+        fields = []
+        fields.append({ 'name': 'Creator', 'value': '462311999980961793', 'inline': False })
+        fields.append({ 'name': 'Servers active', 'value': f'{guilds} ({members} total members)', 'inline': False })
+        fields.append({ 'name': 'Last update', 'value': f'{subprocess.check_output(["git", "log", "-1", "--format=%cd "]).strip().decode("utf-8")}', 'inline': False })
+        fields.append({ 'name': 'Source code', 'value': 'https://github.com/niekesselink/Goose-Bot', 'inline': False })
 
         # Create and send the embed.
         await ctx.send(embed=embed.create(

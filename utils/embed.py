@@ -17,7 +17,7 @@ def create(self, title=None, description=None, colour=None, thumbnail=None, fiel
     # Add fields if necessary.
     if fields is not None:
         for field in fields:
-            embed.add_field(name=field, value=fields[field], inline=False)
+            embed.add_field(name=field['name'], value=field['value'], inline=field['inline'])
 
     # Add author if that is also given, also check for url and add if present.
     if author is not None:

@@ -131,7 +131,7 @@ class Birthday(commands.Cog):
         
         # Format the birthday and create the field.
         format = (await language.get(self, ctx, 'birthday.format')).replace('%Y', '')
-        return { await language.get(self, ctx, 'birthday'): result[0]['birthday'].strftime(format) }
+        return { 'name': await language.get(self, ctx, 'birthday'), 'value': result[0]['birthday'].strftime(format), 'inline': False }
 
     @tasks.loop(minutes=15.0)
     async def check_birthday(self):

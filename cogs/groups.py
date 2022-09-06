@@ -68,25 +68,25 @@ class Groups(commands.Cog):
         groups = await self.bot.db.fetch("SELECT g.name, g.description, "
                                          "(SELECT COUNT(*) FROM group_members AS gm WHERE gm.group_id = g.id) AS membercount "
                                          "FROM groups AS g WHERE g.guild_id = $1 "
-                                         "ORDER BY membercount", ctx.guild.id)
+                                         "ORDER BY membercount DESC", ctx.guild.id)
 
         # Are there even any groups?
         if not groups:
             return await ctx.send(await language.get(self, ctx, 'groups.no_groups'))
 
-        # Get the correct language for members string and define a field variable.
-        members = await language.get(self, ctx, 'groups.list.members')
-        fields = {}
-
         # Fill in the groups in the fields list.
+        fields = []
         for data in groups:
-            fields.update({ data['name'] + ' (' + str(data['membercount']) + f' {members})': data['description'] })
+            fields.append({ 'name': ''.join([f'{chr(173)}\n', await language.get(self, ctx, 'groups.list.title')]), 'value': data['name'], "inline": True })
+            fields.append({ 'name': ''.join([f'{chr(173)}\n', await language.get(self, ctx, 'groups.list.members')]), 'value': str(data['membercount']), 'inline': True })
+            fields.append({ 'name': await language.get(self, ctx, 'groups.list.description'), 'value': data['description'], 'inline': False })
 
         # Send the embed...
         await ctx.send(embed=embed.create(
             self,
-            title=await language.get(self, ctx, 'groups.list.title'),
-            description=await language.get(self, ctx, 'groups.list.description'),
+            title='',
+            description=await language.get(self, ctx, 'groups.list.actual_description'),
+            colour=0x303136,
             fields=fields
         ))
 
@@ -199,7 +199,7 @@ class Groups(commands.Cog):
                                          "WHERE g.guild_id = $1 AND gm.member_id = $2", ctx.guild.id, member.id)
 
         # Return the field now if there is something.
-        return { await language.get(self, ctx, 'groups'): result[0]['groups'] } if result[0]['groups'] else None
+        return { 'name': await language.get(self, ctx, 'groups'), 'value': result[0]['groups'], 'inline': False } if result[0]['groups'] else None
 
 async def setup(bot):
     await bot.add_cog(Groups(bot))
