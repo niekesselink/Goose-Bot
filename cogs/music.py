@@ -206,7 +206,8 @@ class Music(commands.Cog):
             # Now let's see if we need to start playing directly, as in, nothing is playing...
             if not self.bot.memory['music'][ctx.guild.id]['playing']:
                 index = self.bot.memory['music'][ctx.guild.id]['playingIndex'] = self.bot.memory['music'][ctx.guild.id]['playingIndex'] - 1
-                self.start_play(ctx, index)
+                self.bot.memory['music'][ctx.guild.id]['playing'] = True
+                self.play_handler(ctx, index)
 
         # Start looping the whole queue.
         elif trigger == 'queue' or trigger == 'playlist':
@@ -215,7 +216,8 @@ class Music(commands.Cog):
 
             # Now let's see if we need to start playing directly, as in, nothing is playing...
             if not self.bot.memory['music'][ctx.guild.id]['playing']:
-                self.start_play(ctx)
+                self.bot.memory['music'][ctx.guild.id]['playing'] = True
+                self.play_handler(ctx)
 
         # Unknown trigger...
         else:
@@ -462,7 +464,8 @@ class Music(commands.Cog):
 
         # Now let's see if we need to start playing directly, as in, nothing is playing...
         if not self.bot.memory['music'][ctx.guild.id]['playing']:
-            self.start_play(ctx, self.bot.memory['music'][ctx.guild.id]['playingIndex'])
+            self.bot.memory['music'][ctx.guild.id]['playing'] = True
+            self.play_handler(ctx, self.bot.memory['music'][ctx.guild.id]['playingIndex'])
 
     def spotify_to_entry(self, track: str, audioFilter: str=None):
         """Parse a track from Spotify to an in-house entry."""
@@ -531,11 +534,6 @@ class Music(commands.Cog):
             'duration': meta['duration'],
             'audiofilter': audioFilter
         }
-
-    def start_play(self, ctx: commands.Context, index: int=None):
-        """Function to start playing."""
-        self.bot.memory['music'][ctx.guild.id]['playing'] = True
-        self.play_handler(ctx, index)
 
     def play_handler(self, ctx: commands.Context, index: int=None):
         """Function that serves as the play handler."""

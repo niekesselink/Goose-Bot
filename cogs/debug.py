@@ -18,6 +18,9 @@ class Debug(commands.Cog):
         """Initial function that runs when the class has been created."""
         self.bot = bot
 
+    def cog_load(self):
+        """Event that happens once this cog gets loaded."""
+
         # Get reference to the current running process.
         self.process = psutil.Process(os.getpid())
 

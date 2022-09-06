@@ -12,6 +12,9 @@ class Birthday(commands.Cog):
     def __init__(self, bot):
         """Initial function that runs when the class has been created."""
         self.bot = bot
+
+    def cog_load(self):
+        """Event that happens once this cog gets loaded."""
         self.check_birthday.start()
 
     def cog_unload(self):

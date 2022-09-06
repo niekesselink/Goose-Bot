@@ -12,9 +12,6 @@ class Core(commands.Cog):
         """Initial function that runs when the class has been created."""
         self.bot = bot
 
-        # Remove legacy help command, for now it's broken.
-        self.bot.remove_command('help')
-
     @commands.Cog.listener()
     async def on_ready(self):
         """Event that happens once the bot has started."""
@@ -25,6 +22,9 @@ class Core(commands.Cog):
         # But is running.
         print('Bot has started.')
         self.bot.uptime = datetime.utcnow()
+
+        # Remove legacy help command, for now it's broken.
+        self.bot.remove_command('help')
 
         # Sync commands to enable or disable new/old slash commands.
         await self.bot.tree.sync()
