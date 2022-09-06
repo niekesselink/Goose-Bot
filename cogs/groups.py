@@ -142,7 +142,7 @@ class Groups(commands.Cog):
 
     @groups.command()
     @commands.guild_only()
-    @commands.has_permissions(administrator=True)
+    #@commands.has_permissions(administrator=True)
     async def create(self, ctx: commands.Context, *, data: str):
         """Create a new public group for people to join."""
 
