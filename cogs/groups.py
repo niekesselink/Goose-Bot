@@ -1,3 +1,4 @@
+from pickle import FALSE
 from discord.ext import commands
 from utils import embed, language
 
@@ -77,15 +78,15 @@ class Groups(commands.Cog):
         # Fill in the groups in the fields list.
         fields = []
         for data in groups:
-            fields.append({ 'name': ''.join([f'{chr(173)}\n', await language.get(self, ctx, 'groups.list.title')]), 'value': data['name'], "inline": True })
-            fields.append({ 'name': ''.join([f'{chr(173)}\n', await language.get(self, ctx, 'groups.list.members')]), 'value': str(data['membercount']), 'inline': True })
-            fields.append({ 'name': await language.get(self, ctx, 'groups.list.description'), 'value': data['description'], 'inline': False })
+            fields.append({'name': ''.join([f'{chr(173)}\n', data['name']]) + f' `{str(data["membercount"])} {await language.get(self, ctx, "groups.list.members")}`',
+                           'value': data['description'],
+                           'inline': False})
 
         # Send the embed...
         await ctx.send(embed=embed.create(
             self,
             title='',
-            description=await language.get(self, ctx, 'groups.list.actual_description'),
+            description=await language.get(self, ctx, 'groups.list.description'),
             colour=0x303136,
             fields=fields
         ))
