@@ -10,6 +10,21 @@ CREATE TABLE guilds (
 );
 
 
+-- public.autodelete definition
+
+-- Drop table
+
+-- DROP TABLE autodelete;
+
+CREATE TABLE autodelete (
+	guild_id int8 NOT NULL,
+	channel_id int8 NOT NULL,
+	delay int4 NOT NULL,
+	CONSTRAINT autodelete_pk PRIMARY KEY (guild_id, channel_id),
+	CONSTRAINT autodelete_fk FOREIGN KEY (guild_id) REFERENCES guilds(id)
+);
+
+
 -- public.event_boosts definition
 
 -- Drop table
@@ -154,18 +169,21 @@ CREATE TABLE roles_reaction (
 );
 
 
--- public.autodelete definition
+-- public.socials definition
 
 -- Drop table
 
--- DROP TABLE autodelete;
+-- DROP TABLE socials;
 
-CREATE TABLE autodelete (
+CREATE TABLE socials (
 	guild_id int8 NOT NULL,
 	channel_id int8 NOT NULL,
-	delay int4 NOT NULL,
-	CONSTRAINT autodelete_pk PRIMARY KEY (guild_id, channel_id),
-	CONSTRAINT autodelete_fk FOREIGN KEY (guild_id) REFERENCES guilds(id)
+	social text NOT NULL,
+	handle text NOT NULL,
+	"last" text NULL DEFAULT ''::text,
+	"text" text NULL,
+	CONSTRAINT socials_pk PRIMARY KEY (guild_id, channel_id, handle),
+	CONSTRAINT socials_fk FOREIGN KEY (guild_id) REFERENCES guilds(id)
 );
 
 
