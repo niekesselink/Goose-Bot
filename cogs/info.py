@@ -79,7 +79,7 @@ class Info(commands.Cog):
 
         # Define embed fields data.
         fields = []
-        fields.append({ 'name': 'Creator', 'value': '462311999980961793', 'inline': False })
+        fields.append({ 'name': 'Creator', 'value': '<@462311999980961793>', 'inline': False })
         fields.append({ 'name': 'Servers active', 'value': f'{guilds} ({members} total members)', 'inline': False })
         fields.append({ 'name': 'Last update', 'value': f'{subprocess.check_output(["git", "log", "-1", "--format=%cd "]).strip().decode("utf-8")}', 'inline': False })
         fields.append({ 'name': 'Source code', 'value': 'https://github.com/niekesselink/Goose-Bot', 'inline': False })

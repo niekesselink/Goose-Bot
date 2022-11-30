@@ -75,16 +75,21 @@ class Core(commands.Cog):
         if isinstance(error, commands.NoPrivateMessage):
             return await ctx.author.send(await language.get(self, ctx, 'core.no_private_message'))
 
-        # We've hit an error. Inform that the owner is on it...
+        # Create an error message with what went wrong...
+        error_msg = discord.Embed(
+            description=f'**{ctx.message.content}**\n`{str(error)}`',
+            colour=0xFF0000
+        )
+
+        # If we're in debug, show the error message in the chat where it happened and end here.
+        if (self.bot.config.debug == '1'):
+            return await ctx.send(embed=error_msg)
+
+        # Not in debug, send full message to the bot owner and just a generic one to the channel.
+        owner = self.bot.get_user(462311999980961793)
+        await owner.send(embed=error_msg)
         await ctx.send(embed=discord.Embed(
             description=await language.get(self, ctx, 'core.error'),
-            colour=0xFF0000
-        ))
-
-        # Create a special error embed for this error and send it to the bot owner.
-        owner = self.bot.get_user(462311999980961793)
-        await owner.send(embed=discord.Embed(
-            description=f'**{ctx.message.content}**\n`{str(error)}`',
             colour=0xFF0000
         ))
             

@@ -5,6 +5,7 @@
   "activityText": "humans.",
   "colour": "73BBFF",
   "prefix": ".",
+  "debug": "0",
 
   "spotify_client_id": "insert client id here",
   "spotify_client_secret": "insert client secret here",
