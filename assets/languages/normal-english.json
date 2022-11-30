@@ -31,6 +31,8 @@
   "debug.reload_slash": "Slash commands reloaded!",
   "debug.reload_util": "Util {0} has been (re)loaded!",
   "debug.update": "Updating pip package...",
+  "example.ping": "Ping!",
+  "example.pong": "Pong!",
   "groups": "Groups",
   "groups.already_a_member": "You're already in that group, {user_mention}!",
   "groups.already_exist": "A group with that name already exist, {user_mention}!",

@@ -31,6 +31,8 @@
   "debug.reload_slash": "Slash commands herladen!",
   "debug.reload_util": "Util {0} is ge(her)laden!",
   "debug.update": "Updating pip package...",
+  "example.ping": "Ping!",
+  "example.pong": "Pong!",
   "groups": "Groepen",
   "groups.already_exist": "Een groep met die naam bestaat al {user_mention}!",
   "groups.created": "Groep {0} is aangemaakt! Iedereen kan nu lid worden als ze dat willen.",
