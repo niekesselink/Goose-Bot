@@ -121,9 +121,9 @@ class Core(commands.Cog):
         await self.bot.db.execute("INSERT INTO guild_members (guild_id, id) VALUES ($1, $2)", member.guild.id, member.id)
 
     @commands.Cog.listener()
-    async def on_member_remove(self, member):
+    async def on_raw_member_remove(self, payload):
         """Event that happens once a member leaves the guild the bot is in."""
-        await self.bot.db.execute("DELETE FROM guild_members WHERE guild_id = $1 AND id = $2", member.guild.id, member.id)
+        await self.bot.db.execute("DELETE FROM guild_members WHERE guild_id = $1 AND id = $2", payload.guild_id, payload.user.id)
 
 async def setup(bot):
     await bot.add_cog(Core(bot))
