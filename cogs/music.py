@@ -376,12 +376,6 @@ class Music(commands.Cog):
     async def play(self, ctx: commands.Context, *, query: str):
         """Play a song or playlist by providing the name/artist or through an URL."""
 
-        # If given, cut the audio filter away from the query into it's own.
-        audioFilter = None
-        if query.endswith(']') and '[' in query:
-            audioFilter = re.search(r'\[.*?\]', query)[0][1:-1]
-            query = query.replace(f' [{audioFilter}]', '')
-
         # Start typing...
         async with ctx.channel.typing():
 
@@ -402,7 +396,7 @@ class Music(commands.Cog):
 
                     # Now let's add them to the local playlist...
                     for track in playlist:
-                        entry = self.spotify_to_entry(track['track'], audioFilter)
+                        entry = self.spotify_to_entry(track['track'])
                         self.bot.memory['music'][ctx.guild.id]['playlist'].append(entry)
                 
                     # Inform we're done adding a playlist.
@@ -411,7 +405,7 @@ class Music(commands.Cog):
 
                 # It's a track link...
                 elif 'track' in query:
-                    entry = self.spotify_to_entry(spotify.track(query), audioFilter)
+                    entry = self.spotify_to_entry(spotify.track(query))
                     self.bot.memory['music'][ctx.guild.id]['playlist'].append(entry)
                     await ctx.send((await language.get(self, ctx, 'music.queued')).format(entry['title']))
 
@@ -438,8 +432,7 @@ class Music(commands.Cog):
                         self.bot.memory['music'][ctx.guild.id]['playlist'].append({
                             'query': f'ytsearch:{item.snippet.title}',
                             'title': item.snippet.title,
-                            'duration': 0,
-                            'audiofilter': audioFilter
+                            'duration': 0
                         })
 
                     # Inform succes...
@@ -448,7 +441,7 @@ class Music(commands.Cog):
 
                 # It's a track link...
                 else:
-                    entry = self.get_from_youtube(query, audioFilter)
+                    entry = self.get_from_youtube(query)
                     self.bot.memory['music'][ctx.guild.id]['playlist'].append(entry)
                     await ctx.send((await language.get(self, ctx, 'music.queued')).format(entry['title']))
             
@@ -458,7 +451,7 @@ class Music(commands.Cog):
 
             # Finally, search for the song on YouTube...
             else:
-                entry = self.get_from_youtube(f'ytsearch:{query}', audioFilter)
+                entry = self.get_from_youtube(f'ytsearch:{query}')
                 self.bot.memory['music'][ctx.guild.id]['playlist'].append(entry)
                 await ctx.send((await language.get(self, ctx, 'music.queued')).format(entry['title']))
 
@@ -467,7 +460,7 @@ class Music(commands.Cog):
             self.bot.memory['music'][ctx.guild.id]['playing'] = True
             self.play_handler(ctx, self.bot.memory['music'][ctx.guild.id]['playingIndex'])
 
-    def spotify_to_entry(self, track: str, audioFilter: str=None):
+    def spotify_to_entry(self, track: str):
         """Parse a track from Spotify to an in-house entry."""
 
         # Get a proper query variable including the name of all the artists.
@@ -480,11 +473,10 @@ class Music(commands.Cog):
         return {
             'query': query,
             'title': f"{track['name']} - {track['artists'][0]['name']}",
-            'duration': track['duration_ms'],
-            'audiofilter': audioFilter
+            'duration': track['duration_ms']
         }
 
-    def get_from_youtube(self, query: str, audioFilter: str=None):
+    def get_from_youtube(self, query: str):
         """Function to find and get information of a video on YouTube."""
             
         # Declare yt-dlp options.
@@ -531,8 +523,7 @@ class Music(commands.Cog):
         return {
             'query': bestFormat['url'],
             'title': meta['title'],
-            'duration': meta['duration'],
-            'audiofilter': audioFilter
+            'duration': meta['duration']
         }
 
     def play_handler(self, ctx: commands.Context, index: int=None):
@@ -579,12 +570,11 @@ class Music(commands.Cog):
 
         # If the query is still a YouTube search, then let's do that first...
         if 'ytsearch:' in entry['query']:
-            entry = self.get_from_youtube(entry['query'], entry['audiofilter'])
+            entry = self.get_from_youtube(entry['query'])
 
         # Now let's actually start playing..
-        ffmpegOptions = "-vn" + (f" -af \"{entry['audiofilter']}\"" if entry['audiofilter'] else '')
         ffmpegOptionsBefore = '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -re'
-        source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(entry['query'], options=ffmpegOptions, before_options=ffmpegOptionsBefore), self.bot.memory['music'][ctx.guild.id]['volume'])
+        source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(entry['query'], options='-vn', before_options=ffmpegOptionsBefore), self.bot.memory['music'][ctx.guild.id]['volume'])
         ctx.voice_client.play(source, after=lambda e: self.play_handler(ctx))
 
     @commands.Cog.listener()
