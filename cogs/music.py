@@ -1,6 +1,5 @@
 import asyncio
 import discord
-import os
 import pyyoutube
 import random
 import re
@@ -528,14 +527,6 @@ class Music(commands.Cog):
 
     def play_handler(self, ctx: commands.Context, index: int=None):
         """Function that serves as the play handler."""
-
-        # Remove previous downloaded file.
-        song_there = os.path.isfile(f'{ctx.guild.id}.mp3')
-        try:
-            if song_there:
-                os.remove(f'{ctx.guild.id}.mp3')
-        except:
-            pass
 
         # Do we still have a queue or are we still in a channel? If one check fails then end.
         if ctx.guild.id not in self.bot.memory['music'] or ctx.voice_client is None or not self.bot.memory['music'][ctx.guild.id]['playing']:
