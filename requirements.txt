@@ -2,7 +2,7 @@ asyncio
 asyncpg
 emoji
 cachetools
-discord.py
+discord.py[voice]
 pillow
 psutil
 python-dateutil
