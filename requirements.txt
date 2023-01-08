@@ -3,7 +3,6 @@ asyncpg
 emoji
 cachetools
 discord.py[voice]
-pillow
 psutil
 python-dateutil
 python-youtube
