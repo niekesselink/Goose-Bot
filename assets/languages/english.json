@@ -35,6 +35,7 @@
   "groups.non_existent": "**Honk!** That group doesn't exist, {user_mention}!",
   "groups.not_a_member": "**Honk!** You're not in this group, {user_mention}!",
   "groups.list.description": "Below is a list of groups which you can join by using `.groups join`. Once you've joined a group, you can mention everyone or be mentioned by doing `@group <name>`.",
+  "groups.list.member": "member",
   "groups.list.members": "members",
   "info.created": "Created",
   "info.description": "Open-source Discord bot for providing moderation features, music features and other fun commands to a Discord server.",

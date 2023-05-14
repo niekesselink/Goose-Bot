@@ -1,4 +1,5 @@
-from pickle import FALSE
+import textwrap
+
 from discord.ext import commands
 from utils import embed, language
 
@@ -40,8 +41,16 @@ class Groups(commands.Cog):
         group_id = int(result[0]['id'])
         await self.bot.db.execute("UPDATE groups SET last_called = NOW() WHERE id = $1", group_id)
 
-        # Now publish the results.
-        await message.channel.send(f"**@{result[0]['name']}!** {result[0]['members']}")
+        # Split results to keep Discord message character limit in mind.
+        wrapper = textwrap.TextWrapper(width=1900)
+        lines = wrapper.wrap(text=result[0]['members'])
+
+        # Now publish it, first post get's the group name.
+        for index, line in enumerate(lines):
+            if index == 0:
+                await message.channel.send(f"**@{result[0]['name']}!** {line[:-1]}")
+            else:
+                await message.channel.send(line[:-1])
 
     @commands.Cog.listener()
     async def on_member_remove(self, member):
@@ -78,7 +87,8 @@ class Groups(commands.Cog):
         # Fill in the groups in the fields list.
         fields = []
         for data in groups:
-            fields.append({'name': ''.join([f'{chr(173)}\n', data['name']]) + f' `{str(data["membercount"])} {await language.get(self, ctx, "groups.list.members")}`',
+            memberLang = "groups.list.member" if data["membercount"] == 1 else "groups.list.members"
+            fields.append({'name': ''.join([f'{chr(173)}\n', data['name']]) + f' `{str(data["membercount"])} {await language.get(self, ctx, memberLang)}`',
                            'value': data['description'],
                            'inline': False})
 
