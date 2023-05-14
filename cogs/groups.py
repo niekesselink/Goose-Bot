@@ -22,7 +22,7 @@ class Groups(commands.Cog):
         group = message.content.split(' ')[1]
 
         # Get the group result
-        result = await self.bot.db.fetch("SELECT g.id, g.name, '<@' || gm.member_id::TEXT || '>, ' AS members, g.last_called "
+        result = await self.bot.db.fetch("SELECT g.id, g.name, string_agg('<@' || gm.member_id::TEXT || '>,', ' ') AS members, g.last_called "
                                          "FROM groups AS g LEFT OUTER JOIN group_members AS gm ON gm.group_id = g.id "
                                          "WHERE g.guild_id = $1 AND LOWER(g.name) = LOWER($2) "
                                          "GROUP BY g.id", message.guild.id, group)
