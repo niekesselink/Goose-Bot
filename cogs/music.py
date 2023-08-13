@@ -110,6 +110,34 @@ class Music(commands.Cog):
         await ctx.send((await language.get(self, ctx, 'music.volume')).format(level))
         self.bot.memory['music'][ctx.guild.id]['volume'] = level / 100
         ctx.voice_client.source.volume = level / 100
+        
+    @commands.hybrid_command()
+    @commands.guild_only()
+    @commands.check(is_allowed_to_use)
+    async def pause(self, ctx: commands.Context):
+        """Pauses the current playing song."""
+
+        # Ensure we have a source...
+        if ctx.voice_client.source is None:
+            return await ctx.send(await language.get(self, ctx, 'music.not_playing'))
+        
+        # Pause it!
+        ctx.voice_client.pause()
+        await ctx.send(await language.get(self, ctx, 'music.pause')) if ctx.clean_prefix == '/' else await ctx.message.add_reaction('👍')        
+        
+    @commands.hybrid_command()
+    @commands.guild_only()
+    @commands.check(is_allowed_to_use)
+    async def resume(self, ctx: commands.Context):
+        """Pauses the current playing song."""
+
+        # Ensure we have a source...
+        if ctx.voice_client.source is None:
+            return await ctx.send(await language.get(self, ctx, 'music.not_playing'))
+        
+        # Resume it!
+        ctx.voice_client.resume()
+        await ctx.send(await language.get(self, ctx, 'music.resume')) if ctx.clean_prefix == '/' else await ctx.message.add_reaction('👍')        
 
     @commands.hybrid_command(aliases=['next'])
     @commands.guild_only()
