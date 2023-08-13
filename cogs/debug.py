@@ -94,7 +94,7 @@ class Debug(commands.Cog):
         importlib.reload(util)
 
         # Inform completion.
-        await ctx.send('Util {name} has been (re)loaded!')
+        await ctx.send(f'Util {name} has been (re)loaded!')
 
     #endregion
 
