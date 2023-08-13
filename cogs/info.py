@@ -37,7 +37,7 @@ class Info(commands.Cog):
 
         # Author field.
         author = {
-            'name': f'{user.name}#{user.discriminator}',
+            'name': f'{user.name}',
             'icon': user.avatar.url
         }
 

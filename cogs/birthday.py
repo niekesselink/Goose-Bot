@@ -116,7 +116,7 @@ class Birthday(commands.Cog):
                 continue
 
             # Add to the array.
-            lines.append(f"● `{birthday['text']}` **{member.name}**#{member.discriminator}")
+            lines.append(f"● `{birthday['text']}` **{member.name}**")
 
         # Now, we'll send it.
         await ctx.send(await language.get(self, ctx, 'birthday.upcoming') + '\n'.join(lines))

@@ -58,7 +58,7 @@ def fill(string, ctx=None, member=None, message=None):
         replace = {
             '{guild_name}': ctx.guild.name,
             '{user_mention}': ctx.author.mention,
-            '{user_id}': f'{ctx.author.name}#{ctx.author.discriminator}'
+            '{user_id}': f'{ctx.author.name}'
         }
 
     # For member.
@@ -66,7 +66,7 @@ def fill(string, ctx=None, member=None, message=None):
         replace = {
             '{guild_name}': member.guild.name,
             '{user_mention}': member.mention,
-            '{user_id}': f'{member.name}#{member.discriminator}'
+            '{user_id}': f'{member.name}'
         }
 
     # For message.
@@ -74,7 +74,7 @@ def fill(string, ctx=None, member=None, message=None):
         replace = {
             '{guild_name}': message.guild.name,
             '{user_mention}': message.author.mention,
-            '{user_id}': f'{message.author.name}#{message.author.discriminator}'
+            '{user_id}': f'{message.author.name}'
         }
 
     # Now make it happen.
