@@ -183,7 +183,8 @@ class Debug(commands.Cog):
 
             # Loop through the guilds.
             async for guild in self.bot.fetch_guilds():
-
+                guild = self.bot.get_guild(guild.id)
+                
                 # Add the guild itself to the database.
                 await self.bot.db.execute("INSERT INTO guilds (id) VALUES ($1) ON CONFLICT (id) DO UPDATE SET migrated = NOW()", guild.id)
 
