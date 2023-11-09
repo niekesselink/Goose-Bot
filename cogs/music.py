@@ -411,7 +411,7 @@ class Music(commands.Cog):
                 spotifyCredentials = SpotifyClientCredentials(client_id=self.bot.config.spotify_client_id, client_secret=self.bot.config.spotify_client_secret)
                 spotify = spotipy.Spotify(client_credentials_manager=spotifyCredentials)
 
-                # It's a playlist link...
+                # Check if it's a playlist link...
                 if 'playlist' in query:
 
                     # Now, let's get all the results from Spotify properly into an array...
@@ -431,15 +431,15 @@ class Music(commands.Cog):
                     await ctx.send(message.format(len(playlist)))
 
                 # It's a track link...
-                elif 'track' in query:
+                else:
                     entry = self.spotify_to_entry(spotify.track(query))
                     self.bot.memory['music'][ctx.guild.id]['playlist'].append(entry)
                     await ctx.send((await language.get(self, ctx, 'music.queued')).format(entry['title']))
 
             # Secondly, let's handle YouTube links.
-            elif 'youtube.com' in query or 'youtu.be' in query:
+            elif ('youtube.com' in query or 'youtu.be' in query) and ('playlist?list=' in query or 'watch?v=' in query):
 
-                # It's a playlist link...
+                # Check if it's a playlist link...
                 if 'playlist?list=' in query:
 
                     # Extract the ID from the url.
