@@ -30,7 +30,7 @@ class Core(commands.Cog):
         await self.bot.tree.sync()
 
         # Set a status if type and content are set.
-        if self.bot.config.activityType is not '' and self.bot.config.activityText is not '':
+        if self.bot.config.activityType != '' and self.bot.config.activityText != '':
             
             # Get the right activity type.
             activityType = self.bot.config.activityType.lower()
