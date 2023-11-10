@@ -55,7 +55,7 @@ class Admin(commands.Cog):
         """Change the status of the bot."""
 
         # For a non-fork, so Goose bot, only the real owner can do this..
-        if self.bot.user.id == 672445557293187128 and self.bot.is_owner(ctx.author) is False:
+        if self.bot.user.id == 672445557293187128 and await self.bot.is_owner(ctx.author) is False:
             return ctx.send(await language.get(self, ctx, 'admin.status_not_allowed'))
 
         # Get the correct data from the message.
@@ -97,7 +97,7 @@ class Admin(commands.Cog):
         """Change the status of the bot."""
 
         # For a non-fork, so Goose bot, only the real owner can do this..
-        if self.bot.user.id == 672445557293187128 and self.bot.is_owner(ctx.author) is False:
+        if self.bot.user.id == 672445557293187128 and await self.bot.is_owner(ctx.author) is False:
             return ctx.send(await language.get(self, ctx, 'admin.status_not_allowed'))
         
         await self.bot.user.edit(username=data)
@@ -110,7 +110,7 @@ class Admin(commands.Cog):
         """Change the status of the bot."""
 
         # For a non-fork, so Goose bot, only the real owner can do this..
-        if self.bot.user.id == 672445557293187128 and self.bot.is_owner(ctx.author) is False:
+        if self.bot.user.id == 672445557293187128 and await self.bot.is_owner(ctx.author) is False:
             return ctx.send(await language.get(self, ctx, 'admin.status_not_allowed'))
         
         img = requests.get(url).content
