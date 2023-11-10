@@ -1,5 +1,6 @@
 import discord
 import json
+import requests
 
 from discord.ext import commands
 from utils import language
@@ -87,6 +88,33 @@ class Admin(commands.Cog):
         )
 
         # Add reaction to confirm it's done.
+        await ctx.message.add_reaction('👍')
+        
+    @admin.command()
+    @commands.guild_only()
+    @commands.has_permissions(administrator=True)
+    async def name(self, ctx: commands.Context, name: str):
+        """Change the status of the bot."""
+
+        # For a non-fork, so Goose bot, only the real owner can do this..
+        if self.bot.user.id == 672445557293187128 and self.bot.is_owner(ctx.author) is False:
+            return ctx.send(await language.get(self, ctx, 'admin.status_not_allowed'))
+        
+        await self.bot.user.edit(username=name)
+        await ctx.message.add_reaction('👍')
+
+    @admin.command()
+    @commands.guild_only()
+    @commands.has_permissions(administrator=True)
+    async def avatar(self, ctx: commands.Context, url: str):
+        """Change the status of the bot."""
+
+        # For a non-fork, so Goose bot, only the real owner can do this..
+        if self.bot.user.id == 672445557293187128 and self.bot.is_owner(ctx.author) is False:
+            return ctx.send(await language.get(self, ctx, 'admin.status_not_allowed'))
+        
+        img = requests.get(url).content
+        await self.bot.user.edit(avatar=img)
         await ctx.message.add_reaction('👍')
 
 async def setup(bot):
