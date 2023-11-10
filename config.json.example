@@ -1,8 +1,8 @@
 {
   "token": "insert token here",
   "postgre": "insert url here",
-  "activityType": "listening",
-  "activityText": "humans.",
+  "activityType": "",
+  "activityText": "",
   "colour": "73BBFF",
   "prefix": ".",
   "debug": "0",

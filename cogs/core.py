@@ -29,27 +29,30 @@ class Core(commands.Cog):
         # Sync commands to enable or disable new/old slash commands.
         await self.bot.tree.sync()
 
-        # Get the right activity type.
-        activityType = self.bot.config.activityType.lower()
-        if activityType == "playing":
-            activityType = discord.ActivityType.playing
-        elif activityType == "streaming":
-            activityType = discord.ActivityType.streaming
-        elif activityType == "listening":
-            activityType = discord.ActivityType.listening
-        elif activityType == "watching":
-            activityType = discord.ActivityType.watching
-        elif activityType == "custom":
-            activityType = discord.ActivityType.custom
-        elif activityType == "competing":
-            activityType = discord.ActivityType.competing
+        # Set a status if type and content are set.
+        if self.bot.config.activityType is not '' and self.bot.config.activityText is not '':
+            
+            # Get the right activity type.
+            activityType = self.bot.config.activityType.lower()
+            if activityType == "playing":
+                activityType = discord.ActivityType.playing
+            elif activityType == "streaming":
+                activityType = discord.ActivityType.streaming
+            elif activityType == "listening":
+                activityType = discord.ActivityType.listening
+            elif activityType == "watching":
+                activityType = discord.ActivityType.watching
+            elif activityType == "custom":
+                activityType = discord.ActivityType.custom
+            elif activityType == "competing":
+                activityType = discord.ActivityType.competing
 
-        # Check-double-check to ensure the type is not a string, if correct, go and change...
-        if isinstance(activityType, str) is False:
-            await self.bot.change_presence(
-                activity=discord.Activity(type=activityType, name=self.bot.config.activityText),
-                status=discord.Status.online
-            )
+            # Check-double-check to ensure the type is not a string, if correct, go and change...
+            if isinstance(activityType, str) is False:
+                await self.bot.change_presence(
+                    activity=discord.Activity(type=activityType, name=self.bot.config.activityText),
+                    status=discord.Status.online
+                )
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
