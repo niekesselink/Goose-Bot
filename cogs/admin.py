@@ -93,14 +93,14 @@ class Admin(commands.Cog):
     @admin.command()
     @commands.guild_only()
     @commands.has_permissions(administrator=True)
-    async def name(self, ctx: commands.Context, name: str):
+    async def name(self, ctx: commands.Context, *, data: str):
         """Change the status of the bot."""
 
         # For a non-fork, so Goose bot, only the real owner can do this..
         if self.bot.user.id == 672445557293187128 and self.bot.is_owner(ctx.author) is False:
             return ctx.send(await language.get(self, ctx, 'admin.status_not_allowed'))
         
-        await self.bot.user.edit(username=name)
+        await self.bot.user.edit(username=data)
         await ctx.message.add_reaction('👍')
 
     @admin.command()
