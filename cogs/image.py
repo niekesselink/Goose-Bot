@@ -11,22 +11,22 @@ class Image(commands.Cog):
         self.bot = bot
 
     @commands.hybrid_command()
-    async def cat(self, ctx):
+    async def cat(self, ctx: commands.Context):
         """Posts a random cat picture."""
         await self.get_image(ctx, 'http://aws.random.cat/meow', 'file')
 
     @commands.hybrid_command()
-    async def dog(self, ctx):
+    async def dog(self, ctx: commands.Context):
         """Posts a random dog picture."""
         await self.get_image(ctx, 'http://random.dog/woof.json', 'url')
 
     @commands.hybrid_command()
-    async def birb(self, ctx):
+    async def birb(self, ctx: commands.Context):
         """Posts a random birb picture."""
         await self.get_image(ctx, 'https://api.alexflipnote.dev/birb', 'file')
 
     @commands.hybrid_command()
-    async def duck(self, ctx):
+    async def duck(self, ctx: commands.Context):
         """Posts a random duck picture."""
         await self.get_image(ctx, 'https://random-d.uk/api/v1/random', 'url') 
         
