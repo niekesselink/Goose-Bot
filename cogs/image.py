@@ -9,7 +9,7 @@ class Image(commands.Cog):
     def __init__(self, bot):
         """Initial function that runs when the class has been created."""
         self.bot = bot
-
+        
     @commands.hybrid_command()
     async def cat(self, ctx: commands.Context):
         """Posts a random cat picture."""
@@ -28,15 +28,15 @@ class Image(commands.Cog):
     @commands.hybrid_command()
     async def duck(self, ctx: commands.Context):
         """Posts a random duck picture."""
-        await self.get_image(ctx, 'https://random-d.uk/api/v1/random', 'url') 
+        await self.get_image(ctx, 'https://random-d.uk/api/v1/random', 'url')
         
-    async def get_image(self, ctx, link: str, keyword: str):
+    async def get_image(self, ctx: commands.Context, link: str, keyword: str):
         """Function that gets an image from a given url and places it in an embed."""
 
         image = discord.Embed()
         image.set_image(url=requests.get(link).json()[keyword])
         await ctx.send(embed=image)
 
-def setup(bot):
-    bot.add_cog(Image(bot))
+async def setup(bot):
+    await bot.add_cog(Image(bot))
     
