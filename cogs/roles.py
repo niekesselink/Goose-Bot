@@ -61,7 +61,7 @@ class Roles(commands.Cog):
 
             # Define variables.
             role = None
-            reaction = discord.utils.get(self.bot.emojis, id=data[3])
+            reaction = discord.utils.get(self.bot.emojis, id=int(data[3]))
 
             # Get the role by ID, but only if it's an id, otherwise look it up in case of a name match.
             if data[2].isdigit():
@@ -77,7 +77,7 @@ class Roles(commands.Cog):
             # If any other exception we will throw it so it can be solved by the developer.
             try:
                 await self.bot.db.execute("INSERT INTO roles_reaction (guild_id, channel_id, message_id, role_id, reaction) VALUES ($1, $2, $3, $4, $5)",
-                                          ctx.guild.id, message.channel.id, message_id, role.id, reaction)
+                                          ctx.guild.id, message.channel.id, message_id, role.id, str(reaction))
             except asyncpg.exceptions.UniqueViolationError:
                 if ctx.prefix is self.bot.config.prefix:
                     return await ctx.send(await language.get(self, ctx, 'roles.already_exist'), delete_after=10)
