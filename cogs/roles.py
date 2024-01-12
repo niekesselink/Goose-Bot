@@ -61,7 +61,7 @@ class Roles(commands.Cog):
 
             # Define variables.
             role = None
-            reaction = data[3]
+            reaction = discord.utils.get(self.bot.emojis, id=data[3])
 
             # Get the role by ID, but only if it's an id, otherwise look it up in case of a name match.
             if data[2].isdigit():
