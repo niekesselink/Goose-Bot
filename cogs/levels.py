@@ -112,15 +112,16 @@ class Levels(commands.Cog):
 
             # Let's add the ranks...
             await member.add_roles(*achieved_ranks)
+            
+    async def is_levels_enabled(ctx: commands.Context):
+        """Function that checks if levels are enabled on the server."""
+        return ctx.guild.id in ctx.bot.memory['levels']
 
     @commands.hybrid_command()
     @commands.guild_only()
+    @commands.check(is_levels_enabled)
     async def rank(self, ctx: commands.Context, username: str=None):
         """Get information about your current level."""
-
-        # Command only works when levels are activated.
-        if ctx.guild.id not in self.bot.memory['levels']:
-            return
 
         # Get the user if given, else resort to self.
         user = ctx.author
@@ -154,9 +155,10 @@ class Levels(commands.Cog):
 
     @commands.hybrid_command()
     @commands.guild_only()
+    @commands.check(is_levels_enabled)
     async def leaderboard(self, ctx: commands.Context):
         """Get's the top 10 people of the server."""
-        
+
         # Get the top ten members.
         result = await self.bot.db.fetch("SELECT member_id, xp, level FROM levels WHERE guild_id = $1 "
                                          "ORDER BY xp DESC LIMIT 10", ctx.guild.id)
@@ -194,12 +196,9 @@ class Levels(commands.Cog):
     @levels.command()
     @commands.guild_only()
     @commands.has_permissions(manage_roles=True)
+    @commands.check(is_levels_enabled)
     async def setxp(self, ctx: commands.Context, *, data: str):
         """Give an user a specific amount of XP."""
-
-        # Command only works when levels are activated.
-        if ctx.guild.id not in self.bot.memory['levels']:
-            return
 
         # Split the data and find an user.
         data = data.split(' ', 1)
@@ -220,12 +219,9 @@ class Levels(commands.Cog):
     @levels.command()
     @commands.guild_only()
     @commands.has_permissions(manage_roles=True)
+    @commands.check(is_levels_enabled)
     async def addxp(self, ctx: commands.Context, *, data: str):
         """Give an user a specific amount of XP."""
-
-        # Command only works when levels are activated.
-        if ctx.guild.id not in self.bot.memory['levels']:
-            return
 
         # Split the data and find an user.
         data = data.split(' ', 1)
@@ -246,12 +242,9 @@ class Levels(commands.Cog):
     @levels.command()
     @commands.guild_only()
     @commands.has_permissions(manage_roles=True)
+    @commands.check(is_levels_enabled)
     async def removexp(self, ctx: commands.Context, *, data: str):
         """Remove XP from an user, use 'all' to remove all the earned XP."""
-
-        # Command only works when levels are activated.
-        if ctx.guild.id not in self.bot.memory['levels']:
-            return
 
         # Split the data and find an user.
         data = data.split(' ', 1)
@@ -286,9 +279,10 @@ class Levels(commands.Cog):
     @levels.command()
     @commands.guild_only()
     @commands.has_permissions(administrator=True)
+    @commands.check(is_levels_enabled)
     async def disable(self, ctx: commands.Context):
         """Disables the leveling system."""
-
+        
         # Disable it...
         await self.bot.db.execute("UPDATE guild_settings SET value = 'False' WHERE key = 'levels.enabled' AND guild_id = $1", ctx.guild.id)
         self.bot.memory[ctx.guild.id]['levels.enabled'] = 'False'
@@ -300,6 +294,7 @@ class Levels(commands.Cog):
     @levels.command()
     @commands.guild_only()
     @commands.has_permissions(administrator=True)
+    @commands.check(is_levels_enabled)
     async def recalculate(self, ctx: commands.Context):
         """Recalculates the level of everyone. It's dangerous, and might take long."""
 
