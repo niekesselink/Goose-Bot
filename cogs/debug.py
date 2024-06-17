@@ -157,7 +157,7 @@ class Debug(commands.Cog):
         await ctx.send('Restarting...')
 
         # Restart the bot.
-        os.execl('restart-script.sh', '&')
+        await self.bot.close()
 
     #endregion
 
