@@ -106,7 +106,7 @@ class Music(commands.Cog):
         if ctx.voice_client.source is None:
             return await ctx.send(await language.get(self, ctx, 'music.not_playing'))
 
-        # Make sure we only a number to convert to int...
+        # Just some code because someone used a % symbol when changing the volume...
         level = re.sub('[^0-9]', '', level)
         level = int(level)
 
