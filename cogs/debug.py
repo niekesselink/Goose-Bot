@@ -149,6 +149,16 @@ class Debug(commands.Cog):
         # Return the output.
         return [output.decode() for output in result]
 
+    @debug.command()
+    async def restart(self, ctx:commands.Context):
+        """Restarts the bot."""
+
+        # Inform the user.
+        await ctx.send('Restarting...')
+
+        # Restart the bot.
+        os.execl('restart-script.sh', '&')
+
     #endregion
 
     #region Misc
