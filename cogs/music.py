@@ -99,12 +99,16 @@ class Music(commands.Cog):
     @commands.hybrid_command()
     @commands.guild_only()
     @commands.check(is_allowed_to_use)
-    async def volume(self, ctx: commands.Context, level: int):
+    async def volume(self, ctx: commands.Context, level: str):
         """Changes the volume of the music."""
 
         # Ensure we have a source...
         if ctx.voice_client.source is None:
             return await ctx.send(await language.get(self, ctx, 'music.not_playing'))
+
+        # Make sure we only a number to convert to int...
+        level = re.sub('[^0-9]', '', level)
+        level = int(level)
 
         # Now let's change the volume and inform...
         await ctx.send((await language.get(self, ctx, 'music.volume')).format(level))
