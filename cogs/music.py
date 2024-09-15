@@ -514,7 +514,7 @@ class Music(commands.Cog):
         ydl_options = {
             'format': 'bestaudio/best',
             'geo_bypass': True,
-            'geo_bypass_country': 'DE'
+            'geo_bypass_country': 'DE',
             'noplaylist': True,
             'quiet': True,
             'skip_download': True,
