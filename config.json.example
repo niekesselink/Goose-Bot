@@ -9,5 +9,6 @@
 
   "spotify_client_id": "insert client id here",
   "spotify_client_secret": "insert client secret here",
+  "youtube_po_token": "",
   "youtube_api_key": "insert api key here"
 }

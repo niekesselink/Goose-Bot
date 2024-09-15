@@ -512,6 +512,7 @@ class Music(commands.Cog):
             
         # Declare yt-dlp options.
         ydl_options = {
+            'extractor_args': 'youtube:player-client=web,default;po_token=web+' + self.bot.config.youtube_po_token,
             'noplaylist': True,
             'quiet': True,
             'skip_download': True
