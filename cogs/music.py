@@ -512,10 +512,13 @@ class Music(commands.Cog):
             
         # Declare yt-dlp options.
         ydl_options = {
-            'extractor_args': 'youtube:player-client=web,default;po_token=web+' + self.bot.config.youtube_po_token,
+            'format': 'bestaudio/best',
+            'geo_bypass': True,
+            'geo_bypass_country': 'DE'
             'noplaylist': True,
             'quiet': True,
-            'skip_download': True
+            'skip_download': True,
+            'source_address': '0.0.0.0'
         }
 
         # Time to find a video matching the result and get the information from it.
