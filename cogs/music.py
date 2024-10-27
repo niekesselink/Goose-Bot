@@ -511,19 +511,18 @@ class Music(commands.Cog):
         """Function to find and get information of a video on YouTube."""
             
         # Declare yt-dlp options.
-        ydl_options = {
+        ytdl_options = {
             'format': 'bestaudio/best',
-            'geo_bypass': True,
-            'geo_bypass_country': 'DE',
             'noplaylist': True,
             'quiet': True,
             'skip_download': True,
-            'source_address': '0.0.0.0'
+            'username' : 'oauth2',
+            'password': ''
         }
 
         # Time to find a video matching the result and get the information from it.
         # However, sometimes an error occurs, and thus, hacky fixes in the except handler.
-        with yt_dlp.YoutubeDL(ydl_options) as ydl:
+        with yt_dlp.YoutubeDL(ytdl_options) as ydl:
             try:
                 meta = ydl.extract_info(query, download=False)
             except:
