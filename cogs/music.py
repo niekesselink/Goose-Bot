@@ -516,7 +516,7 @@ class Music(commands.Cog):
             'noplaylist': True,
             'quiet': True,
             'skip_download': True,
-            'username' : 'oauth2',
+            'username' : 'oauth',
             'password': ''
         }
 
