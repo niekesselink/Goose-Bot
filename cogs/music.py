@@ -514,7 +514,6 @@ class Music(commands.Cog):
         ytdl_options = {
             'format': 'bestaudio/best',
             'noplaylist': True,
-            'quiet': True,
             'skip_download': True,
             'username' : 'oauth',
             'password': ''
