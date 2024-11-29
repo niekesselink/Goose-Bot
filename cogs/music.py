@@ -515,8 +515,7 @@ class Music(commands.Cog):
             'format': 'bestaudio/best',
             'noplaylist': True,
             'skip_download': True,
-            'username' : 'oauth',
-            'password': ''
+            'cookiefile' : 'cookies.txt'
         }
 
         # Time to find a video matching the result and get the information from it.
