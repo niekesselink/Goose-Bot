@@ -14,7 +14,7 @@
   "birthday.success": "{user_mention}, your birthday is now set to {0} in the {1} timezone! Not right? Try rephrasing it, maybe switch the numbers or spell out the month.",
   "birthday.timezone_set": "{user_mention}, your timezone is now set to {0}!",
   "birthday.timezone_unknown": "{user_mention}, I don’t recognize that timezone. Check [this site](http://www.timezoneconverter.com/cgi-bin/findzone) to find the correct one!",
-  "birthday.upcoming": "Here are the upcoming birthdays… 🎉",
+  "birthday.upcoming": "Here are the upcoming birthdays… 🎉\n\n",
   "birthday.wish": "Hey @everyone, it’s {0}’s birthday today! Be awesome and wish them a happy birthday!",
   "core.error": "**Uh-oh!** Something went wrong. I’ve reported it to my creator—thanks for being my crash-test dummy, {user_mention}!",
   "core.incorrect_usage": "{user_mention}, that’s not how you use this command! Try again.",

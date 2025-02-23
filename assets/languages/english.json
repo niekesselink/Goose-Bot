@@ -14,7 +14,7 @@
   "birthday.success": "**Honk!** {user_mention}, your birthday is now set to {0} in timezone {1}! If that looks wrong, try again and mix up the numbers!",
   "birthday.timezone_set": "**Honk!** {user_mention}, I have set your timezone to {0}! Now I know exactly when to honk for your birthday!",
   "birthday.timezone_unknown": "**Honk!** {user_mention}, I have no clue what timezone that is! Check here: http://www.timezoneconverter.com/cgi-bin/findzone",
-  "birthday.upcoming": "**Honk!** Here are the upcoming birthdays! Get ready to honk extra loud!",
+  "birthday.upcoming": "**Honk!** Here are the upcoming birthdays! Get ready to honk extra loud! 🎉\n\n",
   "birthday.wish": "**HONK HONK!** Attention, humans! It's {0}'s birthday today! Be nice and honk a happy birthday!",
   "core.error": "**Honk!** Oops, something broke! My caretaker has been notified—I'll honk at them until they fix it!",
   "core.incorrect_usage": "**Honk!** Nope, {user_mention}, that's not how you use this command! Try again!",
