@@ -10,10 +10,10 @@ class Image(commands.Cog):
         """Initial function that runs when the class has been created."""
         self.bot = bot
         
-    @commands.hybrid_command()
-    async def cat(self, ctx: commands.Context):
-        """Posts a random cat picture."""
-        await self.get_image(ctx, 'http://aws.random.cat/meow', 'file')
+#    @commands.hybrid_command()
+#    async def cat(self, ctx: commands.Context):
+#        """Posts a random cat picture."""
+#        await self.get_image(ctx, 'http://aws.random.cat/meow', 'file')
 
     @commands.hybrid_command()
     async def dog(self, ctx: commands.Context):
