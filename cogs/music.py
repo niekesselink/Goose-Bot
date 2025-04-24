@@ -1,4 +1,5 @@
 import asyncio
+import functools
 import discord
 import pyyoutube
 import random
@@ -7,6 +8,7 @@ import requests
 import spotipy
 import yt_dlp
 
+from concurrent.futures import ProcessPoolExecutor
 from discord.ext import commands
 from spotipy.oauth2 import SpotifyClientCredentials
 from utils import language
@@ -472,7 +474,7 @@ class Music(commands.Cog):
 
                 # It's a track link...
                 else:
-                    entry = self.get_from_youtube(query)
+                    entry = await self.async_get_from_youtube(query)
                     self.bot.memory['music'][ctx.guild.id]['playlist'].append(entry)
                     await ctx.send((await language.get(self, ctx, 'music.queued')).format(entry['title']))
             
@@ -482,7 +484,7 @@ class Music(commands.Cog):
 
             # Finally, search for the song on YouTube...
             else:
-                entry = self.get_from_youtube(f'ytsearch:{query}')
+                entry = await self.async_get_from_youtube(f'ytsearch:{query}')
                 self.bot.memory['music'][ctx.guild.id]['playlist'].append(entry)
                 await ctx.send((await language.get(self, ctx, 'music.queued')).format(entry['title']))
 
@@ -506,6 +508,14 @@ class Music(commands.Cog):
             'title': f"{track['name']} - {track['artists'][0]['name']}",
             'duration': track['duration_ms']
         }
+
+    async def async_get_from_youtube(self, query: str):
+        """Function to find and get information of a video on YouTube."""
+
+        loop = asyncio.get_event_loop()
+        partial = functools.partial(self.get_from_youtube, query)
+        return await loop.run_in_executor(None, partial)
+
 
     def get_from_youtube(self, query: str):
         """Function to find and get information of a video on YouTube."""
@@ -599,7 +609,7 @@ class Music(commands.Cog):
         # Now let's actually start playing..
         ffmpegOptionsBefore = '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -re'
         source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(entry['query'], options='-vn', before_options=ffmpegOptionsBefore), self.bot.memory['music'][ctx.guild.id]['volume'])
-        ctx.voice_client.play(source, after=lambda e: self.play_handler(ctx))
+        ctx.voice_client.play(source, after=lambda: self.play_handler(ctx))
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
