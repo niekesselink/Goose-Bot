@@ -604,7 +604,7 @@ class Music(commands.Cog):
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
 
-        Make sure the bot is the last one left before we continue the timeout period.
+        # Make sure the bot is the last one left before we continue the timeout period.
         if before.channel is None or len(before.channel.members) != 1 or before.channel.members[0].id != self.bot.user.id:
             return
 
