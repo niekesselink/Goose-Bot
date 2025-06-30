@@ -601,8 +601,8 @@ class Music(commands.Cog):
         source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(entry['query'], options='-vn', before_options=ffmpegOptionsBefore), self.bot.memory['music'][ctx.guild.id]['volume'])
         ctx.voice_client.play(source, after=lambda e: self.play_handler(ctx))
 
-    @commands.Cog.listener()
-    async def on_voice_state_update(self, member, before, after):
+    # @commands.Cog.listener()
+    # async def on_voice_state_update(self, member, before, after):
 
         # Make sure the bot is the last one left before we continue the timeout period.
         # if before.channel is None or len(before.channel.members) != 1 or before.channel.members[0].id != self.bot.user.id:
