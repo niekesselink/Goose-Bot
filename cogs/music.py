@@ -605,18 +605,18 @@ class Music(commands.Cog):
     async def on_voice_state_update(self, member, before, after):
 
         # Make sure the bot is the last one left before we continue the timeout period.
-        if before.channel is None or len(before.channel.members) != 1 or before.channel.members[0].id != self.bot.user.id:
-            return
+        # if before.channel is None or len(before.channel.members) != 1 or before.channel.members[0].id != self.bot.user.id:
+        #     return
 
-        # Grace period of 10 second; cancel in case someone joins.
-        await asyncio.sleep(10)
-        if len(before.channel.members) != 1:
-            return
+        # # Grace period of 10 second; cancel in case someone joins.
+        # await asyncio.sleep(10)
+        # if len(before.channel.members) != 1:
+        #     return
 
-        # Bot is leaving the channel...
-        del(self.bot.memory['music'][before.channel.guild.id])
-        voice_client = discord.utils.get(self.bot.voice_clients, guild=before.channel.guild)
-        await voice_client.disconnect()
+        # # Bot is leaving the channel...
+        # del(self.bot.memory['music'][before.channel.guild.id])
+        # voice_client = discord.utils.get(self.bot.voice_clients, guild=before.channel.guild)
+        # await voice_client.disconnect()
 
 async def setup(bot):
     await bot.add_cog(Music(bot))
