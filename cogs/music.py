@@ -533,7 +533,7 @@ class Music(commands.Cog):
                 # However, lyrics trick might work by getting song title from the page HTML's code.
                 elif 'youtube.com' in query or 'youtu.be' in query:
                     result = requests.get(query)
-                    query = re.search('<\W*title\W*(.*)</title', result.text, re.IGNORECASE).group(1)[:-10]
+                    query = re.search(r'<\s*title\s*>(.*?)</\s*title\s*>', result.text, re.IGNORECASE).group(1)[:-10]
                     meta = ydl.extract_info(f'ytsearch:{query} lyrics', download=False)
 
                 # Raise exception if no fixes applicable.
