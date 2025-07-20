@@ -514,7 +514,8 @@ class Music(commands.Cog):
         ytdl_options = {
             'format': 'bestaudio/best',
             'noplaylist': True,
-            'skip_download': True
+            'skip_download': True,
+            'cookiefile' : 'cookies.txt'
         }
 
         # Time to find a video matching the result and get the information from it.
