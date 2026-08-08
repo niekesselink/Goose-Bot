@@ -153,7 +153,8 @@ class Debug(commands.Cog):
     async def restart(self, ctx:commands.Context):
         """Restarts the bot."""
 
-        # Inform the user.
+        # Inform console of the restart, but also the user in Discord.
+        print('Bot is restarting. Ignore crach comment below.')
         await ctx.send('Restarting...')
 
         # Restart the bot.

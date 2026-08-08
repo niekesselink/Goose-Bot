@@ -80,7 +80,7 @@ class Birthday(commands.Cog):
 
         # Get the Json array of possible timezones.
         timezones = {}
-        with open('assets/json/timezones.json', encoding='utf8') as data:
+        with open('assets/data/timezones.json', encoding='utf8') as data:
             timezones = json.load(data)
 
         # Now let's check if the given timezone is present, return error if none.

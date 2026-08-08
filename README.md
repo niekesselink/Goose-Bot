@@ -1,6 +1,6 @@
 # Goose Bot
 ## Introduction
-Discord bot for spicing up a server and provide some fun. The code is open-source but this bot is running publicly on a VPS. I rather have you invite the bot yourself instead of starting up your own instance; this way I know if there are any issues lingering around quicker! The code is open-source for learning purposes and of course transparancy. Í am self-hosting this bot for a few servers. If you're interested, reach out to me through a direct message.
+Discord bot for spicing up a server and provide some fun. The code is open-source but this bot is running publicly on a VPS. I rather have you invite the bot yourself instead of starting up your own instance; this way I know if there are any issues lingering around quicker! The code is open-source for learning purposes and of course transparancy. ï¿½ am self-hosting this bot for a few servers. If you're interested, reach out to me through a direct message.
 
 Please note that this bot may not be perfect and may contain errors. If you encounter one, or you have a feature suggestion, you can use the Issues tab on Github or contact the owner of this bot on Discord at Niek#7864. Thanks!
 

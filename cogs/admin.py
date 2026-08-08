@@ -31,7 +31,7 @@ class Admin(commands.Cog):
 
         # Get the Json array of possible settings.
         settings = {}
-        with open('assets/json/settings.json', encoding='utf8') as data:
+        with open('assets/data/settings.json', encoding='utf8') as data:
             settings = json.load(data)
 
         # Make sure the config_name is a valid one.

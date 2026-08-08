@@ -1,8 +1,7 @@
 {
   "token": "insert token here",
   "postgre": "insert url here",
-  "activityType": "",
-  "activityText": "",
+  "activity": "",
   "colour": "73BBFF",
   "prefix": ".",
   "debug": "0",
