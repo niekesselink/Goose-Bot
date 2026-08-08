@@ -514,7 +514,14 @@ class Music(commands.Cog):
         ytdl_options = {
             'format': 'bestaudio/best',
             'noplaylist': True,
-            'skip_download': True
+            'skip_download': True,
+            'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'extractor_args': {
+                'youtube': {
+                    'player_client': ['android', 'ios'],
+                    'player_skip': ['webpage', 'configs']
+                }
+            }
         }
 
         # Time to find a video matching the result and get the information from it.
@@ -546,13 +553,10 @@ class Music(commands.Cog):
                     meta = ydl.extract_info(f'{query} lyrics', download=False)
                 meta = meta['entries'][0]
 
-        # Get from the meta formats only those with audio channels, and get then the one with the best quality...
-        audioFormats = list(filter(lambda x: x.get('audio_channels') is not None and x.get('audio_channels') > 0, meta['formats']))
-        bestFormat = max(audioFormats, key=lambda x: x.get('quality'))
-
         # Send back the entry.
+        if 'entries' in meta: meta = meta['entries'][0]
         return {
-            'query': bestFormat['url'],
+            'query': meta['url'],
             'title': meta['title'],
             'duration': meta['duration']
         }
@@ -595,9 +599,15 @@ class Music(commands.Cog):
         if 'ytsearch:' in entry['query']:
             entry = self.get_from_youtube(entry['query'])
 
+        # Get the source.
+        headers = 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        ffmpegBeforeOptions = f'-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -headers "{headers}"'
+        source = discord.PCMVolumeTransformer(
+            discord.FFmpegPCMAudio(entry['query'], options='-vn', before_options=ffmpegBeforeOptions),
+            self.bot.memory['music'][ctx.guild.id]['volume']
+        )
+
         # Now let's actually start playing..
-        ffmpegOptionsBefore = '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -re'
-        source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(entry['query'], options='-vn', before_options=ffmpegOptionsBefore), self.bot.memory['music'][ctx.guild.id]['volume'])
         ctx.voice_client.play(source, after=lambda e: self.play_handler(ctx))
 
     @commands.Cog.listener()
