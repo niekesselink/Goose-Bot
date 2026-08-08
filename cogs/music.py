@@ -516,8 +516,15 @@ class Music(commands.Cog):
             'noplaylist': True,
             'skip_download': True,
             'extractor_args': {
+                'youtube': {
+                    'player_client': ['web'],
+                    'player_skip': ['android', 'ios', 'mweb']
+                },
                 'youtubepot-bgutilcli': {
                     'enabled': True
+                },
+                'youtubepot': {
+                    'key': 'bgutil'
                 }
             }
         }
