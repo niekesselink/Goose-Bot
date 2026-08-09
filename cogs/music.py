@@ -515,6 +515,7 @@ class Music(commands.Cog):
             'format': 'bestaudio/best',
             'noplaylist': True,
             'skip_download': True,
+            'verbose': True,
             'extractor_args': {
                 'youtube': {
                     'player_client': ['web'],
@@ -522,9 +523,6 @@ class Music(commands.Cog):
                 },
                 'youtubepot-bgutilcli': {
                     'enabled': True
-                },
-                'youtubepot': {
-                    'key': 'bgutil'
                 }
             }
         }
