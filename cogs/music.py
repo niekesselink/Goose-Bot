@@ -516,15 +516,7 @@ class Music(commands.Cog):
             'noplaylist': True,
             'skip_download': True,
             'verbose': True,
-            'extractor_args': {
-                'youtube': {
-                    'player_client': ['web'],
-                    'player_skip': ['android', 'ios', 'mweb']
-                },
-                'youtubepot-bgutilcli': {
-                    'enabled': True
-                }
-            }
+            'cookiefile' : 'cookies.txt'
         }
 
         # Time to find a video matching the result and get the information from it.
